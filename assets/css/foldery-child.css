@@ -1,0 +1,328 @@
+/*
+Theme Name: Foldery Child
+Author: Sebastien Jacqmin
+Description: Modifications du thème ZK-monaco
+Version: 1.0.0
+*/
+/*
+
+Mode d'emploi :
+
+la page d'accueil
+-----------------
+
+Contient des 'blocs' CMS_GRID qui affichent des images liens vers des pages PORTFOLIO
+ces blocs affiches les images grace a des templates situé dans /vc_templates :
+
+- cms_grid--dessin  ->      affiche des tas de trois images pioché dans un dossier de media dont l'ID est 
+                            associé à la page PORTFOLIO via un champs ACF nomé 'id_categorie' 
+                            et présent dans l'édition de la page PORTFOLIO
+
+- cms_grid__last-pictures ->affiche des images, tous dossiers media confondu, qui on l'attribut ACF 'mise_en_avant'
+                            de coché. Les images sont affichés avec un cadre.
+
+                            
+Les pages PORTFOLIO
+-------------------
+
+Ces pages affichent les medias contenu dans le dossier de média dont l'ID est associé a cette page 
+via l'attribut ACF 'id_categorie'
+
+
+*/
+
+body {
+  background: #f6f5ee;
+  /* background-image:url('https://sebastienj.com/wp-content/uploads/photos_2017_9_7_fst_stained-wooden-texture-table-copie.jpg');
+  background-size: contain; */
+}
+
+/**
+ * Cadre autour des images.
+ */
+ 
+.expo td {
+	position:relative;
+	width:50%;
+	padding:20px 0;
+    border:0;
+
+}
+.expo figure {
+	margin:10px 70px 50px 50px;
+}
+.expo h5 {
+    margin-left:20px;
+    color:#a8a8a8;
+}
+.frame {
+	position: relative;
+	display: block;
+}
+
+.frame:before {
+	content: "";
+	position: absolute;
+	display: block;
+	top: -20px;
+	left: -20px;
+	background-color: #fff;
+	z-index: 4;
+	box-shadow:inset 2px 5px .5em rgba(0,0,0,.25);
+
+}
+
+.frame:after {
+	content: "";
+	position: absolute;
+	display: block;
+	top: -30px;
+	left: -30px;
+	background: rgba(226, 188, 147, 1);
+	background-image:url("../../themes/custom/wood.jpg");
+	z-index: 1;
+	box-shadow:
+		0px 1em 2em -1em rgba(0,0,0,.4),
+		0px 2em 2em -1em rgba(0,0,0,.3)
+		;
+}
+.frame.borderless:before {
+	top:0px;
+	left:0px;
+	background:none;
+}
+.frame.borderless:after {
+	top:-10px;
+	left:-10px;
+}
+.frame.borderless img {
+	z-index:3;
+}
+
+.frame img {
+	background: #fff;
+	position: relative;
+	display: block;
+	height: auto;
+	z-index:4;
+}
+@media screen and (max-width: 812px) {
+	.frame {
+		margin:0 auto;
+	}
+	.frame img {
+		max-width:100%;
+	}
+	.frame:before, .frame:after	 {
+		display:none;
+	}
+  table.expo {
+    border: 0;
+  }
+  table.expo tr {
+    display:block;
+  }
+  table.expo td {
+    display:block;
+	  width:100%;
+	  padding:10px;
+  }
+}
+
+/**
+ * Effet images empilées
+ */
+
+.stack-link  {
+    display:inline-block;
+    vertical-align: top;
+}
+.stack-link h5 {
+    color:#a8a8a8;
+    margin-bottom: 20px;
+    text-align: center;
+}
+.stack {
+	margin: 20px 0;
+	width: 260px;
+	padding: 0;
+	position: relative;
+	max-width: 100%;
+}
+
+.stack img {
+	max-width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	transition: all 0.3s;
+	 box-shadow: 4px 6px 11px 0px rgba(113,108,108,0.2);
+}
+
+.stack img:last-child {
+	position: relative;
+}
+/* Random rotation */
+.stack-randomrot.active img:nth-child(3) {
+	-webkit-transform: translate(15px,15px);
+	transform: translate(15px,15px);
+	-webkit-transform: rotate(-5deg);
+	transform: rotate(-5deg);
+	
+}
+
+.stack-randomrot.active img:first-child {
+	-webkit-transform: rotate(-10deg);
+	transform: rotate(-10deg);
+}
+
+.stack-randomrot.active img:nth-child(2) {
+	-webkit-transform: rotate(10deg);
+	transform: rotate(10deg);
+} 
+
+.stack:hover img:nth-child(3) {
+	-webkit-transform: rotate(-10deg);
+	transform: rotate(-10deg);
+}
+
+.stack:hover img:first-child {
+	-webkit-transform: rotate(-15deg);
+	transform: rotate(-15deg);
+}
+
+.stack:hover img:nth-child(2) {
+	-webkit-transform: rotate(15deg);
+	transform: rotate(15deg);
+} 
+.stack-item {
+    float:left;
+    margin:20px;
+    height:370px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding-top: 15px;    
+}
+
+.img-area{
+    position: relative;
+    padding:10px;
+    z-index:1;
+}
+.img-area img {
+    border: 10px solid #fff;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+.img-area:before,.img-area:after {
+    content: '';
+    background: #fff;
+    z-index: -1;
+    position: absolute;   
+
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;    
+}
+.img-area:before{
+
+    top: 0;
+    left: -10px;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    transform: rotate(-5deg);
+
+}
+.img-area:after{
+    top: 5px;
+    left: 0;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    transform: rotate(4deg);
+}
+ 
+ 
+ 
+div.gallery .gallery-item .gallery-caption {
+    background_color:none;
+}
+ 
+ 
+h2.padding {
+    margin:30px 0;
+} 
+ 
+.pad {
+    padding-top:30px;
+    padding-bottom:30px;
+}
+ 
+ 
+/* 
+ * Masonry 
+*/
+@media screen and (max-width: 812px) {
+    .grid {
+        margin: 0 auto;
+    } 
+}
+ .grid-item {
+    float: left;
+    margin:0 auto 20px auto;
+    border-radius:5px;
+    overflow:visible;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;    
+ }
+.grid-item:before,  .grid-item:after {
+  z-index: 1;
+  position: absolute;
+  content: "";
+  bottom: 15px;
+  left: 10px;
+  width: 50%;
+  top: 80%;
+  max-width:300px;
+  background: #777;
+  -webkit-box-shadow: 0 15px 10px #777;
+  -moz-box-shadow: 0 15px 10px #777;
+  box-shadow: 0 15px 10px #777;
+  -webkit-transform: rotate(-3deg);
+  -moz-transform: rotate(-3deg);
+  -o-transform: rotate(-3deg);
+  -ms-transform: rotate(-3deg);
+  transform: rotate(-3deg);
+}
+.grid-item:after
+{
+  -webkit-transform: rotate(3deg);
+  -moz-transform: rotate(3deg);
+  -o-transform: rotate(3deg);
+  -ms-transform: rotate(3deg);
+  transform: rotate(3deg);
+  right: 10px;
+  left: auto;
+}
+ 
+ 
+ .grid-item img {
+     border-radius:5px;
+      position: relative; 
+      z-index:5;
+ }
+ .img-lg, .img-sq {
+    width:400px;
+
+ }
+ .img-ht {
+     width:200px;
+ }
+
+ /* clearfix */
+.grid:after {
+  content: '';
+  display: block;
+  clear: both;
+}
+.clear {
+  clear: both;
+    
+}
+ 
+ 
+ 

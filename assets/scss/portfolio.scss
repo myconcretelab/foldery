@@ -1,0 +1,104 @@
+/* All Style for Single Portfolio */
+.primary.single-portfolio{
+	.entry-media{
+		margin-bottom: 35px;
+		&.entry-gallery{
+			margin-bottom: 0;
+			> div{margin-bottom: -20px;}
+		}
+	}
+	.entry-content{
+		.entry-header{
+			margin: -10px 0 15px 0;
+		}
+		.entry-description{
+			padding: 0 0 20px 0;
+			margin: 0 0 30px 0;
+			border-bottom: $main_border;
+		}
+		.entry-date,
+		.entry-client{
+			margin-bottom: 30px;
+		}
+		.entry-category{
+			padding-bottom: 40px;
+			margin-bottom: 40px;
+			border-bottom: $main_border;
+		}
+
+		.portfolio-share{
+			a{
+				width: 45px;
+				height: 45px;
+				line-height: 45px;
+				margin-right: 5px;
+				display: inline-block;
+				text-align: center;
+				background: #212121;
+				color: $white;
+				font-size: 20px;
+
+				@include css3-prefix('border-radius','50%');
+
+				&:hover{
+					background: $primary_color;
+				}
+			}
+		}
+	}
+	.cms-portfolio-related-title{
+		margin-bottom: 45px;
+	}
+
+	/* Full Width Layout */
+	.portfolio-fullwidth{
+		.entry-media{
+			margin-bottom: 45px;
+		}
+		.entry-header{ margin-bottom: 15px;}
+		.entry-content{
+			margin-top: 15px;
+
+			.portfolio-meta{
+				border: $main_border;
+				padding: 30px;
+
+				.entry-category{
+					padding: 0;
+					margin: 0;
+					border: 0;
+				}
+			}
+
+			.entry-footer{
+				margin-top: 35px;
+			}
+		}
+	}
+}
+
+/**/
+
+.cms-portfolio-popup{
+	background: $white;
+	padding-bottom: 100px;
+	bottom: auto !important;
+	header.cms-portfolio-popup-header{
+		padding: 30px 15px;
+		margin-bottom: 60px;
+		border-bottom: $main_border;
+		a.close-btn{
+			font-size: 60px;
+			color: #222222;
+		}
+		@media (min-width: 768px){
+			padding-left: 50px;
+			padding-right: 50px;
+		}
+	}
+}
+.admin-bar{
+	.cms-portfolio-popup{
+		top: 32px;
+	}
+}

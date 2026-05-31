@@ -1,0 +1,12 @@
+/* All style for sidebar */
+#page-sidebar #secondary > aside,
+#sidebar-area > aside {
+	margin-bottom: 40px;
+	padding-bottom: 40px;
+	border-bottom: $main_border;
+	&:last-child{
+		margin-bottom: 0;
+		padding-bottom: 0;
+		border-bottom: 0;
+	}
+}

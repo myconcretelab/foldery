@@ -1,0 +1,18 @@
+/* ALl Style for CMS Social Widget */
+.cms-social a:last-child{ margin-right: 5px;}
+.cms-social a:last-child{ margin-right: 0;}
+.cms-social a,
+.cms-social a:hover,
+.cms-social a:focus,
+.cms-social a:visited{ text-decoration: none; display: inline-block; text-align: center; -webkit-transition:all 300ms linear 0ms; -moz-transition:all 300ms linear 0ms; -ms-transition:all 300ms linear 0ms; -o-transition:all 300ms linear 0ms; transition:all 300ms linear 0ms;}
+.cms-social a i{ width: 45px; height: 45px; line-height: 45px; font-size: 20px; display: inline-block; background: #fff; color: #222; -webkit-transition:all 300ms linear 0ms; -moz-transition:all 300ms linear 0ms; -ms-transition:all 300ms linear 0ms; -o-transition:all 300ms linear 0ms; transition:all 300ms linear 0ms;}
+.cms-social a:last-child{ margin-right: 0;}
+.cms-social a i:before{ width: 45px; height: 45px; line-height: 45px; font-size: 20px;}
+.cms-social a:hover i{ background: #b46d70; color: #fff;}
+
+
+/* Rounded */
+.cms-social.rounded a i{ -webkit-border-radius: 5px; -moz-border-radius: 5px; -ms-border-radius: 5px; -o-border-radius: 5px; border-radius: 5px;}
+
+/* Circle */
+.cms-social.circle a i{ -webkit-border-radius: 50%; -moz-border-radius: 50%; -ms-border-radius: 50%; -o-border-radius: 50%; border-radius: 50%;}

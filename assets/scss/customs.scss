@@ -1,0 +1,151 @@
+/* Custom Bootstrap */
+	.container{
+		max-width: 100%;
+		@media (min-width: 1200px){
+			width: 1200px;
+		}
+	}
+
+	/* Modal */
+	.modal-open {
+		.cms-grid-wraper.template-cms_grid--popup .cms-grid{
+			z-index: 1050;
+		}
+	}
+
+.soldout {
+	position: absolute;
+	bottom: 20px;
+	right: 20px; 
+	background-color: #f05127;
+	border-radius: 50%;color: #fff;
+	font-size: .8rem;
+	height: 40px;
+	width: 40px;
+	line-height: 2.6em;
+	padding: 10px 10px 10px 6px;
+	text-transform: uppercase;
+}
+/* Remove padding style for Bootstrap grid column */
+.nopaddingall{padding: 0 !important;}
+.nopaddingtop{ padding-top: 0 !important;}
+.nopaddingright{ padding-right: 0 !important;}
+.nopaddingbottom{ padding-bottom: 0 !important;}
+.nopaddingleft{ padding-left: 0 !important;}
+
+
+/* Custom VC */
+.vc_row-fluid{  
+	position: relative;
+	.cms-bg-overlay{ content: ""; position: absolute; top: 0; right: 0; bottom: 0; left: 0;}
+	
+	@media( max-width: 767px){
+		.wpb_column + .wpb_column{ margin-top: 30px;}
+	}
+}
+.vc_row{
+	&[data-vc-full-width]{
+		overflow: visible !important;
+	}
+	&.vc_parallax {
+		overflow: hidden !important;
+		.vc_parallax-inner{
+			background-color: inherit;
+			&:after{
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				content: "";
+				display: block;
+				background-color: inherit;
+			}
+		}
+		&.mask,
+		&.mask-default,
+		&.vc_parallax-content-moving-fade{
+			background: rgba(0,0,0,0.4);
+		}
+		&.cms-bg-fixed{
+			.vc_parallax-inner{
+				height: 100% !important;
+				top: 0 !important;
+				background-size: cover; 
+				background-repeat: no-repeat;
+				background-position: center top;
+				background-attachment: fixed;
+			}
+		}
+	}
+	.parallax_overlay{
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
+}
+@media (min-width: 768px){
+	.cms-flex-row{
+		display: flex;
+		display: -webkit-flex;
+		z-index: 1;
+		> .wpb_column,
+		> .cms-column{
+			> .wpb_wrapper{
+				height: calc(100%);
+			}
+		}
+	}
+}
+
+/** Re-Style VC Element **/
+	/* VC Image Gallery */
+	.wpb_gallery {
+		.wpb_image_grid {
+			.wpb_image_grid_ul {
+				.isotope-item{
+					margin: 0;
+				}
+			}
+		}
+		.theme_gallery {
+			text-align: center;
+			> a{
+				display: block;
+				float: left;
+				img{
+					-webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+    				filter: grayscale(100%);
+    				@include transition();
+				}
+				@media (min-width: $screen-md-min){
+					width: 25%;
+				}
+				@media (min-width: $screen-sm-min) and (max-width: $screen-sm-max){
+					width: 50%;
+				}
+				@media (max-width: $screen-xs-max){
+					width: 100%;
+				}
+
+				&:hover img{
+					-webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+    				filter: grayscale(0%);
+				}
+			}
+		}
+	}
+	/* VC Image carousel */
+	.wpb_images_carousel .vc_images_carousel.vc_per-view-more {
+		.vc_carousel-slideline {
+			.vc_carousel-slideline-inner {
+				> .vc_item {
+					> .vc_inner{
+						margin: 0;
+					}
+				}
+			}
+		}
+	}

@@ -1,0 +1,111 @@
+/* General */
+.btn,
+button,
+.button,
+input[type='button'],
+input[type='submit'],
+input[type='reset'],
+.woocommerce #respond input#submit, .woocommerce a.button, .woocommerce button.button, .woocommerce input.button,
+a.added_to_cart {
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	height: 50px;
+	line-height: 50px;
+	padding: 0 20px;
+	text-indent: 0;
+	outline: none;
+	@include css3-prefix('border-radius','0');
+	@include transition();
+}
+
+/* Default Button */
+.btn,
+.btn-default,
+button, 
+input[type='button'], 
+input[type='reset'], 
+input[type='submit'],
+.woocommerce #respond input#submit, 
+.woocommerce a.button, 
+.woocommerce button.button, 
+.woocommerce input.button, 
+a.added_to_cart,
+a.added {
+	border: 1px solid $primary_color;
+	color: $primary_color !important;
+	background: transparent;
+
+	&:hover,
+	&:active,
+	&:focus{
+		background-color: $primary_color;
+		border-color: $primary_color;
+		color: $white !important;
+	}
+}
+.woocommerce #respond input#submit, 
+.woocommerce a.button, 
+.woocommerce button.button, 
+.woocommerce input.button, 
+a.added_to_cart,
+a.added {
+	border: 1px solid $primary_color !important;
+	&:hover,
+	&:focus,
+	&:active{
+		color: $white !important;
+	}
+}
+/* Custom button default style in some area */
+.button-primary,
+.woocommerce{
+	.btn,
+	.btn-default,
+	button, 
+	input[type='button'], 
+	input[type='reset'], 
+	input[type='submit'],
+	button.button.alt,
+	input.button.alt{
+		background-color: $primary_color;
+		color: #fff !important;
+		border: 1px solid $primary_color;
+
+		&:hover,
+		&:active,
+		&:focus{
+			background-color: $darken_primary;
+			border-color: $darken_primary;
+		}
+	}
+}
+
+/* Primary Button */
+.btn-primary,
+.tnp-widget input.tnp-submit{
+	background: $primary_color !important;
+	color: $white !important;
+	border: 1px solid $primary_color !important;
+	&[type="submit"]{
+		color: $white !important;
+	}
+	/* Hover State */
+	&:hover{
+		background: $darken_primary !important;
+		border-color: $darken_primary !important;
+	}
+}
+
+/* Alt White Button */
+.btn-alt-white{
+	background: transparent;
+	color: $white;
+	border-color: $white;
+
+	&:hover{
+		background: $white !important;
+		color: $title_color !important;
+	}
+}
+
+

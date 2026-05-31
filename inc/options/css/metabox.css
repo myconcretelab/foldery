@@ -1,0 +1,93 @@
+@CHARSET "ISO-8859-1";
+
+/*** Tab Option ***/
+.etabs {
+	margin: 10px 0 0;
+}
+.etabs li.tab {
+	display: inline-block;
+	margin: 0;
+}
+.etabs li.tab a {
+	color: #868686;
+	background-color: #f8f7ee;
+    display: block;
+	font-size: 14px;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 15px;
+    text-align: center;
+    width: auto;
+    text-decoration: none;
+    text-transform: uppercase;
+    outline: none;
+    position: relative;
+    border-color: #ddd;
+    border-style: solid;
+    border-width: 1px 1px 0 1px;
+}
+.etabs li.active a {
+	background-color: #fff;
+    border-color: #ddd;
+    border-style: solid;
+    border-width: 0 1px;
+    margin-bottom: 0;
+	-webkit-box-shadow: 0 2px 0 #6f4792 inset;
+       -moz-box-shadow: 0 2px 0 #6f4792 inset;
+        -ms-box-shadow: 0 2px 0 #6f4792 inset;
+         -o-box-shadow: 0 2px 0 #6f4792 inset;
+            box-shadow: 0 2px 0 #6f4792 inset;
+}
+.etabs li.active a:before {
+	background: #fff;
+    bottom: -1px;
+    content: "";
+    height: 1px;
+    left: 0;
+    position: absolute;
+    width: 100%;
+}
+.panel-container {
+	border: 1px solid #ddd;
+    padding: 20px;
+}
+/* Fancy Box */
+#cms_fancybox-cms-img-select,
+#cms_counter-cms-img-select,
+#cms_grid-cms-img-select,
+#cms_carousel-cms-img-select, {
+    margin-top: 20px;
+}
+#cms_fancybox-cms-img-select img,
+#cms_counter-cms-img-select img,
+#cms_grid-cms-img-select img,
+#cms_carousel-cms-img-select img {
+    display: inline-block;
+    margin: 10px;
+    width: 44.2%;
+    padding: 5px;
+}
+#cms_fancybox-cms-img-select img:hover,
+#cms_counter-cms-img-select img:hover,
+#cms_grid-cms-img-select img:hover,
+#cms_carousel-cms-img-select img:hover {
+    cursor: pointer;
+}
+#cms_fancybox-cms-img-select img.selected,
+#cms_fancybox-cms-img-select img:hover,
+#cms_counter-cms-img-select img.selected,
+#cms_counter-cms-img-select img:hover,
+#cms_grid-cms-img-select img:hover,
+#cms_grid-cms-img-select img.selected,
+#cms_carousel-cms-img-select img:hover,
+#cms_carousel-cms-img-select img.selected {
+    -webkit-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+       -moz-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+        -ms-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+         -o-box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.2);
+}
+#redux-header .rAds,
+#redux-header .redux-dev-mode-notice-container {
+    display: none;
+}

@@ -1,0 +1,45 @@
+/*
+Theme Name: Foldery
+Theme URI: https://github.com/myconcretelab/foldery
+Author: Sebastien Jacqmin
+Description: Theme autonome pour sebastienj.com, base Monaco integree avec les personnalisations du theme enfant.
+Version: 1.0.0
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tags: one-column, two-columns, right-sidebar, custom-header, custom-menu, editor-style, featured-images, microformats, post-formats, rtl-language-support, sticky-post, translation-ready
+Text Domain: foldery
+
+This theme, like WordPress, is licensed under the GPL.
+Use it to make something cool, have fun, and share what you've learned with others.
+*/
+
+/*
+
+Mode d'emploi :
+
+la page d'accueil
+-----------------
+
+Contient des 'blocs' CMS_GRID qui affichent des images liens vers des pages PORTFOLIO
+ces blocs affiches les images grace a des templates situé dans /vc_templates :
+
+- cms_grid--dessin  ->      affiche des tas de trois images pioché dans un dossier de media dont l'ID est 
+                            associé à la page PORTFOLIO via un champs ACF nomé 'id_categorie' 
+                            et présent dans l'édition de la page PORTFOLIO
+
+- cms_grid__last-pictures ->affiche des images, tous dossiers media confondu, qui on l'attribut ACF 'mise_en_avant'
+                            de coché. Les images sont affichés avec un cadre.
+                            
+
+Les pages de thematique (dessins,peinture,..) 
+----------------------------------------------
+
+Sont des pages avec un CMS_GRID qui collecte des pages partfolio qui ont la catégorie associée  (dessins,peinture,..)                            
+
+                            
+Les pages PORTFOLIO
+-------------------
+
+Ces pages affichent les medias contenu dans le dossier de média dont l'ID est associé a cette page 
+via l'attribut ACF 'id_categorie'
+

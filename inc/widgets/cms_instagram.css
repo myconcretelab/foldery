@@ -1,0 +1,7 @@
+/* All style for CMS Instagram widget */
+.cms-instagram-pics{
+	margin-left: -10px;
+}
+
+.cms-instagram-pics .cms-instagram-item a{ margin: 0 0 10px 10px; display: block;}
+.cms-instagram-pics .cms-instagram-item a img{ max-width: 100%;}

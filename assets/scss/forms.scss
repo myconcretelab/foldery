@@ -1,0 +1,122 @@
+/* All Style for Default Form */
+
+form,
+.form {
+	input{ 
+		height: 50px; 
+		line-height: 50px; 
+		border: $main_border; 
+		padding: 0 20px; outline: none;
+		@include border-radius(0); 
+		@include box-shadow(0,0,0,transparent); 
+		@include transition();
+
+		/* Special style for input type*/
+		&[type='text'],
+		&[type='email'],
+		&[type='password'],
+		&[type='search'],
+		&[type='date'],
+		&[type='time']{
+			width: 100%;
+		}
+
+		&[type='number']{
+			padding: 0 5px;
+		}
+		&[type='checkbox'],
+		&[type='radio']{
+			height: inherit;
+			line-height: inherit;
+		}
+		/* Hover State */
+		&:hover,
+		&:active,
+		&:focus{
+			border-color: $primary_color;
+			outline: none;
+			@include box-shadow(0,0,0,transparent);
+		}
+	}
+	textarea{
+		border: $main_border; 
+		padding: 15px 20px; outline: none; 
+		width: 100%;
+		@include border-radius(0); 
+		@include box-shadow(0,0,0,transparent);
+		@include transition();
+		/* Hover State */
+		&:hover,
+		&:active,
+		&:focus{
+			border-color: $primary_color;
+			outline: none;
+			@include box-shadow(0,0,0,transparent);
+		}
+	}
+	
+	.required {
+	  color: red;
+	}
+
+	/* Extra style */
+	.row{
+		+ .row{
+			margin-top: 20px;
+		}
+	}
+}
+select,
+.select2.select2-container{
+	max-width: 100%;
+	width: 100%;
+	height: 50px; 
+	line-height: 50px; 
+	border: $main_border; 
+	padding: 0 20px; outline: none;
+	@include border-radius(0); 
+	@include box-shadow(0,0,0,transparent); 
+	@include transition();
+
+	-webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url(../images/select-arrow.jpg);
+    background-position: 100%  50%;
+    background-repeat: no-repeat;
+	/* Hover State */
+	&:hover,
+	&:active,
+	&:focus{
+		border-color: $primary_color;
+		outline: none;
+		@include box-shadow(0,0,0,transparent);
+	}
+}
+.select2.select2-container{
+	padding: 0 0 0 20px;
+	border-color: $border_color !important;
+	background-image: none;
+	.select2-selection--single{
+		border: 0;
+		line-height: 50px;
+		padding: 0;
+		background: transparent;
+		@include border-radius(0);
+		.select2-selection__rendered{
+			height: 50px;
+			line-height: 50px;
+		}
+		.select2-selection__arrow{
+			top: 10px;
+		}
+	}
+}
+div#select2-drop{
+	border-color: $border_color !important;
+}
+.select2.select2-container {
+	+ select{
+		background-image: none !important;
+	}
+}

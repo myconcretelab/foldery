@@ -1,0 +1,310 @@
+
+/* All style for Blog page */
+
+.cms-blog{   
+	&.blog-archive{
+		.cs_pagination{
+			margin-top: 60px;
+		}
+	}
+	/* Post Header */
+	.entry-header{
+		padding: 0;
+		margin: 0;
+		.entry-title{
+			padding: 0;
+			margin: 0;
+		}
+	}
+	/* Post meta */
+	.cms-meta{
+		font-style: italic;
+		font-size: 14px;
+		color: $meta_color;
+		&.entry-meta{
+			.list-inline{ margin-left: 0; margin-bottom: 0;}
+			li{
+				padding: 0;
+				&:after{
+					content: "/";
+					display: inline-block;
+					padding: 0 5px;
+				}
+
+				&:last-child{
+					&:after{
+						display: none;
+					}
+				}
+
+				a{
+					color: $meta_color;
+					&:hover,
+					&:active,
+					&:focus{
+						color: $link_color;
+					}
+				}
+			}
+		}
+		/* Style for meta in Element */
+		> span{ 
+			position: relative;
+			&:after{
+				content: "/";
+				display: inline-block;
+				padding: 0 5px;
+			}
+
+			&:last-child{
+				&:after{
+					display: none;
+				}
+			}
+			a{
+				color: $link_hover;
+				&:hover{
+					color: $link_color;
+				}
+			}
+		}
+	}
+	/* Entry Content */
+	.entry-content{ 
+		margin-top: 25px;
+		.entry-introtext{
+			margin-top: 40px;
+		}
+	}
+	/* Style for each post type in blog */
+	.cms-grid-item{
+		> article{
+			/* Post Quote */
+			&.format-quote{
+				.quote-content{ 
+					position: relative;  text-align: center; font-size: 24px; line-height: 39px;
+					font-style:  italic;
+					blockquote{ 
+						font-size: 24px;
+						.quote-author{
+							padding: 0;
+							margin: 30px 0 0 0;
+							display: block;
+						}
+					}
+					&.has-thumbnail{
+						color: $white;
+						.overlay-content{
+							background: url(../images/icon-quote.png)  50%  15px no-repeat;
+							padding-top: 60px;
+						}
+						.quote-author{
+							color: $white;
+						}
+					}
+
+				}
+			}
+		}
+	}
+
+	/* Custom style for each blog layout */
+	/* 1. Blog Standard */
+	&.cms-blog-standard{
+		.cms-grid-item{
+			> article {
+				padding-bottom: 70px;
+				margin-bottom: 60px;
+				border-bottom: 1px solid $border_color;
+			}
+		}
+	}
+	/* 2. Blog Grid */
+	&.cms-blog-grid{
+		.cms-isotope-masonry-post,
+		.cms-isotope-grid-post {
+			padding-bottom: 30px;
+			margin-bottom: 60px;
+			border-bottom: 1px solid $border_color;
+		}
+		.cms-grid-item{
+			> article {
+				margin-bottom: 30px;
+				.entry-introtext{
+					display: none;
+				}
+				.entry-content{
+					margin-top: 20px;
+					.entry-header{
+						margin-bottom: 10px;
+					}
+				}
+				/* Post Quote */
+				&.format-quote{
+					.quote-content{ 
+						font-size: 16px; line-height: 26px;
+						blockquote{ 
+							font-size: 16px;
+							padding: 0 10px;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/* Load more button style */
+	#cshero-load-posts{
+		padding: 0;
+		margin: 0;
+		text-align: center;
+	}
+
+	/* Fix Style for embed video in grid coloumns */
+	&.cms-blog-standard{
+		.cms-grid-item{
+			.format-video{
+				.entry-media{
+					height: 520px;
+					iframe{
+						height: 520px;
+					}
+				}
+			}
+		}
+	}
+	&.grid-2{
+		.cms-grid-item {
+			.format-video{
+				.entry-media{
+					height: 250px;
+					iframe{
+						height: 250px;
+					}
+				}
+			}
+		}
+	}
+}
+
+/* All style for Portfolio blog page */
+.cms-portfolio{
+	.cms-loadmore-post{
+		margin-bottom: 30px;
+		&.portfolio-grid2{
+			margin-bottom: 60px;
+		}
+		article{
+			padding: 0 0 38px 0;
+			margin: 0 0 40px 0;
+			border-bottom: $main_border;
+
+			.entry-media{
+				margin-bottom: 25px;
+				img{
+					width: 100%;
+					max-width: 100%;
+				}
+			}
+			.entry-meta{
+				a{
+					color: $meta_color;
+					&:hover{
+						color: $primary_color;
+					}
+				}
+			}
+
+			&.muliples{
+				padding-bottom: 0;
+				border-bottom: 0;
+				margin-bottom: 35px;
+				.overlay-content{
+				}
+				.entry-media{ margin-bottom: 20px;}
+			}
+			&.nospace{
+				padding: 0;
+				margin: 0;
+				border: 0;
+				.entry-media{
+					padding: 0;
+					margin: 0;
+					.overlay-content{
+						*{
+							color: $white;
+						}
+					}
+				}
+			}
+		}
+	}
+	/* Portfolio Masonry Template */
+	&.cms-portfolio-masonry{
+		margin-bottom: 50px;
+		.cms-loadmore-post{
+			margin: 0 -25px;
+			.cms-grid-item{
+				padding: 0 25px;
+				margin-bottom: 50px;
+			}
+		}
+	}
+}
+.cms-blog-portfolio{
+	&.no-container{
+		padding: 0 30px;
+		&.cms-blog-portfolio-masonry{
+			padding: 0;
+		}
+	}
+}
+.cms-blog-portfolio-nospace{
+	&.no-container{
+		padding: 0;
+	}
+}
+
+/* Style For Blog Filter */
+ul.cms-filter-category{
+	text-align: center;
+	margin-bottom: 70px !important;
+	li{
+		a{
+			padding: 0 15px;
+			line-height: 38px;
+			display: inline-block;
+			border: 1px solid transparent;
+			color: $meta_color;
+			&:hover,
+			&.active{
+				border-color: $primary_color;
+				color: $primary_color;
+			}
+		}
+	}
+}
+
+/* Load more button */
+.cs_pagination{
+	text-align: center;
+}
+
+/* Some special style for Page template */
+.page-template-blog-masonry2{
+	@media (min-width: $sm-screen){
+		#content{
+			padding: 0 75px;
+		}
+		.cms-loadmore-post{
+			margin: 0;
+			.cms-grid-item{
+				padding: 0;
+				> article{
+					margin-bottom: 40px;
+					padding: 0 25px;
+				}
+			}
+		}
+	}
+}

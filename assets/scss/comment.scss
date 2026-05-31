@@ -1,0 +1,75 @@
+/* =Comments Area
+-------------------------------------------------------------- */
+.comments-area {
+  border-top: $main_border;
+  .comments-title{
+    padding: 60px 0;
+  }
+  .comment-list{
+    padding: 0;
+    list-style: none;
+    .comment{
+      .comment-body{
+        padding: 0 0 25px;
+        margin: 0 0 25px;
+        border-bottom: $main_border;
+        .comment-author{ 
+          float: left;
+          margin-right: 30px;
+
+          img{
+            @include css3-prefix('border-radius','50%');
+          }
+        }
+        .comment-meta-wrap{
+          padding-left: 130px;
+          position: relative;
+          cite{ font-style: normal; }
+          .comment-meta{
+            color: $meta_color;
+            margin-bottom: 15px;
+            a{
+              color: $meta_color;
+            }
+          }
+          .comment-reply{
+            position: absolute;
+            right: 0;
+            top: 0;
+          }
+          p{
+            &:last-child{margin-bottom: 0;}
+          }
+          blockquote,
+          .blockquote{
+            margin-bottom: 20px;
+          }
+        }
+      }
+      .children{ 
+        padding-left: 100px;
+        list-style: none;
+      }
+    } 
+  }
+}
+
+/* Comment form */
+#respond {
+  #reply-title{
+    margin: 50px 0 25px 0;
+  }
+  form{
+    > p{ margin-bottom: 15px;
+      &:last-child{
+        margin-bottom: 0;
+      }
+    }
+    .form-allowed-tags{ display: none;}
+    .form-submit{
+      clear: both;
+      display: block;
+      overflow: hidden;
+    }
+  }
+}

@@ -1,0 +1,365 @@
+/* =Main content and comment content
+-------------------------------------------------------------- */
+
+/* Single Post*/
+.single-post{
+  /* Post Navigation */
+  .post-navigation{
+    margin-bottom: 20px;
+  }
+  .entry-media{
+    margin-bottom: 50px;
+  }
+  .entry-header {
+    margin-bottom: 40px;
+    .entry-title{
+      padding: 0;
+      margin: 0 0 10px 0;
+    }
+    .entry-meta {
+      margin-top: -5px;
+      font-style: italic;
+      font-size: 14px;
+      color: $meta_color;
+      &.entry-meta{
+        .list-inline{ margin-left: 0; margin-bottom: 0;}
+        li{
+          padding: 0;
+          &:after{
+            content: "/";
+            display: inline-block;
+            padding: 0 7px;
+          }
+
+          &:last-child{
+            &:after{
+              display: none;
+            }
+          }
+
+          a{
+            color: $meta_color;
+            &:hover{
+              color: $meta_color_hover;
+            }
+          }
+        }
+      }
+      /* Style for meta in Element */
+      > span{ 
+        position: relative;
+        &:after{
+          content: "/";
+          display: inline-block;
+          padding: 0 7px;
+        }
+
+        &:last-child{
+          &:after{
+            display: none;
+          }
+        }
+      }
+    }
+  }
+  /* Entry Content */
+  .entry-content{
+    .blockquote,
+    blockquote{
+      margin-top: 50px;
+      margin-bottom: 50px;
+      padding-left: 110px;
+      position: relative;
+      font-size: 15px;
+      &:before{
+        display: inline-block;
+        content: "\“";
+        font-size: 180px;
+        font-style: normal;
+        color: $primary_color;
+        line-height: 46px;
+        height: 46px;
+        margin-top: 10px;
+        position: absolute;
+        left: 30px;
+        top: 50%;
+      }
+    }
+
+    input[name="post_password"]{ margin-bottom: 15px;}
+  }
+
+  .entry-footer{
+    padding: 28px 0 45px 0;
+    border-bottom: $main_border;
+    /* Post Share */
+    .post-share-title{
+      position: relative;
+      .h6{ cursor: pointer;}
+      .post-share{
+        visibility:hidden;
+        width: 0;
+        height: 40px;
+        position: absolute;
+        left: 100%; 
+        top: -10px;
+        padding: 0;
+        background: $primary_color;
+        color: $white;
+        @include css3-prefix('border-radius','5px');
+        @include transition();
+
+        a{
+          color: $white;
+          width: 30px;
+          height: 30px;
+          line-height: 30px;
+          font-size: 20px;
+          display: inline-block;
+          text-align: center;
+          margin: 5px;
+          &:hover{
+            @include css3-prefix('transform','scale(1.1)');
+          }
+        }
+      }
+      &:hover,
+      &:active,
+      &:focus{
+        .post-share{
+          visibility: visible;
+          width: 220px;
+        }
+      }
+    }
+    /* Post Tags */
+    .single-tags{
+      &:before{
+        content: "|";
+        padding: 0 10px;
+        display: inline-block;
+      }
+      .tags-list{
+        margin-left: 10px;
+        a{
+          padding: 0 12px;
+          border: 1px solid $border_color;
+          line-height: 34px;
+          display: inline-block;
+          text-transform: capitalize;
+          margin:0 3px 5px 3px;
+          font-style: italic;
+          &:first-child{ margin-left: 0;}
+          &:last-child{ margin-right: 0;}
+          &:hover{
+            color: $white;
+            border-color: $primary_color;
+            background: $primary_color;
+          }
+        }
+      }
+    }
+    /* Edit Link */
+    .edit-link{ float: right;}
+  }
+  /* Post Author */
+  .entry-author{
+    padding: 20px 0;
+    .author-avatar{ 
+      float: left;
+      margin-right: 20px;
+      img{ @include css3-prefix('border-radius','50%');}
+    }
+    .author-info{
+      padding-top: 30px;
+      text-transform: lowercase;
+      h3{ text-transform: lowercase;}
+    }
+
+    .entry-author-info{
+      padding-top: 38px;
+      padding-bottom: 38px;
+      .single-comment{
+        &:after{
+          display: inline-block;
+          content: "/";
+          padding: 0 10px;
+        }
+      }
+    }
+  } 
+
+  /* 1. Post Format */
+  /* 1.1 Video */
+  &.format-video{
+    .wp-playlist{ 
+      padding: 0; 
+      margin: 0;
+      border: 0;
+    }
+  }
+  /* 1.2. Quote */
+  &.format-quote{
+    .quote-content{
+      position: relative;
+      font-size: 24px;
+      line-height: 39px;
+      text-align: center;
+      &.has-thumbnail{
+        color: $white;
+        .overlay-content{
+          background: url(../images/icon-quote.png)  50%  15px no-repeat;
+          padding: 60px 40px 0;
+        }
+        .quote-author{
+          color: $white;
+        }
+      }
+      blockquote,
+      .blockquote{ font-size: 24px; line-height: 39px;}
+      .quote-author{
+        display: block;
+        margin-top: 30px;
+      }
+      + .entry-header{
+        margin-top: 50px;
+      }
+    }
+  }
+
+  /* 2. Post Type */
+  /* 2.1. Team */
+  &.single-team{
+    .cms-team-social{
+      margin-top: 40px;
+      a{
+        margin-right: 10px;
+        display: inline-block;
+        &:last-child{
+          margin-right: 0;
+        }
+        i{
+          width: 45px;
+          height: 45px;
+          line-height: 45px;
+          display: block;
+          text-align: center;
+          background: #202020;
+          color: #fff;
+          font-size: 20px;
+          @include css3-prefix('border-radius','50%');
+          @include transition();
+        }
+
+        &:hover,
+        &:focus{
+          i{
+            background: $primary_color;
+          }
+        }
+      }
+    }
+  }
+
+}
+/* More Link */
+.more-link{
+  white-space: nowrap;
+  color: $primary_color;
+  &:hover{
+    color: $link_color;
+  }
+}
+
+/* Sticky Post */
+article.sticky .entry-header {
+  padding-left: 60px;
+  position: relative;
+
+  &:before{
+    content: "\f08d";
+    font-family: $fontAwesome;
+    font-size: 60px;
+    line-height: 60px;
+    color: $title_color;
+    position: absolute;
+    left: 0;
+  }
+}
+
+
+img.alignleft,
+.wp-caption.alignleft {
+  margin: 12px 24px 12px 0;
+}
+img.alignright,
+.wp-caption.alignright {
+  margin: 12px 0 12px 24px;
+}
+img.aligncenter,
+.wp-caption.aligncenter {
+  clear: both;
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.page-links {
+  clear: both;
+}
+
+/* Post Navigation */
+.post-navigation{
+  div{
+    &.nav-previous,
+    &.nav-next{
+      width: 50%;
+      float: left;
+      text-align: left;
+      > a{
+        display: block;
+      }
+      i{
+        font-size: 40px;
+        margin-top: 5px;
+        display: inline-block;
+        &.pe-7s-angle-left{ margin-left: -15px;}
+        &.pe-7s-angle-right{ margin-right: -15px;}
+      }
+      img{
+        vertical-align: top;
+        margin-top: 5px;
+        width: 60px;
+        height: 40px;
+      }
+      .nav-label-wrap{
+        display: inline-block;
+        margin: 0 0 0 15px;
+        .nav-label,
+        .nav-title{
+          display: block;
+        }
+        .nav-label{ line-height: 1;}
+      }
+    }
+    &.nav-next{
+      text-align: right;
+      float: right;
+      .nav-label-wrap{
+        margin: 0 15px 0 0;
+      }
+    }
+  }
+  &.portfolio-navigation{
+    margin: 100px 0 70px;
+    padding: 35px 15px;
+    border-top: $main_border;
+    border-bottom: $main_border;
+  }
+}
+
+
+footer{
+  &.entry-meta{
+    clear: both;
+  }
+}
