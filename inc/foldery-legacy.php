@@ -72,6 +72,9 @@ function wpd_date_404_template( $template = '' ){
     global $wp_query;
 
     if(isset($wp_query->query['serie_id'])) {
+        $wp_query->is_404 = false;
+        status_header( 200 );
+
         if ( isset( $wp_query->query['post_type'] ) ) {
             $located = locate_template( 'single-' . $wp_query->query['post_type'] . '.php', false );
             $template = $located !== '' ? $located : locate_template( 'single.php', false );

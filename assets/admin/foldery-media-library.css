@@ -1,0 +1,120 @@
+.foldery-media-panel {
+	background: #fff;
+	border: 1px solid #c3c4c7;
+	box-sizing: border-box;
+	margin: 12px 0;
+	max-width: 1120px;
+	padding: 12px;
+}
+
+.foldery-media-panel__header,
+.foldery-media-actions {
+	align-items: center;
+	display: flex;
+	gap: 8px;
+	justify-content: space-between;
+}
+
+.foldery-media-panel__header strong {
+	font-size: 14px;
+}
+
+.foldery-media-tree {
+	border: 1px solid #dcdcde;
+	margin: 10px 0;
+	max-height: 280px;
+	overflow: auto;
+	padding: 6px;
+}
+
+.foldery-media-tree,
+.foldery-media-tree ul {
+	list-style: none;
+}
+
+.foldery-media-tree ul {
+	margin: 0;
+	padding: 0;
+}
+
+.foldery-media-tree li {
+	margin: 0;
+}
+
+.foldery-media-folder {
+	align-items: center;
+	background: transparent;
+	border: 0;
+	border-radius: 2px;
+	color: #1d2327;
+	cursor: pointer;
+	display: flex;
+	gap: 8px;
+	justify-content: space-between;
+	min-height: 30px;
+	padding: 4px 8px 4px calc(8px + (var(--folder-depth, 0) * 18px));
+	text-align: left;
+	width: 100%;
+}
+
+.foldery-media-folder:hover,
+.foldery-media-folder.is-drop-target {
+	background: #f0f6fc;
+}
+
+.foldery-media-folder.is-active {
+	background: #2271b1;
+	color: #fff;
+}
+
+.foldery-media-folder__name {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.foldery-media-folder__count {
+	background: rgba(0, 0, 0, .08);
+	border-radius: 999px;
+	font-size: 11px;
+	line-height: 1;
+	min-width: 18px;
+	padding: 4px 6px;
+	text-align: center;
+}
+
+.foldery-media-folder.is-active .foldery-media-folder__count {
+	background: rgba(255, 255, 255, .22);
+}
+
+.foldery-media-actions {
+	justify-content: flex-start;
+}
+
+.foldery-media-message {
+	color: #646970;
+	margin: 8px 0 0;
+	min-height: 18px;
+}
+
+.attachments .attachment[draggable="true"] {
+	cursor: grab;
+}
+
+@media (min-width: 1120px) {
+	.upload-php .foldery-media-panel {
+		float: left;
+		margin-right: 16px;
+		width: 260px;
+	}
+
+	.upload-php .foldery-media-panel + .wp-filter,
+	.upload-php .foldery-media-panel + form#posts-filter,
+	.upload-php .foldery-media-panel ~ .media-frame {
+		margin-left: 276px;
+	}
+
+	.upload-php .foldery-media-tree {
+		max-height: calc(100vh - 290px);
+	}
+}
