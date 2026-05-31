@@ -28,7 +28,7 @@ wp_reset_postdata();
 
 // On recupère l'objet $folder via l'url ou via l'attribut de page
 
-    $folder = get_field('folder');
+    $folder = foldery_rml_resolve_folder(get_field('folder'));
     if (!is_rml_folder($folder)) {
         $id_gallery = get_query_var('serie_id');
         $folder = wp_rml_get_object_by_id($id_gallery);

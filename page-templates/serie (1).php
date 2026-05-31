@@ -9,8 +9,8 @@
 ?>
 <?php get_header();
 
-// Le champs folder renvoie un objet IFolder
-$folder = get_field('folder');
+// Le champs folder peut renvoyer un objet IFolder ou l'ID du dossier.
+$folder = foldery_rml_resolve_folder(get_field('folder'));
 $col = 3;
 $thumbSize = 'medium';
 if (is_rml_folder($folder) ): 

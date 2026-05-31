@@ -10,8 +10,8 @@
 <?php get_header();?>
 <?php the_content();?>
 <?php 
-// Le champs folder renvoie un objet IFolder
-$folder = get_field('folder');
+// Le champs folder peut renvoyer un objet IFolder ou l'ID du dossier.
+$folder = foldery_rml_resolve_folder(get_field('folder'));
 
 if (is_rml_folder($folder) ): 
     $series = $folder->getChildren();

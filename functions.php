@@ -32,6 +32,7 @@ if ( ! isset( $content_width ) ) $content_width = 1170;
 /* Add base functions */
 require( get_template_directory() . '/inc/base.class.php' );
 require( get_template_directory() . '/inc/foldery-compat.php' );
+require( get_template_directory() . '/inc/foldery-rml.php' );
 foldery_load_theme_options();
 /* Install Sample Data */
 //require( get_template_directory() . '/inc/demo-data.php' );

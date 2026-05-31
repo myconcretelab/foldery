@@ -236,8 +236,9 @@ function get_attachements_from_source ($source = 'attr', $field = 'mise_en_avant
     	);
     } elseif ($source == 'dir_id') {
         // Sinon, on va chercher les images presentent dans un certain dossier.
-        $imagesIDs =  wp_rml_get_attachments($id);
+        $imagesIDs =  wp_rml_get_attachments($field);
         $q['post__in'] = $imagesIDs;
+        $q['orderby'] = 'post__in';
     }
     
     return get_posts($q); 
@@ -266,13 +267,13 @@ function masonry_shortcode( $atts = [], $content = null, $tag = '' ) {
 	}
 	if($fid) :
         $folder = wp_rml_get_object_by_id($fid);
-	    $imagesIDs =  $folder->read();
+	    $imagesIDs =  is_rml_folder($folder) ? $folder->read() : array();
 	    if(count($imagesIDs) === 0){
-            $children = $folder->getChildren();
-            if($children->getCnt()) {
+            $children = is_rml_folder($folder) ? $folder->getChildren() : array();
+            if(count($children)) {
                 foreach ($children as $child) {
                     if($child->getCnt()) {
-                        $imagesIDs[] = $child->read();
+                        $imagesIDs = array_merge($imagesIDs, $child->read());
                     }
                 } 
                 
