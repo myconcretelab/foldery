@@ -79,7 +79,7 @@ body {
 	top: -30px;
 	left: -30px;
 	background: rgba(226, 188, 147, 1);
-	background-image:url("../../themes/custom/wood.jpg");
+	background-image:url("../images/wood.jpg");
 	z-index: 1;
 	box-shadow:
 		0px 1em 2em -1em rgba(0,0,0,.4),
