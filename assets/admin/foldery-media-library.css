@@ -274,11 +274,90 @@
 	}
 
 	.upload-php .media-frame.mode-grid .wp-filter {
+		align-items: center;
+		display: flex;
+		flex-wrap: nowrap;
+		gap: 24px;
 		grid-column: 2;
 		grid-row: 1;
 		margin-left: 0;
 		max-width: none;
 		min-width: 0;
+		min-height: 88px;
+		padding: 24px 32px;
+	}
+
+	.upload-php .media-frame.mode-grid .media-toolbar-secondary {
+		align-items: center;
+		display: flex;
+		flex: 1 1 auto;
+		flex-wrap: nowrap;
+		gap: 24px;
+		height: auto;
+		min-width: 0;
+	}
+
+	.upload-php .media-frame.mode-grid .media-toolbar-primary.search-form {
+		align-items: center;
+		display: flex;
+		flex: 0 0 auto;
+		gap: 20px;
+		height: auto;
+		margin-left: auto;
+		min-width: 0;
+		position: static;
+		width: auto;
+	}
+
+	.upload-php .media-frame.mode-grid .view-switch,
+	.upload-php .media-frame.mode-grid .attachment-filters,
+	.upload-php .media-frame.mode-grid .select-mode-toggle-button,
+	.upload-php .media-frame.mode-grid .spinner {
+		float: none;
+		margin: 0;
+		position: static;
+	}
+
+	.upload-php .media-frame.mode-grid .view-switch {
+		align-items: center;
+		display: flex;
+		flex: 0 0 auto;
+		gap: 8px;
+		height: 40px;
+	}
+
+	.upload-php .media-frame.mode-grid #media-attachment-foldery-filter {
+		display: none;
+	}
+
+	.upload-php .media-frame.mode-grid .attachment-filters {
+		flex: 0 0 auto;
+		max-width: 280px;
+		min-width: 150px;
+		min-height: 40px;
+	}
+
+	.upload-php .media-frame.mode-grid .select-mode-toggle-button {
+		flex: 0 0 auto;
+		height: 40px;
+		line-height: 38px;
+		min-height: 0;
+		padding-bottom: 0;
+		padding-top: 0;
+		white-space: nowrap;
+	}
+
+	.upload-php .media-frame.mode-grid .media-search-input-label {
+		flex: 0 0 auto;
+		font-size: 14px;
+		line-height: 1.25;
+		position: static;
+		width: 115px;
+	}
+
+	.upload-php .media-frame.mode-grid #media-search-input {
+		flex: 0 0 240px;
+		min-height: 40px;
 	}
 
 	.upload-php .media-frame.mode-grid .attachments-wrapper,
