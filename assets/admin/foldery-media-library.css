@@ -24,7 +24,7 @@
 	margin: 10px 0;
 	max-height: 280px;
 	overflow: auto;
-	padding: 6px;
+	padding: 6px 4px;
 }
 
 .foldery-media-tree,
@@ -44,8 +44,9 @@
 .foldery-media-folder-row {
 	align-items: center;
 	display: flex;
-	gap: 6px;
-	padding-left: calc(var(--folder-depth, 0) * 30px);
+	gap: 5px;
+	min-height: 26px;
+	padding-left: calc(var(--folder-depth, 0) * 20px);
 	position: relative;
 }
 
@@ -54,15 +55,15 @@
 }
 
 .foldery-media-folder-list .foldery-media-folder-list {
-	margin-left: 30px;
+	margin-left: 20px;
 	position: relative;
 }
 
 .foldery-media-folder-list .foldery-media-folder-list::before {
 	background: #dcdcde;
-	bottom: 4px;
+	bottom: 2px;
 	content: "";
-	left: 11px;
+	left: 8px;
 	position: absolute;
 	top: 0;
 	width: 1px;
@@ -79,13 +80,13 @@
 	color: #1d2327;
 	cursor: pointer;
 	display: flex;
-	flex: 0 0 18px;
-	font-size: 20px;
-	height: 24px;
+	flex: 0 0 14px;
+	font-size: 16px;
+	height: 20px;
 	justify-content: center;
 	line-height: 1;
 	padding: 0;
-	width: 18px;
+	width: 14px;
 }
 
 .foldery-media-toggle::before {
@@ -106,35 +107,35 @@
 	border-radius: 2px;
 	color: #0073aa;
 	cursor: move;
-	flex: 0 0 24px;
-	height: 24px;
+	flex: 0 0 18px;
+	height: 18px;
 	position: relative;
-	width: 24px;
+	width: 18px;
 }
 
 .foldery-media-folder-handle::before {
-	border: 2px solid currentColor;
+	border: 1.5px solid currentColor;
 	border-radius: 2px;
 	box-sizing: border-box;
 	content: "";
-	height: 16px;
+	height: 12px;
 	left: 1px;
 	position: absolute;
-	top: 6px;
-	width: 22px;
+	top: 5px;
+	width: 16px;
 }
 
 .foldery-media-folder-handle::after {
-	border: 2px solid currentColor;
+	border: 1.5px solid currentColor;
 	border-bottom: 0;
 	border-radius: 2px 2px 0 0;
 	box-sizing: border-box;
 	content: "";
-	height: 6px;
-	left: 3px;
+	height: 5px;
+	left: 2px;
 	position: absolute;
-	top: 3px;
-	width: 11px;
+	top: 2px;
+	width: 8px;
 }
 
 .foldery-media-folder {
@@ -145,16 +146,16 @@
 	color: #1d2327;
 	cursor: pointer;
 	display: flex;
-	gap: 8px;
+	gap: 6px;
 	justify-content: space-between;
-	min-height: 30px;
-	padding: 4px 8px;
+	min-height: 24px;
+	padding: 2px 6px;
 	text-align: left;
 	width: 100%;
 }
 
 .foldery-media-folder-row .foldery-media-folder {
-	padding-left: 8px;
+	padding-left: 4px;
 }
 
 .foldery-media-folder:hover,
@@ -168,8 +169,9 @@
 }
 
 .foldery-media-folder__name {
-	font-size: 18px;
+	font-size: 14px;
 	font-weight: 400;
+	line-height: 20px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -180,8 +182,8 @@
 	border-radius: 999px;
 	font-size: 11px;
 	line-height: 1;
-	min-width: 18px;
-	padding: 4px 6px;
+	min-width: 16px;
+	padding: 4px 5px;
 	text-align: center;
 }
 
@@ -228,7 +230,7 @@
 	background: #f0f6fc;
 	border: 1px dashed #2271b1;
 	box-sizing: border-box;
-	min-height: 30px;
+	min-height: 24px;
 }
 
 @media (min-width: 1120px) {
