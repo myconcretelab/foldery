@@ -247,10 +247,11 @@
 	.upload-php .foldery-media-panel {
 		display: flex;
 		flex-direction: column;
+		height: calc(100vh - 150px);
 		left: 0;
 		margin: 0;
-		max-height: calc(100vh - 150px);
 		max-width: none;
+		overflow: hidden;
 		position: absolute;
 		top: 64px;
 		width: 300px;
@@ -258,6 +259,7 @@
 	}
 
 	.upload-php .media-frame.mode-grid .foldery-media-panel {
+		height: calc(100vh - 120px);
 		top: 12px;
 	}
 
@@ -276,6 +278,12 @@
 		flex: 1 1 auto;
 		max-height: none;
 		min-height: 0;
+	}
+
+	.upload-php .foldery-media-panel__header,
+	.upload-php .foldery-media-actions,
+	.upload-php .foldery-media-message {
+		flex: 0 0 auto;
 	}
 
 	.upload-php .foldery-media-actions .button {
