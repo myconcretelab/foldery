@@ -46,7 +46,7 @@
 	display: flex;
 	gap: 5px;
 	min-height: 26px;
-	padding-left: calc(var(--folder-depth, 0) * 20px);
+	padding-left: calc(var(--folder-depth, 0) * 12px);
 	position: relative;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .foldery-media-folder-list .foldery-media-folder-list {
-	margin-left: 20px;
+	margin-left: 12px;
 	position: relative;
 }
 
@@ -63,7 +63,7 @@
 	background: #dcdcde;
 	bottom: 2px;
 	content: "";
-	left: 8px;
+	left: 5px;
 	position: absolute;
 	top: 0;
 	width: 1px;
