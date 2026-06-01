@@ -910,6 +910,41 @@ function foldery_rml_move_attachments( $to, $ids ) {
 	return true;
 }
 
+function foldery_rml_reorder_attachments( $fid, $ids ) {
+	global $wpdb;
+
+	$fid = is_numeric( $fid ) ? (int) $fid : 0;
+	$ids = array_values( array_unique( array_filter( array_map( 'intval', (array) $ids ) ) ) );
+	if ( empty( $ids ) ) {
+		return array( __( 'No media selected.', 'foldery' ) );
+	}
+	if ( $fid <= 0 || _wp_rml_root() === $fid || ! is_rml_folder( wp_rml_get_object_by_id( $fid ) ) ) {
+		return array( __( 'Select a folder before reordering media.', 'foldery' ) );
+	}
+
+	$current = wp_rml_get_attachments( $fid, 'ASC', 'rml' );
+	$current = array_values( array_map( 'intval', $current ) );
+	$ordered = array_values( array_intersect( $ids, $current ) );
+	$ordered = array_merge( $ordered, array_values( array_diff( $current, $ordered ) ) );
+
+	$table_posts = foldery_rml_table_name( 'posts' );
+	foreach ( $ordered as $index => $attachment_id ) {
+		$wpdb->update(
+			$table_posts,
+			array( 'nr' => $index + 1 ),
+			array(
+				'fid'        => $fid,
+				'attachment' => $attachment_id,
+				'isShortcut' => 0,
+			),
+			array( '%d' ),
+			array( '%d', '%d', '%d' )
+		);
+	}
+
+	return true;
+}
+
 if ( ! function_exists( 'wp_rml_create' ) ) {
 	function wp_rml_create( $name, $parent, $type = RML_TYPE_FOLDER, $restrictions = array(), $supress_validation = false, $return_existing_id = false ) {
 		return foldery_rml_create_folder( $name, $parent );
@@ -1080,7 +1115,7 @@ function foldery_rml_admin_enqueue( $hook ) {
 	$script = get_template_directory() . '/assets/admin/foldery-media-library.js';
 	$style  = get_template_directory() . '/assets/admin/foldery-media-library.css';
 	wp_enqueue_style( 'foldery-media-library', get_template_directory_uri() . '/assets/admin/foldery-media-library.css', array(), file_exists( $style ) ? filemtime( $style ) : null );
-	wp_enqueue_script( 'foldery-media-library', get_template_directory_uri() . '/assets/admin/foldery-media-library.js', array( 'jquery', 'media-views', 'wp-util' ), file_exists( $script ) ? filemtime( $script ) : null, true );
+	wp_enqueue_script( 'foldery-media-library', get_template_directory_uri() . '/assets/admin/foldery-media-library.js', array( 'jquery', 'jquery-ui-sortable', 'media-views', 'wp-util' ), file_exists( $script ) ? filemtime( $script ) : null, true );
 	wp_localize_script(
 		'foldery-media-library',
 		'folderyMediaLibrary',
@@ -1102,6 +1137,8 @@ function foldery_rml_admin_enqueue( $hook ) {
 				'unorganized'    => __( 'Unorganized', 'foldery' ),
 				'dropToMove'     => __( 'Drop to move', 'foldery' ),
 				'moved'          => __( 'Media moved.', 'foldery' ),
+				'orderSaved'     => __( 'Media order saved.', 'foldery' ),
+				'orderDisabled'  => __( 'Select a folder to reorder media.', 'foldery' ),
 			),
 		)
 	);
@@ -1143,6 +1180,12 @@ function foldery_rml_admin_ajax() {
 			$ids      = isset( $_POST['ids'] ) ? (array) $_POST['ids'] : array();
 			$result   = foldery_rml_move_attachments( $to, $ids );
 			$selected = $to;
+			break;
+		case 'reorder':
+			$id       = isset( $_POST['id'] ) ? (int) $_POST['id'] : $selected;
+			$ids      = isset( $_POST['ids'] ) ? (array) $_POST['ids'] : array();
+			$result   = foldery_rml_reorder_attachments( $id, $ids );
+			$selected = $id;
 			break;
 		default:
 			wp_send_json_error( array( 'message' => __( 'Unknown action.', 'foldery' ) ), 400 );

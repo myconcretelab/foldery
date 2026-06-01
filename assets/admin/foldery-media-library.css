@@ -106,6 +106,17 @@
 	cursor: grab;
 }
 
+.foldery-media-can-reorder .attachments .attachment {
+	cursor: move;
+}
+
+.foldery-media-sort-placeholder {
+	background: #f0f6fc;
+	border: 2px dashed #2271b1;
+	box-sizing: border-box;
+	margin: 8px;
+}
+
 @media (min-width: 1120px) {
 	.upload-php .wrap {
 		position: relative;

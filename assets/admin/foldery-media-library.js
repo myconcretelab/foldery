@@ -4,6 +4,7 @@
 	var config = window.folderyMediaLibrary || {};
 	var selectedFolder = parseInt(config.tree && config.tree.selected, 10) || 0;
 	var draggedAttachmentId = null;
+	var isSorting = false;
 
 	function labels(key) {
 		return config.labels && config.labels[key] ? config.labels[key] : key;
@@ -111,6 +112,7 @@
 		var canEditFolder = selectedFolder > 0;
 		$('.foldery-media-rename, .foldery-media-delete').prop('disabled', !canEditFolder);
 		$('.foldery-media-move').prop('disabled', selectedFolder === 0);
+		$('.attachments-browser').toggleClass('foldery-media-can-reorder', canReorder());
 	}
 
 	function mediaBrowser() {
@@ -132,6 +134,7 @@
 			browser.collection.reset();
 			browser.collection.more();
 			syncUploader();
+			setTimeout(initAttachmentSorting, 500);
 			return;
 		}
 
@@ -152,6 +155,7 @@
 		$('.foldery-media-folder[data-folder-id="' + selectedFolder + '"]').addClass('is-active');
 		updateButtons();
 		syncUploader();
+		initAttachmentSorting();
 		if (refresh !== false) {
 			refreshMedia();
 		}
@@ -214,8 +218,75 @@
 		}
 	}
 
+	function canReorder() {
+		return selectedFolder > 0 && selectedFolder !== parseInt(config.rootId, 10);
+	}
+
+	function visibleAttachmentIds() {
+		var ids = [];
+		$('.attachments .attachment').each(function () {
+			var id = parseInt($(this).attr('data-id'), 10);
+			if (id) {
+				ids.push(id);
+			}
+		});
+		return ids;
+	}
+
+	function saveAttachmentOrder() {
+		var ids = visibleAttachmentIds();
+		if (!canReorder() || ids.length < 2) {
+			return;
+		}
+		request('reorder', { id: selectedFolder, ids: ids }).done(function () {
+			$('.foldery-media-message').text(labels('orderSaved'));
+		});
+	}
+
 	function enableDragOnAttachments() {
+		if (canReorder()) {
+			$('.attachments .attachment').removeAttr('draggable');
+			return;
+		}
 		$('.attachments .attachment').attr('draggable', 'true');
+	}
+
+	function initAttachmentSorting() {
+		var $attachments = $('.attachments');
+		if (!$attachments.length || !$.fn.sortable) {
+			return;
+		}
+
+		if (!canReorder()) {
+			if ($attachments.data('ui-sortable')) {
+				$attachments.sortable('destroy');
+			}
+			enableDragOnAttachments();
+			return;
+		}
+
+		$('.attachments .attachment').removeAttr('draggable');
+		if ($attachments.data('ui-sortable')) {
+			$attachments.sortable('refresh');
+			return;
+		}
+
+		$attachments.sortable({
+			items: '.attachment',
+			placeholder: 'foldery-media-sort-placeholder',
+			tolerance: 'pointer',
+			start: function (event, ui) {
+				isSorting = true;
+				ui.placeholder.width(ui.item.outerWidth());
+				ui.placeholder.height(ui.item.outerHeight());
+			},
+			stop: function () {
+				window.setTimeout(function () {
+					isSorting = false;
+				}, 0);
+			},
+			update: saveAttachmentOrder
+		});
 	}
 
 	function installMediaFilter() {
@@ -257,7 +328,10 @@
 	$(function () {
 		renderPanel();
 		syncUploader();
-		setTimeout(enableDragOnAttachments, 800);
+		setTimeout(function () {
+			enableDragOnAttachments();
+			initAttachmentSorting();
+		}, 800);
 
 		$(document).on('click', '.foldery-media-folder', function () {
 			setFolder(parseInt($(this).attr('data-folder-id'), 10));
@@ -303,6 +377,10 @@
 		$(document).on('mouseenter', '.attachments .attachment', enableDragOnAttachments);
 
 		$(document).on('dragstart', '.attachments .attachment', function (event) {
+			if (isSorting || canReorder()) {
+				event.preventDefault();
+				return;
+			}
 			draggedAttachmentId = parseInt($(this).attr('data-id'), 10);
 			if (event.originalEvent && event.originalEvent.dataTransfer && draggedAttachmentId) {
 				event.originalEvent.dataTransfer.setData('text/plain', String(draggedAttachmentId));
@@ -337,6 +415,7 @@
 				setTimeout(function () {
 					setFolder(selectedFolder, false);
 					enableDragOnAttachments();
+					initAttachmentSorting();
 				}, 100);
 			});
 		}
