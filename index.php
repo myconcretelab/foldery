@@ -10,7 +10,7 @@
  * @link http://codex.wordpress.org/Template_Hierarchy
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 global $smof_data, $paged, $wp_query;

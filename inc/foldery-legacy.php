@@ -94,8 +94,8 @@ add_filter( '404_template', 'wpd_date_404_template' );
 function change_custom_post_type_archive_title( $title ) {
     if ( get_page_template( 'serie-details' ) ){
         $id_gallery = get_query_var('serie_id');
-        $folder = wp_rml_get_object_by_id($id_gallery);
-        if (is_rml_folder($folder)) {       
+        $folder = foldery_media_get_folder($id_gallery);
+        if (foldery_is_media_folder($folder)) {       
             $title = "Série " . $folder->getName();
             return $title;
         }
@@ -120,16 +120,17 @@ function serie_shortcode( $atts = [], $content = null, $tag = '' ) {
 	// override default attributes with user attributes
 	extract (shortcode_atts(
 		array(
+			'folder_ids' => 0,
 			'fids' => 0,
 		), $atts, $tag
 	));
-    
-    
-    if ($fids) {
-        $fids = explode(',',$fids);
-        if(count($fids)) {
-            foreach ($fids as $fid) {
-                $series[] = wp_rml_get_object_by_id($fid);
+
+    $folder_ids = $folder_ids ? $folder_ids : $fids;
+    if ($folder_ids) {
+        $folder_ids = explode(',',$folder_ids);
+        if(count($folder_ids)) {
+            foreach ($folder_ids as $folder_id) {
+                $series[] = foldery_media_get_folder($folder_id);
             }
             print_serie($series);
         }
@@ -239,7 +240,7 @@ function get_attachements_from_source ($source = 'attr', $field = 'mise_en_avant
     	);
     } elseif ($source == 'dir_id') {
         // Sinon, on va chercher les images presentent dans un certain dossier.
-        $imagesIDs =  wp_rml_get_attachments($field);
+        $imagesIDs =  foldery_media_get_attachments($field);
         $q['post__in'] = $imagesIDs;
         $q['orderby'] = 'post__in';
     }
@@ -254,6 +255,7 @@ function masonry_shortcode( $atts = [], $content = null, $tag = '' ) {
 	extract(shortcode_atts(
 		array(
 			'folder' => false,
+			'folder_id' => 0,
 			'fid' => 0,
 			'thumbSize' => 'medium',
 			'r'=>0,
@@ -268,11 +270,12 @@ function masonry_shortcode( $atts = [], $content = null, $tag = '' ) {
 	if ($imagesIDs) {
 	    $imagesIDs = explode(',',$imagesIDs);
 	}
-	if($fid) :
-        $folder = wp_rml_get_object_by_id($fid);
-	    $imagesIDs =  is_rml_folder($folder) ? $folder->read() : array();
+    $folder_id = $folder_id ? $folder_id : $fid;
+	if($folder_id) :
+        $folder = foldery_media_get_folder($folder_id);
+	    $imagesIDs =  foldery_is_media_folder($folder) ? $folder->read() : array();
 	    if(count($imagesIDs) === 0){
-            $children = is_rml_folder($folder) ? $folder->getChildren() : array();
+            $children = foldery_is_media_folder($folder) ? $folder->getChildren() : array();
             if(count($children)) {
                 foreach ($children as $child) {
                     if($child->getCnt()) {
@@ -328,7 +331,7 @@ function my_theme_enqueue_styles() {
 	wp_enqueue_style(
 		'foldery-child-style',
 		get_template_directory_uri() . '/assets/css/foldery-child.css',
-		array( 'monaco-style' ),
+		array( 'foldery-style' ),
 		'1.0.0'
 	);
 }

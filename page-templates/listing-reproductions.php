@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: Listing Reproductions
- * @package CMSSuperHeroes
+ * @package Foldery
  * @subpackage ZK Theme
  * @since 1.0.0
  * @author Chinh Duong Manh
@@ -58,8 +58,8 @@ echo 'to'
 						<figure class="<?php echo $classes?>" id="frame_<?php echo $post->ID ?>" style="width:<?php echo $img[1] * $ratio ?>px;">
 						<?php
 							// Display full-size image in lightbox when clicked.
-							if ( function_exists( 'slb_activate' ) ) {
-								echo slb_activate($imgtag );
+							if ( function_exists('foldery_lightbox_activate') ) {
+								echo foldery_lightbox_activate($imgtag );
 							}
 						?>
 						</figure>						

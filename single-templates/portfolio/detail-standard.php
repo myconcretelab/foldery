@@ -13,19 +13,19 @@
 <div class="vc-zigzag-inner" style="width: 100%;min-height: 14px;background: 0 repeat-x url('data:image/svg+xml;utf-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%3C%21DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%3Csvg%20width%3D%2214px%22%20height%3D%2212px%22%20viewBox%3D%220%200%2018%2015%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cpolygon%20id%3D%22Combined-Shape%22%20fill%3D%22%23ebebeb%22%20points%3D%228.98762301%200%200%209.12771969%200%2014.519983%209%205.40479869%2018%2014.519983%2018%209.12771969%22%3E%3C%2Fpolygon%3E%3C%2Fsvg%3E');"></div>
 
 <?php
-$id_gallery = foldery_rml_folder_id(get_field('id_gallerie'));
+$id_gallery = foldery_media_folder_id(get_field('id_gallerie'));
 $first = 0;
 if ($id_gallery) :
     switch (get_field('presentation_type')) :
         case 'gallery' :
-            $folder = wp_rml_get_object_by_id($id_gallery);
+            $folder = foldery_media_get_folder($id_gallery);
             // On affiche la galerie avec les images
-            if ( function_exists('slb_activate') && $folder->getCnt()) :
-                echo slb_activate(do_shortcode('[folder-gallery fid="' . $id_gallery . '" size="medium" orderby="rml"]'));
+            if ( function_exists('foldery_lightbox_activate') && $folder->getCnt()) :
+                echo foldery_lightbox_activate(do_shortcode('[folder-gallery folder_id="' . $id_gallery . '" size="medium" orderby="folder_order"]'));
                 $first = 1;
             endif;            
             // On va tester si le dossier à des enfants
-            if (is_rml_folder($folder)) {
+            if (foldery_is_media_folder($folder)) {
                 $children = $folder->getChildren();
                 if(is_array($children)) {
                     // Si oui, on va créer une gallerie pour chaque enfant
@@ -33,10 +33,10 @@ if ($id_gallery) :
                         if($child->getCnt()) {
                             echo $first == 0 ?  "" :  "<div class=\"vc-zigzag-inner\" style=\"width: 100%;min-height: 14px;background: 0 repeat-x url('data:image/svg+xml;utf-8,%3C%3Fxml%20version%3D%221.0%22%20encoding%3D%22utf-8%22%3F%3E%3C%21DOCTYPE%20svg%20PUBLIC%20%22-%2F%2FW3C%2F%2FDTD%20SVG%201.1%2F%2FEN%22%20%22http%3A%2F%2Fwww.w3.org%2FGraphics%2FSVG%2F1.1%2FDTD%2Fsvg11.dtd%22%3E%3Csvg%20width%3D%2214px%22%20height%3D%2212px%22%20viewBox%3D%220%200%2018%2015%22%20version%3D%221.1%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20xmlns%3Axlink%3D%22http%3A%2F%2Fwww.w3.org%2F1999%2Fxlink%22%3E%3Cpolygon%20id%3D%22Combined-Shape%22%20fill%3D%22%23ebebeb%22%20points%3D%228.98762301%200%200%209.12771969%200%2014.519983%209%205.40479869%2018%2014.519983%2018%209.12771969%22%3E%3C%2Fpolygon%3E%3C%2Fsvg%3E');\"></div>";;
                             echo '<h2 class="padding">' . $child->getName() . '</h2>';
-                            $meta = get_media_folder_meta($child->getId());
+                            $meta = foldery_media_get_folder_meta($child->getId());
                             echo isset($meta['description']) ? '<p>' . str_replace("\n", "</p>\n<p>", $meta['description'][0]) . '</p><p>&nbsp;</p>' : '';
-                            if ( function_exists('slb_activate') ) :
-                                echo slb_activate(do_shortcode('[folder-gallery fid="' . $child->getId() . '" size="medium" orderby="rml"]'));
+                            if ( function_exists('foldery_lightbox_activate') ) :
+                                echo foldery_lightbox_activate(do_shortcode('[folder-gallery folder_id="' . $child->getId() . '" size="medium" orderby="folder_order"]'));
                             endif;
                             $first = 1;
                         }
@@ -58,10 +58,10 @@ endif;
  *
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
-//$portfolio_meta = cms_post_meta_data();
+//$portfolio_meta = foldery_post_meta_data();
 
 /* aller chercher tous les fichiers donc la propriété
 * "reproduction disponible est "true"
@@ -70,7 +70,7 @@ endif;
 $id_gallery = get_field('id_gallerie');
 if ($id_gallery) :
     // appeller le shortcode [last_pics source="dir_id" id="$id_gallery" limit="-1" col="2" details="1" proportions="0"] 
-    $imagesIDs =  wp_rml_get_attachments($id_gallery);
+    $imagesIDs =  foldery_media_get_attachments($id_gallery);
 endif;
 $attachments = get_posts( array(
 	'post_type' => 'attachment',
@@ -112,8 +112,8 @@ $attachments = get_posts( array(
 						<figure class="<?php echo $classes?>" id="frame_<?php echo $post->ID ?>" style="width:<?php echo $img[1] * $ratio ?>px;">
 						<?php
 							// Display full-size image in lightbox when clicked.
-							if ( function_exists( 'slb_activate' ) ) {
-								echo slb_activate($imgtag );
+							if ( function_exists('foldery_lightbox_activate') ) {
+								echo foldery_lightbox_activate($imgtag );
 							}
 						?>
 						</figure>						

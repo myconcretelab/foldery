@@ -4,10 +4,10 @@
  *
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
-$portfolio_meta = cms_post_meta_data();
+$portfolio_meta = foldery_post_meta_data();
 ?>
 
 <article id="post-<?php the_ID(); ?>" <?php post_class('container portfolio-fullwidth'); ?>>

@@ -3,7 +3,7 @@
  * The Template for displaying all single posts
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 

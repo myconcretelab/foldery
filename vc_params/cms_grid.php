@@ -34,7 +34,7 @@
 ?>
 <?php 
       $params = array(
-            /* Add option show/hide image for default CMS GRID Layout*/
+            /* Add option show/hide image for default Foldery GRID Layout*/
            array(
                   "type" => "dropdown",
                   "heading" => esc_html__("Show Image", 'foldery' ),
@@ -49,7 +49,7 @@
                         'cms_grid--popup.php',
                   )
             ),
-            /* Add option make first and second item is large for CMS Grid Portfolio Layout */
+            /* Add option make first and second item is large for Foldery Grid Portfolio Layout */
             array(
                   "type" => "dropdown",
                   "heading" => esc_html__("Make first and second item large", 'foldery' ),

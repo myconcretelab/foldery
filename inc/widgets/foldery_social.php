@@ -1,28 +1,28 @@
 <?php
-if(!function_exists('cms_widget_register')) return;
+if(!function_exists('foldery_register_widget')) return;
 
 add_action('widgets_init', 'register_social_widget');
 function register_social_widget() {
-    cms_widget_register('CMS_Social_Widget');
+    foldery_register_widget('Foldery_Social_Widget');
 }
 
 
-class CMS_Social_Widget extends WP_Widget {
+class Foldery_Social_Widget extends WP_Widget {
     public function __construct() {
         parent::__construct(
-            'cms_social_widget', // Base ID
-            __('CMS Social', 'foldery' ), // Name
-            array('description' => esc_html__('CMS Social Widget', 'foldery' ),) // Args
+            'foldery_social_widget', // Base ID
+            __('Foldery Social', 'foldery' ), // Name
+            array('description' => esc_html__('Foldery Social Widget', 'foldery' ),) // Args
         );
         add_action('wp_enqueue_scripts', array($this, 'widget_scripts'));
     }
     function widget_scripts() {
-        wp_enqueue_style('widget_cms_social_scripts', get_template_directory_uri() . '/inc/widgets/cms_social.css');
+        wp_enqueue_style('widget_foldery_social_scripts', get_template_directory_uri() . '/inc/widgets/foldery_social.css');
     }
     function widget($args, $instance) {
         extract($args);
 		if (!empty($instance['title'])) {
-        $title = apply_filters('widget_title', empty($instance['title']) ? __('CMS Social', 'foldery' ) : $instance['title'], $instance, $this->id_base);
+        $title = apply_filters('widget_title', empty($instance['title']) ? __('Foldery Social', 'foldery' ) : $instance['title'], $instance, $this->id_base);
         }
 
         $style = 'default';
@@ -83,10 +83,10 @@ class CMS_Social_Widget extends WP_Widget {
         else {
             $before_widget = str_replace('class="', 'class="'. $extra_class . ' ', $before_widget);
         }
-        cms_allowed_html($before_widget);
+        foldery_allowed_html($before_widget);
 
         if (!empty($title))
-            cms_allowed_html($before_title . $title . $after_title);
+            foldery_allowed_html($before_title . $title . $after_title);
 
         echo '<div class="cms-social '.$style.' '.$align.'">';
 
@@ -144,7 +144,7 @@ class CMS_Social_Widget extends WP_Widget {
 
         echo "</div>";
 
-        echo cms_allowed_html($after_widget);
+        echo foldery_allowed_html($after_widget);
     }
 
     function update( $new_instance, $old_instance ) {

@@ -1,0 +1,98 @@
+- generic [ref=e2]:
+  - generic:
+    - search [ref=e5]:
+      - generic [ref=e6]:
+        - textbox "Type your search" [active] [ref=e8]
+        - button "Search" [ref=e10] [cursor=pointer]
+        - generic [ref=e13] [cursor=pointer]: 
+    - banner [ref=e14]:
+      - generic [ref=e16]:
+        - link "Sébastien Jacqmin" [ref=e18] [cursor=pointer]:
+          - /url: http://127.0.0.1:8093
+          - img "Sébastien Jacqmin" [ref=e19]
+        - navigation [ref=e21]:
+          - list [ref=e23]:
+            - listitem [ref=e24]:
+              - link "Dessins" [ref=e25] [cursor=pointer]:
+                - /url: http://127.0.0.1:8093/dessins/
+            - listitem [ref=e26]:
+              - link "SketchBook" [ref=e27] [cursor=pointer]:
+                - /url: http://127.0.0.1:8093/sketchbook/
+            - listitem [ref=e28]:
+              - link "Peintures" [ref=e29] [cursor=pointer]:
+                - /url: http://127.0.0.1:8093/peintures/
+            - listitem [ref=e30]:
+              - link "Reproductions" [ref=e31] [cursor=pointer]:
+                - /url: http://127.0.0.1:8093/reproductions/
+        - generic: 
+  - main [ref=e36]:
+    - article [ref=e37]:
+      - generic [ref=e39]:
+        - link "Houses of Imagine" [ref=e41] [cursor=pointer]:
+          - /url: http://127.0.0.1:8093/serie/houses-of-imagine/45
+          - heading "Houses of Imagine" [level=5] [ref=e42]
+          - figure [ref=e43]
+        - link "Maisons" [ref=e45] [cursor=pointer]:
+          - /url: http://127.0.0.1:8093/serie/maisons/49
+          - heading "Maisons" [level=5] [ref=e46]
+          - figure [ref=e47]
+        - link "Croquis 2025" [ref=e49] [cursor=pointer]:
+          - /url: http://127.0.0.1:8093/serie/croquis-2025/56
+          - heading "Croquis 2025" [level=5] [ref=e50]
+          - figure [ref=e51]
+        - link "Les nus" [ref=e53] [cursor=pointer]:
+          - /url: http://127.0.0.1:8093/serie/les-nus/38
+          - heading "Les nus" [level=5] [ref=e54]
+          - figure [ref=e55]
+        - link "Portraits" [ref=e57] [cursor=pointer]:
+          - /url: http://127.0.0.1:8093/serie/portraits/2
+          - heading "Portraits" [level=5] [ref=e58]
+          - figure [ref=e59]
+        - link "Les oubliés" [ref=e61] [cursor=pointer]:
+          - /url: http://127.0.0.1:8093/serie/les-oublies/12
+          - heading "Les oubliés" [level=5] [ref=e62]
+          - figure [ref=e63]
+        - link "Les Vacances" [ref=e65] [cursor=pointer]:
+          - /url: http://127.0.0.1:8093/serie/les-vacances/1
+          - heading "Les Vacances" [level=5] [ref=e66]
+          - figure [ref=e67]:
+            - img "Dessin au fusain et pastel représentant un paysage de campagne" [ref=e68]
+        - table [ref=e69]:
+          - rowgroup [ref=e70]:
+            - row "50 x 65 cm (Raisin) 50 x 65 cm (Raisin)" [ref=e71]:
+              - cell "50 x 65 cm (Raisin)" [ref=e72]:
+                - figure [ref=e73]:
+                  - link [ref=e74] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8093/wp-content/uploads/img_9788-1.jpg
+                - heading "50 x 65 cm (Raisin)" [level=5] [ref=e75]
+              - cell "50 x 65 cm (Raisin)" [ref=e76]:
+                - figure [ref=e77]:
+                  - link "Branches mortes abandonnées dans une lande" [ref=e78] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8093/wp-content/uploads/img_9800-1.jpg
+                    - img "Branches mortes abandonnées dans une lande" [ref=e79]
+                - heading "50 x 65 cm (Raisin)" [level=5] [ref=e80]
+        - paragraph [ref=e81]: "[vc_row][vc_column width= »1/3″][vc_column_text css_animation= »none »]"
+        - heading "Jacqmin Sébastien" [level=3] [ref=e82]
+        - paragraph [ref=e83]:
+          - text: Artiste travaillant en Bretagne – France
+          - text: "Instagram :"
+          - link "sebastienjacqmin" [ref=e84] [cursor=pointer]:
+            - /url: https://www.instagram.com/sebastienjacqmin/
+          - text: "[/vc_column_text][/vc_column][vc_column width= »1/3″][vc_column_text]"
+        - heading "Contact" [level=3] [ref=e85]
+        - paragraph [ref=e86]:
+          - text: +33.(0)6.20.72.60.10
+          - link "contact@sebastienj.com" [ref=e87] [cursor=pointer]:
+            - /url: mailto:contact@sebastienj.com
+          - text: "[/vc_column_text][/vc_column][vc_column width= »1/3″ offset= »vc_hidden-xs »][vc_btn title= »Mes reproductions… » style= »3d » size= »lg » align= »center » i_icon_fontawesome= »fas fa-certificate » button_block= »true » add_icon= »true » link= »url:https%3A%2F%2Fsebastienj.com%2Freproductions%2F|title:Reproductions »][/vc_column][/vc_row][vc_row css= ».vc_custom_1706100232151{background-color: #f2f2f2 !important;} »][vc_column offset= »vc_hidden-xs »][vc_column_text]"
+        - blockquote [ref=e88]:
+          - text: “
+          - paragraph [ref=e89]: Il y a plusieurs façons de fuir. Certains utilisent les drogues dites «psychotogènes». D’autres la psychose. D’autres le suicide. D’autres la navigation en solitaire. Il y a peut-être une autre façon encore fuir dans un monde qui n’est pas de ce monde, le monde de l’imaginaire. Dans ce monde on risque peu d’être poursuivi. On peut s’y tailler un vaste territoire gratifiant, que certains diront narcissique. Peu importe, car dans le monde où règne le principe de réalité, la soumission et la révolte, la dominance et le conservatisme auront perdu pour le fuyard leur caractère anxiogène et ne seront plus considérés que comme un jeu auquel on peut, sans crainte, participer de façon à se faire accepter par les autres comme « normal ».
+          - blockquote [ref=e90]:
+            - paragraph [ref=e91]: Henri Laborit [Eloge de la fuite]
+        - paragraph [ref=e92]: "[/vc_column_text][/vc_column][/vc_row][vc_row][vc_column][vc_column_text]"
+        - heading "Séries en cours…" [level=3] [ref=e93]
+        - paragraph [ref=e94]: "[/vc_column_text][vc_column_text][/vc_column_text][/vc_column][/vc_row][vc_row][vc_column][vc_column_text]"
+        - heading "Récemment créé à l’atelier (ou dehors !)" [level=3] [ref=e95]
+        - paragraph [ref=e96]: "[/vc_column_text][vc_column_text][/vc_column_text][/vc_column][/vc_row]"
+  - contentinfo [ref=e97]

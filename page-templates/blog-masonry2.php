@@ -3,7 +3,7 @@
  * Template Name: Blog Masonry 2
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  * @author Luan Nguyen
  */

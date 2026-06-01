@@ -3,7 +3,7 @@
 /**
  * Template Name: Portfolio Masonry
  * NOTE: Option Columns in Page option not in use for this layout
- * @package CMSSuperHeroes
+ * @package Foldery
  * @subpackage ZK Theme
  * @since 1.0.0
  * @author Chinh Duong Manh

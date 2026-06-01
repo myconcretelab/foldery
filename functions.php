@@ -17,28 +17,29 @@
  *
  * For more information on hooks, actions, and filters, @link http://codex.wordpress.org/Plugin_API
  *
- * @package ZookaStudio
- * @subpackage Monaco
+ * @package Foldery
+ * @subpackage Theme
  * @since 1.0.0
  */
 
 /**
  * Add global values.
  */
-global $smof_data, $cms_meta, $cms_base;
+global $smof_data, $cms_meta, $foldery_base;
 
 define('THEMENAME', 'foldery');
 if ( ! isset( $content_width ) ) $content_width = 1170;
 /* Add base functions */
-require( get_template_directory() . '/inc/base.class.php' );
-require( get_template_directory() . '/inc/foldery-compat.php' );
-require( get_template_directory() . '/inc/foldery-rml.php' );
+require( get_template_directory() . '/inc/foldery-base.php' );
+require( get_template_directory() . '/inc/foldery-core.php' );
+require( get_template_directory() . '/inc/media-folders/bootstrap.php' );
+require( get_template_directory() . '/inc/lightbox/bootstrap.php' );
 foldery_load_theme_options();
 /* Install Sample Data */
 //require( get_template_directory() . '/inc/demo-data.php' );
 
-if(class_exists("CMS_Base")){
-    $cms_base = new CMS_Base();
+if(class_exists("Foldery_Base")){
+    $foldery_base = new Foldery_Base();
 }
 
 /* Add theme options when Redux is available; front-end options are loaded locally above. */
@@ -48,16 +49,16 @@ if ( class_exists( 'ReduxFramework' ) ) {
 
     
 /* Add theme elements */
-add_action('vc_before_init', 'cms_vc_elements');
-function cms_vc_elements(){
-    if(class_exists('CmsShortCode')){
+add_action('vc_before_init', 'foldery_vc_elements');
+function foldery_vc_elements(){
+    if(function_exists('vc_map') && class_exists('WPBakeryShortCode')){
         $element = get_template_directory() . '/inc/elements/googlemap';
         require( $element . '/cms_googlemap.php' );
     }
 }
 
-add_action('vc_before_init', 'cms_vc_params');
-function cms_vc_params() {
+add_action('vc_before_init', 'foldery_vc_params');
+function foldery_vc_params() {
     require( get_template_directory() . '/vc_params/vc_customs.php' );
     require( get_template_directory() . '/vc_params/vc_btn.php' );
     require( get_template_directory() . '/vc_params/vc_icon.php' );
@@ -91,8 +92,8 @@ if(!class_exists('HeroMenuWalker')){
 }
 
 /* Add widgets */
-// require( get_template_directory() . '/inc/widgets/cms_social.php' );
-// require( get_template_directory() . '/inc/widgets/cms_instagram.php' );
+// require( get_template_directory() . '/inc/widgets/foldery_social.php' );
+// require( get_template_directory() . '/inc/widgets/foldery_instagram.php' );
 
 /* Add tinymce */
 // require( get_template_directory() . '/inc/tinymce/button.php' );
@@ -114,12 +115,12 @@ if(class_exists('WooCommerce')){
  * @author Chinh Duong Manh
  */
 
-//add_action('init', 'cms_change_default_woo_thumb_size');
-function cms_change_default_woo_thumb_size(){
-	register_activation_hook('woocommerce/woocommerce.php', 'cms_woocommerce_image_dimensions');
+//add_action('init', 'foldery_change_default_woo_thumb_size');
+function foldery_change_default_woo_thumb_size(){
+	register_activation_hook('woocommerce/woocommerce.php', 'foldery_woocommerce_image_dimensions');
 }
 /*
-function cms_woocommerce_image_dimensions() {
+function foldery_woocommerce_image_dimensions() {
     global $pagenow;
  
     $catalog = array(
@@ -144,10 +145,10 @@ function cms_woocommerce_image_dimensions() {
 }
 */
 /**
- * CMS Theme setup.
+ * Foldery theme setup.
  *
  * Sets up theme defaults and registers the various WordPress features that
- * CMS Theme supports.
+ * Foldery supports.
  *
  * @uses load_theme_textdomain() For translation/localization support.
  * @uses add_editor_style() To add a Visual Editor stylesheet.
@@ -158,7 +159,7 @@ function cms_woocommerce_image_dimensions() {
  *
  * @since 1.0.0
  */
-function cms_setup() {
+function foldery_setup() {
 	/*
 	 * Makes Twenty Twelve available for translation.
 	 *
@@ -229,14 +230,14 @@ function cms_setup() {
 	*/
 }
 
-add_action( 'after_setup_theme', 'cms_setup' );
+add_action( 'after_setup_theme', 'foldery_setup' );
 
 /**
  * Get meta data.
  * @author Fox
  * @return mixed|NULL
  */
-function cms_meta_data(){
+function foldery_meta_data(){
     global $post, $cms_meta;
     if(isset($post->ID)){
         $cms_meta = json_decode(get_post_meta($post->ID, '_cms_meta_data', true));
@@ -250,14 +251,14 @@ function cms_meta_data(){
     }
 
 }
-//add_action('wp', 'cms_meta_data');
+//add_action('wp', 'foldery_meta_data');
 
 /**
  * Get post meta data.
  * @author Fox
  * @return mixed|NULL
  */
-function cms_post_meta_data(){
+function foldery_post_meta_data(){
     global $post;
     if(isset($post->ID)){
 		$cms_meta = json_decode(get_post_meta($post->ID, '_cms_meta_data', true));
@@ -274,10 +275,9 @@ function cms_post_meta_data(){
 
 /**
  * Enqueue scripts and styles for front-end.
- * @author Fox
- * @since Monaco 1.0
+ * @since 1.0.0
  */
-function cms_scripts_styles() {
+function foldery_scripts_styles() {
     
 	global $smof_data, $wp_styles, $cms_meta;
 	
@@ -310,11 +310,11 @@ function cms_scripts_styles() {
 	/** --------------------------custom------------------------------- */
 	
 	/* Add main.js */
-	wp_register_script('cmssuperheroes-main', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), '1.0.0', true);
-	wp_localize_script('cmssuperheroes-main', 'CMSOptions', $script_options);
-	wp_enqueue_script('cmssuperheroes-main');
+	wp_register_script('foldery-main', get_template_directory_uri() . '/assets/js/main.js', array( 'jquery' ), '1.0.0', true);
+	wp_localize_script('foldery-main', 'FolderyOptions', $script_options);
+	wp_enqueue_script('foldery-main');
 	/* Add menu.js */
-    wp_enqueue_script('cmssuperheroes-menu', get_template_directory_uri() . '/assets/js/menu.js', array( 'jquery' ), '1.0.0', true);
+    wp_enqueue_script('foldery-menu', get_template_directory_uri() . '/assets/js/menu.js', array( 'jquery' ), '1.0.0', true);
 	/*
 	 * Adds JavaScript to pages with the comment form to support
 	 * sites with threaded comments (when in use).
@@ -342,26 +342,23 @@ function cms_scripts_styles() {
 	/** --------------------------custom------------------------------- */
 	
 	/* Loads our main stylesheet. */
-	wp_enqueue_style( 'monaco-style', get_stylesheet_uri(), array( 'bootstrap' ));
+	wp_enqueue_style( 'foldery-style', get_stylesheet_uri(), array( 'bootstrap' ));
 
 	/* Loads the Internet Explorer specific stylesheet. */
-	wp_enqueue_style( 'foldery-ie', get_template_directory_uri() . '/assets/css/ie.css', array( 'monaco-style' ), '1.6.0' );
+	wp_enqueue_style( 'foldery-ie', get_template_directory_uri() . '/assets/css/ie.css', array( 'foldery-style' ), '1.6.0' );
 	$wp_styles->add_data( 'foldery-ie', 'conditional', 'lt IE 11' );
 	
 	/* WooCommerce */
 	if(class_exists('WooCommerce')){
-	    wp_enqueue_style( 'monaco-woo', get_template_directory_uri() . "/assets/css/woocommerce.css", array(), '1.6.0');
+	    wp_enqueue_style( 'foldery-woo', get_template_directory_uri() . "/assets/css/woocommerce.css", array(), '1.6.0');
 	}
 	
 	/* Load static css*/
-	wp_enqueue_style('monaco-static', get_template_directory_uri() . '/assets/css/static.css', array( 'monaco-style' ), '2.0.0');
+	wp_enqueue_style('foldery-static', get_template_directory_uri() . '/assets/css/static.css', array( 'foldery-style' ), '2.0.0');
 
-	/* Load PrettyPhoto*/
-/*	wp_enqueue_script('prettyphoto');
-    wp_enqueue_style('prettyphoto');
-*/}
+}
 
-add_action( 'wp_enqueue_scripts', 'cms_scripts_styles' );
+add_action( 'wp_enqueue_scripts', 'foldery_scripts_styles' );
 
 /**
  * Register sidebars.
@@ -370,7 +367,7 @@ add_action( 'wp_enqueue_scripts', 'cms_scripts_styles' );
  *
  * @since Fox
  */
-function cms_widgets_init() {
+function foldery_widgets_init() {
 	register_sidebar( array(
 		'name' => esc_html__( 'Main Sidebar', 'foldery' ),
 		'id' => 'sidebar-1',
@@ -490,7 +487,7 @@ function cms_widgets_init() {
 		) );
 	}
 }
-//add_action( 'widgets_init', 'cms_widgets_init' );
+//add_action( 'widgets_init', 'foldery_widgets_init' );
 
 /**
  * Filter the page menu arguments.
@@ -499,19 +496,19 @@ function cms_widgets_init() {
  *
  * @since 1.0.0
  */
-function cms_page_menu_args( $args ) {
+function foldery_page_menu_args( $args ) {
     if ( ! isset( $args['show_home'] ) )
         $args['show_home'] = true;
     return $args;
 }
-add_filter( 'wp_page_menu_args', 'cms_page_menu_args' );
+add_filter( 'wp_page_menu_args', 'foldery_page_menu_args' );
 
 /**
  * Save custom theme meta. 
  * 
  * @since 1.0.0
  */
-function cms_save_meta_boxes($post_id) {
+function foldery_save_meta_boxes($post_id) {
     
     if(defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
         return;
@@ -522,14 +519,14 @@ function cms_save_meta_boxes($post_id) {
     }
 }
 
-add_action('save_post', 'cms_save_meta_boxes');
+add_action('save_post', 'foldery_save_meta_boxes');
 
 /**
  * Display navigation to next/previous comments when applicable.
  *
  * @since 1.0.0
  */
-function cms_comment_nav() {
+function foldery_comment_nav() {
     // Are there comments to navigate through?
     if ( get_comment_pages_count() > 1 && get_option( 'page_comments' ) ) :
     ?>
@@ -554,13 +551,13 @@ function cms_comment_nav() {
 /**
  * Incudes file
  *
- * @package ZookaStudio
- * @subpackage Monaco
+ * @package Foldery
+ * @subpackage Theme
  * @since 2.0.0
  * @author Chinh Duong Manh
  *
 */
-function monaco_require_folder($foldername,$path)
+function foldery_require_folder($foldername,$path)
 {
     $dir = $path . DIRECTORY_SEPARATOR . $foldername;
     if (!is_dir($dir)) {
@@ -579,13 +576,13 @@ function monaco_require_folder($foldername,$path)
 /**
  * Enqueue scripts and styles for front-end.
  *
- * @package ZookaStudio
- * @subpackage Monaco
+ * @package Foldery
+ * @subpackage Theme
  * @since 2.0
  * @author Chinh Duong Manh
  *
  */
-function monaco_front_end_scripts()
+function foldery_front_end_scripts()
 {
     global $wp_styles;
     $themeframe_ver = wp_get_theme()->get('Version');
@@ -621,13 +618,13 @@ function monaco_front_end_scripts()
     }
 }
 
-//add_action('wp_enqueue_scripts', 'monaco_front_end_scripts');
+//add_action('wp_enqueue_scripts', 'foldery_front_end_scripts');
 
 /**
  * New VC Element
  *
- * @package ZookaStudio
- * @subpackage Monaco
+ * @package Foldery
+ * @subpackage Theme
  * @since 2.0
  * @author Chinh Duong Manh
  *
@@ -635,16 +632,16 @@ function monaco_front_end_scripts()
 /*
   VC Custom 
 */
-monaco_require_folder('vc_customs',get_template_directory());
+foldery_require_folder('vc_customs',get_template_directory());
 
 /**
  * Add new elements for VC
 */
-add_action('vc_before_init', 'monaco_new_vc_elements');
-function monaco_new_vc_elements()
+add_action('vc_before_init', 'foldery_new_vc_elements');
+function foldery_new_vc_elements()
 {
-    if (class_exists('CmsShortCode')) {
-        monaco_require_folder('vc_elements', get_template_directory());
+    if (function_exists('vc_map') && class_exists('WPBakeryShortCode')) {
+        foldery_require_folder('vc_elements', get_template_directory());
     }
 }
 
@@ -664,13 +661,13 @@ add_action('admin_enqueue_scripts',function(){
  * Support GutenBerg
  * @since 2.2
 */
-add_filter('ef3_support_gtb', function (){ 
+add_filter('foldery_support_gutenberg', function (){ 
 	global $smof_data;
-	$ef3_support_gtb = isset($smof_data['gutenberg']) ? (bool) $smof_data['gutenberg'] : true;
+	$foldery_support_gutenberg = isset($smof_data['gutenberg']) ? (bool) $smof_data['gutenberg'] : true;
 	if(class_exists('Classic_Editor'))
 		return false;
 	else
-		return $ef3_support_gtb; // theme support or not
+		return $foldery_support_gutenberg; // theme support or not
 } );
 
 require( get_template_directory() . '/inc/foldery-legacy.php' );

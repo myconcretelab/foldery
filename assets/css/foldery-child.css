@@ -11,7 +11,7 @@ Mode d'emploi :
 la page d'accueil
 -----------------
 
-Contient des 'blocs' CMS_GRID qui affichent des images liens vers des pages PORTFOLIO
+Contient des 'blocs' grille media qui affichent des images liens vers des pages PORTFOLIO
 ces blocs affiches les images grace a des templates situé dans /vc_templates :
 
 - cms_grid--dessin  ->      affiche des tas de trois images pioché dans un dossier de media dont l'ID est 

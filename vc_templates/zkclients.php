@@ -52,7 +52,7 @@ $i=1;
 $j=0;
 ?>
 <div class="<?php echo trim(implode(' ',$wrap_css_class));?>">
-    <?php monaco_owl_dots_top($layout_type, $dot_pos, $dot_style); ?>
+    <?php foldery_owl_dots_top($layout_type, $dot_pos, $dot_style); ?>
     <div id="<?php echo esc_attr($el_id);?>" class="<?php echo join(' ',$css_class_attr);?>">
         <?php
             foreach($values as $value){
@@ -98,9 +98,9 @@ $j=0;
         ?>
     </div>
     <?php 
-        monaco_owl_preload($layout_type);
-        monaco_owl_dots($layout_type, $dot_style, $dot_pos);
-        monaco_owl_nav($layout_type, $nav_style, $nav_pos);
-        monaco_owl_dots_in_nav($layout_type, $nav_style);
+        foldery_owl_preload($layout_type);
+        foldery_owl_dots($layout_type, $dot_style, $dot_pos);
+        foldery_owl_nav($layout_type, $nav_style, $nav_pos);
+        foldery_owl_dots_in_nav($layout_type, $nav_style);
     ?>
 </div>

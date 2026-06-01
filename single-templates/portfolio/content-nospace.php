@@ -5,7 +5,7 @@
  * Used for both single and index/archive/search.
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 global $thumbmail_size;
@@ -17,8 +17,8 @@ global $thumbmail_size;
 			<?php if(has_post_thumbnail() && !post_password_required() && !is_attachment() &&  wp_get_attachment_image_src(get_post_thumbnail_id(get_the_ID()), $thumbmail_size, false)):
 				the_post_thumbnail($thumbmail_size); 
 			else:
-				$thumbnail = '<img src="'.CMS_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
-				echo cms_allowed_html($thumbnail);
+				$thumbnail = '<img src="'.FOLDERY_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
+				echo foldery_allowed_html($thumbnail);
 			endif; ?>
 			<div class="overlay">
 				<div class="overlay-content">

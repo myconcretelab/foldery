@@ -1,10 +1,10 @@
 <?php
 
-if(!function_exists('cms_widget_register')) return;
+if(!function_exists('foldery_register_widget')) return;
 
 add_action('widgets_init', 'cs_recent_post_widgets');
 function cs_recent_post_widgets() {
-    cms_widget_register('CS_Recent_Post_Widget_V2');
+    foldery_register_widget('CS_Recent_Post_Widget_V2');
 }
 
 class CS_Recent_Post_Widget_V2 extends WP_Widget {
@@ -23,10 +23,10 @@ class CS_Recent_Post_Widget_V2 extends WP_Widget {
         $show_decs = (int) $instance['show_decs'];
         $number = (int) $instance['number'];
 
-        cms_allowed_html($before_widget);
+        foldery_allowed_html($before_widget);
 
         if($title) {
-            cms_allowed_html($before_title.$title.$after_title);
+            foldery_allowed_html($before_title.$title.$after_title);
         }
 
         $sticky = get_option('sticky_posts');

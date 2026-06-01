@@ -25,6 +25,6 @@ $template = wc_get_theme_slug_for_templates();
 switch ( $template ) {
 	
 	default :
-		echo '<div id="content-area" class="'.zk_monaco_wc_content_class().'">';
+		echo '<div id="content-area" class="'.foldery_wc_content_class().'">';
 		break;
 }

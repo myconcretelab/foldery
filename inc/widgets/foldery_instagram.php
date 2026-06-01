@@ -1,25 +1,25 @@
 <?php
 
-if(!function_exists('cms_widget_register')) return;
+if(!function_exists('foldery_register_widget')) return;
 
 add_action('widgets_init', 'register_instagram_widget');
 function register_instagram_widget() {
-    cms_widget_register('CMS_instagram_Widget');
+    foldery_register_widget('Foldery_Instagram_Widget');
 }
 
 
-class CMS_Instagram_Widget extends WP_Widget {
+class Foldery_Instagram_Widget extends WP_Widget {
 
     function __construct() {
         parent::__construct(
-            'cms_instagram_widget', // Base ID
-            __('CMS Instagram', 'foldery' ), // Name
-            array('description' => esc_html__('CMS Instagram Widget', 'foldery' ),) // Args
+            'foldery_instagram_widget', // Base ID
+            __('Foldery Instagram', 'foldery' ), // Name
+            array('description' => esc_html__('Foldery Instagram Widget', 'foldery' ),) // Args
         );
         add_action('wp_enqueue_scripts', array($this, 'widget_scripts'));
     }
     function widget_scripts() {
-        wp_enqueue_style('widget_cms_instagram_scripts', get_template_directory_uri() . '/inc/widgets/cms_instagram.css');
+        wp_enqueue_style('widget_foldery_instagram_scripts', get_template_directory_uri() . '/inc/widgets/foldery_instagram.css');
     }
     
     function widget($args, $instance) {      
@@ -50,10 +50,10 @@ class CMS_Instagram_Widget extends WP_Widget {
 	        default:
 	            $span = "col-xs-4 col-sm-4 col-md-4 col-lg-4 nopaddingall";
 	    }
-        cms_allowed_html($before_widget);
+        foldery_allowed_html($before_widget);
 
         if (!empty($title))
-            cms_allowed_html($before_title . $title . $after_title);
+            foldery_allowed_html($before_title . $title . $after_title);
         if ($link != '') {
 			?><div class="user"><a href="//instagram.com/<?php echo trim($username); ?>" rel="me" target="<?php echo esc_attr( $target ); ?>"><?php echo esc_attr($link); ?> @<?php echo trim($username); ?></a></div><?php
 		}
@@ -63,7 +63,7 @@ class CMS_Instagram_Widget extends WP_Widget {
 
 			if ( is_wp_error($media_array) ) {
 
-			   cms_allowed_html($media_array->get_error_message());
+			   foldery_allowed_html($media_array->get_error_message());
 
 			} else {
 
@@ -78,7 +78,7 @@ class CMS_Instagram_Widget extends WP_Widget {
 				?></div><?php
 			}
 		}
-        cms_allowed_html($after_widget);
+        foldery_allowed_html($after_widget);
     }         
     
     function update( $new_instance, $old_instance ) {
@@ -190,12 +190,12 @@ class CMS_Instagram_Widget extends WP_Widget {
 						'type'          => $image['type']
 					);
 			}
-			$instagram = base64_ef3_encode( serialize( $instagram ) );
+			$instagram = foldery_base64_encode( serialize( $instagram ) );
 
 			set_transient('instagram-media-'.sanitize_title_with_dashes($id), $instagram, apply_filters('cs_instagram_cache_time', HOUR_IN_SECONDS*2));
 		}
 
-		$instagram = unserialize( base64_ef3_decode( $instagram ) );
+		$instagram = unserialize( foldery_base64_decode( $instagram ) );
 
 		return array_slice($instagram, 0, $slice);
 	}

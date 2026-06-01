@@ -21,7 +21,7 @@
                                 $thumbnail = get_the_post_thumbnail(get_the_ID(),'medium');
                             else:
                                 $class = ' no-image';
-                                $thumbnail = '<img src="'.CMS_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
+                                $thumbnail = '<img src="'.FOLDERY_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
                             endif;
                             echo '<div class="cms-carousel-media col-xs-3 col-sm-3 col-md-3 col-lg-3'.esc_attr($class).'">'.$thumbnail.'</div>';
                         } ?>
@@ -45,7 +45,7 @@
                                 $thumbnail = get_the_post_thumbnail(get_the_ID(),'medium');
                             else:
                                 $class = ' no-image';
-                                $thumbnail = '<img src="'.CMS_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
+                                $thumbnail = '<img src="'.FOLDERY_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
                             endif;
                             echo '<div class="cms-carousel-media col-xs-3 col-sm-3 col-md-3 col-lg-3'.esc_attr($class).'">'.$thumbnail.'</div>';
                         } ?>

@@ -8,7 +8,7 @@
  * different template.
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  * @author Fox
  */

@@ -6,7 +6,7 @@
  * @author Fox
  * @version 1.0.0
  */
-class CMSSuperHeroes_DynamicCss
+class Foldery_DynamicCss
 {
 
     function __construct()
@@ -21,12 +21,12 @@ class CMSSuperHeroes_DynamicCss
      */
     public function generate_css()
     {
-        global $smof_data, $cms_base;
+        global $smof_data, $foldery_base;
         $css = $this->css_render();
         if (! $smof_data['dev_mode']) {
-            $css = $cms_base->compressCss($css);
+            $css = $foldery_base->compressCss($css);
         }
-        echo '<style type="text/css" data-type="cms_shortcodes-custom-css">'.$css.'</style>';
+        echo '<style type="text/css" data-type="foldery-shortcodes-custom-css">'.$css.'</style>';
     }
 
     /**
@@ -37,7 +37,7 @@ class CMSSuperHeroes_DynamicCss
      */
     public function css_render()
     {
-        global $smof_data, $cms_base;
+        global $smof_data, $foldery_base;
         ob_start();
         /* custom css. */ 
         if(isset($smof_data['custom_css'])) {
@@ -74,4 +74,4 @@ class CMSSuperHeroes_DynamicCss
     }
 }
 
-new CMSSuperHeroes_DynamicCss();
+new Foldery_DynamicCss();

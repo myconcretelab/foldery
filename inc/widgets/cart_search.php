@@ -1,23 +1,23 @@
 <?php
-if(!function_exists('cms_widget_register')) return;
+if(!function_exists('foldery_register_widget')) return;
 
 add_action('widgets_init', 'register_cart_search_widget');
 function register_cart_search_widget() {
-    cms_widget_register('WC_Widget_Cart_Search');
+    foldery_register_widget('WC_Widget_Cart_Search');
 }
 
 class WC_Widget_Cart_Search extends WP_Widget {
     public function __construct() {
         parent::__construct(
             'widget_cart_search', // Base ID
-            esc_html__('CMS WooCommerce Cart', 'foldery' ), // Name
+            esc_html__('Foldery WooCommerce Cart', 'foldery' ), // Name
             array('description' => esc_html__("Display the user's Cart form in the sidebar.", 'foldery' ),) // Args
         );
         add_action('wp_enqueue_scripts', array($this, 'widget_scripts'));
     }
     function widget_scripts() {
-        wp_enqueue_script('widget_cart_search_scripts', get_template_directory_uri() . '/inc/widgets/cms_cart_search.js');
-        wp_enqueue_style('widget_cart_search_scripts', get_template_directory_uri() . '/inc/widgets/cms_cart_search.css');
+        wp_enqueue_script('widget_cart_search_scripts', get_template_directory_uri() . '/inc/widgets/foldery_cart_search.js');
+        wp_enqueue_style('widget_cart_search_scripts', get_template_directory_uri() . '/inc/widgets/foldery_cart_search.css');
     }
     function widget($args, $instance) {
         extract(shortcode_atts($instance,$args));
@@ -28,7 +28,7 @@ class WC_Widget_Cart_Search extends WP_Widget {
         echo isset($before_widget)?$before_widget:'';
         $before_title = isset($before_title)?$before_title:'';
         $after_title = isset($after_title)?$after_title:'';
-        if ( $title ) cms_allowed_html($before_title . $title . $after_title);
+        if ( $title ) foldery_allowed_html($before_title . $title . $after_title);
         $total = 0;
         global $woocommerce;
         ?>
@@ -39,7 +39,7 @@ class WC_Widget_Cart_Search extends WP_Widget {
                         case '0': ?>    
                             <a href="<?php echo esc_url($woocommerce->cart->get_cart_url()); ?>" class="icon_cart_wrap">
                                 <i class="fa fa-shopping-cart"></i>
-                                <span class="cart_total">(<?php cms_allowed_html($woocommerce->cart->get_cart_contents_count());?>)</span>
+                                <span class="cart_total">(<?php foldery_allowed_html($woocommerce->cart->get_cart_contents_count());?>)</span>
                             </a>
                     <?php   
                         break;
@@ -47,7 +47,7 @@ class WC_Widget_Cart_Search extends WP_Widget {
                     ?>
                             <a href="javascript:void(0)" class="icon_cart_wrap" data-display=".shopping_cart_dropdown" data-no_display=".widget_searchform_content">
                                 <i class="fa fa-shopping-cart cart-icon"></i>
-                                <span class="cart_total"><?php cms_allowed_html($woocommerce->cart->get_cart_contents_count());?></span>
+                                <span class="cart_total"><?php foldery_allowed_html($woocommerce->cart->get_cart_contents_count());?></span>
                             </a>
                     <?php    
                         break;
@@ -77,12 +77,12 @@ class WC_Widget_Cart_Search extends WP_Widget {
                                 <li class="cart-list clearfix">
                                     <div class="cart-img pull-left">
                                         <a class="cart-list-image" href="<?php echo get_permalink( $cart_item['product_id'] ); ?>">
-                                            <?php cms_allowed_html($_product->get_image()); ?>  
+                                            <?php foldery_allowed_html($_product->get_image()); ?>  
                                         </a>
                                     </div>
                                     <div class="cart-item-info">
                                         <?php echo '<h6>'.apply_filters('woocommerce_widget_cart_product_title', $_product->get_title(), $_product ).'</h6>'; ?>
-                                        <?php cms_allowed_html($woocommerce->cart->get_item_data( $cart_item )); ?>
+                                        <?php foldery_allowed_html($woocommerce->cart->get_item_data( $cart_item )); ?>
                                         <?php echo apply_filters( 'woocommerce_widget_cart_item_quantity', '<span class="quantity">' . sprintf( '%s &times; %s', $cart_item['quantity'], $product_price ) . '</span>', $cart_item, $cart_item_key ); ?>
                                     </div>
                                 </li>
@@ -173,12 +173,12 @@ if(!function_exists('woocommerce_header_add_to_cart_content')){
                         <li class="cart-list clearfix">
                             <div class="cart-img">
                                 <a class="cart-list-image" href="<?php echo get_permalink( $cart_item['product_id'] ); ?>">
-                                    <?php cms_allowed_html($_product->get_image()); ?>  
+                                    <?php foldery_allowed_html($_product->get_image()); ?>  
                                 </a>
                             </div>
                             <div class="cart-info">
                                 <?php echo '<h6>'.apply_filters('woocommerce_widget_cart_product_title', $_product->get_title(), $_product ).'</h6>'; ?>
-                                <?php cms_allowed_html($woocommerce->cart->get_item_data( $cart_item )); ?>
+                                <?php foldery_allowed_html($woocommerce->cart->get_item_data( $cart_item )); ?>
                                 <?php echo apply_filters( 'woocommerce_widget_cart_item_quantity', '<span class="quantity">' . sprintf( '%s &times; %s', $cart_item['quantity'], $product_price ) . '</span>', $cart_item, $cart_item_key ); ?>
                             </div>
                         </li>

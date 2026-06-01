@@ -5,7 +5,7 @@
  * If no active widgets are in the sidebar, hide it completely.
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 ?>

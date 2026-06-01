@@ -14,16 +14,16 @@
                 setup_postdata($post);
             	// Get the ID attribute from the post
             	// Et aller chercher toutes les images contenue dans le Folder
-                if($id_gallery = foldery_rml_folder_id(get_field('id_gallerie',$post))) :
-                   $imagesIDs =  wp_rml_get_attachments($id_gallery);
+                if($id_gallery = foldery_media_folder_id(get_field('id_gallerie',$post))) :
+                   $imagesIDs =  foldery_media_get_attachments($id_gallery);
                    if(count($imagesIDs) === 0){
-                        $folder = wp_rml_get_object_by_id($id_gallery);
-                        $children = is_rml_folder($folder) ? $folder->getChildren() : array();
+                        $folder = foldery_media_get_folder($id_gallery);
+                        $children = foldery_is_media_folder($folder) ? $folder->getChildren() : array();
                         if(count($children)) {
 //                          while(count($imagesIDs) < 1 || $i < count($children)) {
                             foreach ($children as $child) {
                                 if($child->getCnt()) {
-                                    $imagesIDs = wp_rml_get_attachments($child->getId());
+                                    $imagesIDs = foldery_media_get_attachments($child->getId());
                                     break;
                                 }
                             } 

@@ -46,7 +46,7 @@ $defaults = array(
 	'i_icon_entypo' => 'entypo-icon entypo-icon-note',
 	'i_icon_linecons' => 'vc_li vc_li-heart',
 	'css_animation' => '',
-	/* Custom style from CMS */
+	/* Custom style from Foldery */
 	'vc_btn_type' => 'btn btn-default',
 	'vc_btn_border_color' =>''
 );
@@ -125,8 +125,8 @@ if ( $use_link ):
 	     href="<?php echo esc_url( $a_href ); ?>"
 	     title="<?php echo esc_attr( $a_title ); ?>"
 	     target="<?php echo trim( esc_attr( $a_target ) ); ?>"
-	<?php cms_allowed_html($inline_css); ?>><?php cms_allowed_html($button_html); ?></a><?php
+	<?php foldery_allowed_html($inline_css); ?>><?php foldery_allowed_html($button_html); ?></a><?php
 else:
 	?>
-	<button class="vc_general <?php echo esc_attr( $button_class ); ?>"<?php cms_allowed_html($inline_css); ?>><?php cms_allowed_html($button_html); ?></button><?php
-endif; ?></div><?php cms_allowed_html( $this->endBlockComment( 'vc_btn3' )) . "\n";
+	<button class="vc_general <?php echo esc_attr( $button_class ); ?>"<?php foldery_allowed_html($inline_css); ?>><?php foldery_allowed_html($button_html); ?></button><?php
+endif; ?></div><?php foldery_allowed_html( $this->endBlockComment( 'vc_btn3' )) . "\n";

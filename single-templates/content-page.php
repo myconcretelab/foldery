@@ -3,7 +3,7 @@
  * The template used for displaying page content in page.php
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 ?>

@@ -3,7 +3,7 @@
  * The template for displaying a "No posts found" message
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 ?>

@@ -60,11 +60,6 @@ if ( 'nivo' === $type ) {
 	$slides_wrap_end = '</ul>';
 }
 
-if ( 'link_image' === $onclick ) {
-	wp_enqueue_script( 'prettyphoto' );
-	wp_enqueue_style( 'prettyphoto' );
-}
-
 $flex_fx = '';
 if ( 'flexslider' === $type || 'flexslider_fade' === $type || 'fading' === $type ) {
 	$type = ' wpb_flexslider flexslider_fade flexslider';
@@ -153,4 +148,4 @@ $output .= '<div class="wpb_gallery_slides' . $type . '" data-interval="' . $int
 $output .= '</div>';
 $output .= '</div>';
 
-echo cms_allowed_html($output);
+echo foldery_allowed_html($output);

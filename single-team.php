@@ -3,7 +3,7 @@
  * The Template for displaying all single posts
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 
@@ -14,7 +14,7 @@ get_header(); ?>
             <div id="content" role="main">
                 <?php while ( have_posts() ) : the_post(); 
                 	/* Get Team Meta */
-            		$team_meta = cms_post_meta_data();
+            		$team_meta = foldery_post_meta_data();
                 ?>
                     <article id="post-<?php the_ID(); ?>" <?php post_class('single-team single-post'); ?>>
 						<?php if(has_post_thumbnail()) {?>

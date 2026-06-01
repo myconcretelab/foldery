@@ -2,4 +2,4 @@
 
 Theme WordPress autonome pour `sebastienj`.
 
-Il integre la base visuelle de Monaco et les personnalisations de l'ancien theme enfant, sans dependance parent/enfant et sans chargement obligatoire des anciens plugins EF3/CMS.
+Il integre directement la base visuelle, les personnalisations de l'ancien theme enfant et les fonctions media/options necessaires au site, sans dependance parent/enfant ni chargement obligatoire d'anciens plugins.

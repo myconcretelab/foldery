@@ -44,13 +44,13 @@
                         $title = '<span class="first-word">'.$title.'</span>';
                     }
 
-                    cms_allowed_html($title) ;
+                    foldery_allowed_html($title) ;
                 ?>
 			</h1>
 		</div>
 		<div class="col-xs-12 col-sm-8 col-md-8 col-lg-9">
-			<div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-	        <div class="cms-element-desc"><?php cms_allowed_html($atts['description']); ?></div>
+			<div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+	        <div class="cms-element-desc"><?php foldery_allowed_html($atts['description']); ?></div>
 		</div>
 	</header>
 	<?php endif; ?>

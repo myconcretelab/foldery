@@ -8,10 +8,10 @@ if(!function_exists('cms_integrateWithVC')){
     function cms_integrateWithVC(){
         vc_map(
 			array(
-				"name" => esc_html__("Monaco Single Fancy Box", 'foldery' ),
+				"name" => esc_html__("Foldery Single Fancy Box", 'foldery' ),
 			    "base" => "cms_fancybox_single",
 			    "class" => "vc-cms-fancy-boxes",
-			    "category" => esc_html__("Monaco", 'foldery' ),
+			    "category" => esc_html__("Foldery", 'foldery' ),
 			    "params" => array(
 			    	
 			    	array(

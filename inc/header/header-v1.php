@@ -1,7 +1,7 @@
 <?php
 /**
  * @name : Default
- * @package : CMSSuperHeroes
+ * @package : Foldery
  * @author : Fox
  */
 global $woocommerce;

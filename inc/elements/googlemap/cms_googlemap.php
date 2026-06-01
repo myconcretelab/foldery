@@ -1,9 +1,9 @@
 <?php
 vc_map(array(
-    "name" => 'Monaco Google Map',
+    "name" => 'Foldery Google Map',
     "base" => "cms_googlemap",
     "icon" => "cs_icon_for_vc",
-    "category" => esc_html__('Monaco', 'foldery' ),
+    "category" => esc_html__('Foldery', 'foldery' ),
     "params" => array(
         array(
             "type" => "textfield",
@@ -199,12 +199,9 @@ vc_map(array(
     )
 ));
 
-class WPBakeryShortCode_cms_googlemap extends CmsShortCode
-{
-
-    protected function content($atts, $content = null)
+if ( class_exists( 'WPBakeryShortCode' ) ) {
+    class WPBakeryShortCode_cms_googlemap extends WPBakeryShortCode
     {
-        return parent::content($atts, $content);
     }
 }
 

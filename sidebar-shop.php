@@ -10,7 +10,7 @@
  */
 ?>
 
-<?php if (zk_monaco_wc_sidebar()) : ?>
+<?php if (foldery_wc_sidebar()) : ?>
 	<div id="sidebar-area" class="widget-area sidebar-area sidebar-shop col-md-3">
 		<?php dynamic_sidebar( 'sidebar-9' ); ?>
 	</div>

@@ -5,9 +5,9 @@
  * @since 1.4.0
  * @author Chinh Duong Manh
  */
-add_filter( 'body_class', 'zk_monaco_body_class' ); 
-function zk_monaco_body_class($class=''){
-    global $smof_data, $cms_meta, $cms_base;
+add_filter( 'body_class', 'foldery_body_class' ); 
+function foldery_body_class($class=''){
+    global $smof_data, $cms_meta, $foldery_base;
     $class[] = is_rtl() ? 'rtl' : 'ltr';
     if(is_front_page()) $class[] = 'monaco-home';
 
@@ -37,7 +37,7 @@ function zk_monaco_body_class($class=''){
  * @author Chinh Duong Manh
  * @return Main Logo
 */
-function zk_monaco_main_logo(){
+function foldery_main_logo(){
     global $smof_data;
     $logo_url = isset($smof_data['main_logo']['url']) && !empty($smof_data['main_logo']['url']) ? $smof_data['main_logo']['url'] : get_template_directory_uri().'/assets/images/logo.png';
     ?>
@@ -52,7 +52,7 @@ function zk_monaco_main_logo(){
  * @author Fox
  */
 function cms_page_title(){
-    global $smof_data, $cms_meta, $cms_base, $woocommerce;
+    global $smof_data, $cms_meta, $foldery_base, $woocommerce;
     
     /* page options */
     if(is_page() && isset($cms_meta->_cms_page_title) && $cms_meta->_cms_page_title){
@@ -70,42 +70,42 @@ function cms_page_title(){
             <?php switch ($smof_data['page_title_layout']){
                 case '1':
                     ?>
-                    <div id="page-title-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><h1><?php $cms_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
-                    <div id="breadcrumb-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><?php $cms_base->getBreadCrumb(); ?></div>
+                    <div id="page-title-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><h1><?php $foldery_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
+                    <div id="breadcrumb-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><?php $foldery_base->getBreadCrumb(); ?></div>
                     <?php
                     break;
                 case '2':
                     ?>
-                    <div id="breadcrumb-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><?php $cms_base->getBreadCrumb(); ?></div>
-                    <div id="page-title-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><h1><?php $cms_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
+                    <div id="breadcrumb-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><?php $foldery_base->getBreadCrumb(); ?></div>
+                    <div id="page-title-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><h1><?php $foldery_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
                     <?php          
                     break;
                 case '3':
                     ?>
-                    <div id="page-title-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"><h1><?php $cms_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
-                    <div id="breadcrumb-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"><?php $cms_base->getBreadCrumb(); ?></div>
+                    <div id="page-title-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"><h1><?php $foldery_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
+                    <div id="breadcrumb-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"><?php $foldery_base->getBreadCrumb(); ?></div>
                     <?php
                     break;
                 case '4':
                     ?>
-                    <div id="breadcrumb-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"><?php $cms_base->getBreadCrumb(); ?></div>
-                    <div id="page-title-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"><h1><?php $cms_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
+                    <div id="breadcrumb-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"><?php $foldery_base->getBreadCrumb(); ?></div>
+                    <div id="page-title-text" class="col-xs-12 col-sm-6 col-md-6 col-lg-6"><h1><?php $foldery_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
                     <?php
                     break;
                 case '5':
                     ?>
-                    <div id="page-title-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center"><h1><?php $cms_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
+                    <div id="page-title-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 text-center"><h1><?php $foldery_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
                     <?php
                     break;
                 case '6':
                     ?>
-                    <div id="breadcrumb-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><?php $cms_base->getBreadCrumb(); ?></div>
+                    <div id="breadcrumb-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><?php $foldery_base->getBreadCrumb(); ?></div>
                     <?php
                     break;
                 default :
                     ?>
-                    <div id="page-title-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><h1><?php $cms_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
-                    <div id="breadcrumb-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><?php $cms_base->getBreadCrumb(); ?></div>
+                    <div id="page-title-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><h1><?php $foldery_base->getPageTitle(); ?></h1><?php cms_page_sub_title(); ?></div>
+                    <div id="breadcrumb-text" class="col-xs-12 col-sm-12 col-md-12 col-lg-12"><?php $foldery_base->getBreadCrumb(); ?></div>
                     <?php
                     break;
             } ?>
@@ -554,14 +554,14 @@ function cms_archive_readmore(){
  * @param string $after
  */
 function cms_archive_audio() {
-   global $wp_embed, $cms_base;
+   global $wp_embed, $foldery_base;
     /* get shortcode audio. */
-    $shortcode = $cms_base->getShortcodeFromContent('audio', get_the_content());
+    $shortcode = $foldery_base->getShortcodeFromContent('audio', get_the_content());
     /* Get remote audio */
-    $remote_audio = $cms_base->getShortcodeFromContent('embed', get_the_content());
+    $remote_audio = $foldery_base->getShortcodeFromContent('embed', get_the_content());
 
      /* Get soundcloud audio */
-    $remote_soundcloud = $cms_base->getShortcodeFromContent('soundcloud', get_the_content());
+    $remote_soundcloud = $foldery_base->getShortcodeFromContent('soundcloud', get_the_content());
 
     if($remote_soundcloud != ''){
         echo '<div class="entry-media entry-audio entry-remote-soundcloud">'.do_shortcode($remote_soundcloud).'</div>';
@@ -594,12 +594,12 @@ function cms_archive_audio() {
  */
 function cms_archive_video() {
     
-    global $wp_embed, $cms_base;
+    global $wp_embed, $foldery_base;
     /* Get Local Video */
-    $local_video = $cms_base->getShortcodeFromContent('video', get_the_content());
+    $local_video = $foldery_base->getShortcodeFromContent('video', get_the_content());
     
     /* Get Youtube or Vimeo */
-    $remote_video = $cms_base->getShortcodeFromContent('embed', get_the_content());
+    $remote_video = $foldery_base->getShortcodeFromContent('embed', get_the_content());
     
     if($local_video){
         /* view local. */
@@ -628,9 +628,9 @@ function cms_archive_video() {
  * @since 1.0.0
  */
 function cms_archive_gallery(){
-    global $cms_base;
+    global $foldery_base;
     /* get shortcode gallery. */
-    $shortcode = $cms_base->getShortcodeFromContent('gallery', get_the_content());
+    $shortcode = $foldery_base->getShortcodeFromContent('gallery', get_the_content());
     
     if($shortcode != ''){
         preg_match('/\[gallery.*ids=.(.*).\]/', $shortcode, $ids);
@@ -694,7 +694,7 @@ function cms_archive_quote($introtext = true) {
         the_post_thumbnail('blog-grid');
         echo '<div class="overlay"><div class="overlay-content">';
             if(!empty($blockquote[0])){
-                cms_allowed_html($blockquote[0]);
+                foldery_allowed_html($blockquote[0]);
             } else {
                 '<blockquote>'.the_excerpt().'</blockquote>';
             }
@@ -704,7 +704,7 @@ function cms_archive_quote($introtext = true) {
     } else {
         echo '<div class="quote-content">';
         if(!empty($blockquote[0])){
-            cms_allowed_html($blockquote[0]);
+            foldery_allowed_html($blockquote[0]);
         } else {
             '<blockquote>'.the_excerpt().'</blockquote>';
         }
@@ -850,14 +850,14 @@ function cms_single_like(){
  * @param string $after
  */
 function cms_single_audio() {
-    global $wp_embed, $cms_base;
+    global $wp_embed, $foldery_base;
     /* get shortcode audio. */
-    $shortcode = $cms_base->getShortcodeFromContent('audio', get_the_content());
+    $shortcode = $foldery_base->getShortcodeFromContent('audio', get_the_content());
     /* Get remote audio */
-    $remote_audio = $cms_base->getShortcodeFromContent('embed', get_the_content());
+    $remote_audio = $foldery_base->getShortcodeFromContent('embed', get_the_content());
 
      /* Get soundcloud audio */
-    $remote_soundcloud = $cms_base->getShortcodeFromContent('soundcloud', get_the_content());
+    $remote_soundcloud = $foldery_base->getShortcodeFromContent('soundcloud', get_the_content());
 
     if($remote_soundcloud != ''){
         echo '<div class="entry-media entry-audio entry-remote-soundcloud">'.do_shortcode($remote_soundcloud).'</div>';
@@ -886,12 +886,12 @@ function cms_single_audio() {
  */
 function cms_single_video() {
     
-    global $wp_embed, $cms_base;
+    global $wp_embed, $foldery_base;
     /* Get Local Video */
-    $local_video = $cms_base->getShortcodeFromContent('video', get_the_content());
+    $local_video = $foldery_base->getShortcodeFromContent('video', get_the_content());
     
     /* Get Youtube or Vimeo */
-    $remote_video = $cms_base->getShortcodeFromContent('embed', get_the_content());
+    $remote_video = $foldery_base->getShortcodeFromContent('embed', get_the_content());
     
     if($local_video){
         /* view local. */
@@ -916,9 +916,9 @@ function cms_single_video() {
  * @since 1.0.0
  */
 function cms_single_gallery(){
-    global $cms_base;
+    global $foldery_base;
     /* get shortcode gallery. */
-    $shortcode = $cms_base->getShortcodeFromContent('gallery', get_the_content());
+    $shortcode = $foldery_base->getShortcodeFromContent('gallery', get_the_content());
     
     if($shortcode != ''){
         preg_match('/\[gallery.*ids=.(.*).\]/', $shortcode, $ids);

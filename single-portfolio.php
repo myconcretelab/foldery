@@ -3,11 +3,11 @@
  * The Template for displaying all single posts
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 	global $smof_data;
-	$portfolio_meta = cms_post_meta_data();
+	$portfolio_meta = foldery_post_meta_data();
 	// var_dump($portfolio_meta); exit;
 	// Start Hack
 	//

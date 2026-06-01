@@ -1,7 +1,7 @@
 <?php
 /**
  * Template Name: Gallerie de série (stack)
- * @package CMSSuperHeroes
+ * @package Foldery
  * @subpackage ZK Theme
  * @since 1.0.0
  * @author Seb
@@ -10,10 +10,10 @@
 <?php get_header();
 
 // Le champs folder peut renvoyer un objet IFolder ou l'ID du dossier.
-$folder = foldery_rml_resolve_folder(get_field('folder'));
+$folder = foldery_media_resolve_folder(get_field('folder'));
 $col = 3;
 $thumbSize = 'medium';
-if (is_rml_folder($folder) ): 
+if (foldery_is_media_folder($folder) ): 
     $series = $folder->getChildren();
     if (count($series)) :
             // l'identifiant des colonnes pour Bootstrap

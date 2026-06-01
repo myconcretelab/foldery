@@ -1,8 +1,8 @@
 <?php
 vc_map(array(
-    'name'        => 'Monaco Clients',
+    'name'        => 'Foldery Clients',
     'base'        => 'zkclients',
-    'category'    => esc_html__('Monaco', 'foldery'),
+    'category'    => esc_html__('Foldery', 'foldery'),
     'description' => esc_html__('Add clients image with custom link', 'foldery'),
     'icon'        => 'zkel-icon-client',
     'params'      => array_merge(
@@ -49,7 +49,7 @@ vc_map(array(
                 "type"          => "dropdown",
                 "heading"       => esc_html__("Client image size",'foldery'),
                 "param_name"    => "thumbnail_size",
-                "value"         => monaco_thumbnail_sizes(),
+                "value"         => foldery_thumbnail_sizes(),
                 "std"           => "medium",
                 "group"         => esc_html__('Clients','foldery'),
             ),
@@ -99,14 +99,14 @@ vc_map(array(
             ),
         ),
         /* Grid settings */
-        monaco_grid_settings(array(
+        foldery_grid_settings(array(
             'group'      => esc_html__('Layout Settings','foldery'), 
             'param_name' => 'layout_type', 
             'value'      => 'grid'
             )
         ),
         /* Carousel Settings */
-        monaco_owl_settings(array(
+        foldery_owl_settings(array(
             'group'      => esc_html__('Layout Settings','foldery'), 
             'param_name' => 'layout_type', 
             'value'      => 'carousel'
@@ -115,14 +115,15 @@ vc_map(array(
     )
 ));
 
-class WPBakeryShortCode_zkclients extends CmsShortCode
-{
-    protected function content($atts, $content = null)
+if ( class_exists( 'WPBakeryShortCode' ) ) {
+    class WPBakeryShortCode_zkclients extends WPBakeryShortCode
     {
-        $atts = vc_map_get_attributes( $this->getShortcode(), $atts );
-        extract( $atts );
-        wp_enqueue_style( 'animate-css');
-        monaco_owl_call_settings($atts);
-        return parent::content($atts, $content);
+        protected function content($atts, $content = null)
+        {
+            $atts = vc_map_get_attributes( $this->getShortcode(), $atts );
+            wp_enqueue_style( 'animate-css');
+            foldery_owl_call_settings($atts);
+            return parent::content($atts, $content);
+        }
     }
 }

@@ -12,7 +12,7 @@
     }
     $atts['categories'] = $_category;
     
-    /* Extra params in Monaco Theme */
+    /* Extra params in Foldery Theme */
     $atts['element_title_layout']  = isset($atts['element_title_layout'] )? $atts['element_title_layout']  : '1';
     $element_title_layout = $atts['element_title_layout'];
     $atts['element_title']  = isset($atts['element_title'] )? $atts['element_title']  : '';
@@ -36,12 +36,12 @@
                                 $title = '<span class="first-word">'.$title.'</span>';
                             }
 
-                            cms_allowed_html($title) ;
+                            foldery_allowed_html($title) ;
                         ?>
                     </h1>
                 </div>
-                <div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-                <div class="cms-element-desc"><?php cms_allowed_html($atts['element_title_desc']); ?></div>
+                <div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+                <div class="cms-element-desc"><?php foldery_allowed_html($atts['element_title_desc']); ?></div>
             <?php
                 break;
                 case '2' :
@@ -58,13 +58,13 @@
                                     $title = '<span class="first-word">'.$title.'</span>';
                                 }
 
-                                cms_allowed_html($title) ;
+                                foldery_allowed_html($title) ;
                             ?>
                         </h1>
                     </div>
                     <div class="col-xs-12 col-sm-8 col-md-8 col-lg-9 nopaddingleft">
-                        <div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-                        <div class="cms-element-desc"><?php cms_allowed_html($atts['element_title_desc']); ?></div>
+                        <div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+                        <div class="cms-element-desc"><?php foldery_allowed_html($atts['element_title_desc']); ?></div>
                     </div>
                 </div>
             <?php
@@ -84,13 +84,13 @@
                                     $title = '<span class="first-word">'.$title.'</span>';
                                 }
 
-                                echo cms_allowed_html($title) ;
+                                echo foldery_allowed_html($title) ;
                             ?>
                         </h1>
                     </div>
                     <div class="col-xs-12 col-sm-8 col-md-8 col-lg-9 nopaddingleft">
-                        <div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-                        <div class="cms-element-desc"><?php cms_allowed_html($atts['element_title_desc']); ?></div>
+                        <div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+                        <div class="cms-element-desc"><?php foldery_allowed_html($atts['element_title_desc']); ?></div>
                     </div>
                 </div>
                 </div>
@@ -109,12 +109,12 @@
                                 $title = '<span class="first-word">'.$title.'</span>';
                             }
 
-                            cms_allowed_html($title) ;
+                            foldery_allowed_html($title) ;
                         ?>
                     </h1>
                 </div>
-                <div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-                <div class="cms-element-desc"><?php cms_allowed_html($atts['element_title_desc']); ?></div>
+                <div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+                <div class="cms-element-desc"><?php foldery_allowed_html($atts['element_title_desc']); ?></div>
             <?php
                 break;
             }
@@ -144,8 +144,8 @@
             $groups = array();
             $groups[] = '"all"';
             /* Get Team Meta */
-            $team_meta = cms_post_meta_data();
-            foreach(cmsGetCategoriesByPostID(get_the_ID(),$taxo) as $category){
+            $team_meta = foldery_post_meta_data();
+            foreach(foldery_get_categories_by_post_id(get_the_ID(),$taxo) as $category){
                 $groups[] = '"category-'.$category->slug.'"';
             }
             ?>
@@ -156,7 +156,7 @@
                         $thumbnail = get_the_post_thumbnail(get_the_ID(),$size);
                     else:
                         $class = ' no-image';
-                        $thumbnail = '<img src="'.CMS_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
+                        $thumbnail = '<img src="'.FOLDERY_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
                     endif;
                     echo '<div class="cms-grid-media '.esc_attr($class).'">'.$thumbnail.'</div>';
                 ?>

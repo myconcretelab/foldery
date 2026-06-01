@@ -5,7 +5,7 @@
  * Contains footer content and the closing of the #main and #page div elements.
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 global $smof_data;

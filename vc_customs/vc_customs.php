@@ -34,7 +34,7 @@ if(!function_exists('vc_remove_wp_edit_post_link')){
     add_action('vc_after_init', 'vc_remove_wp_edit_post_link');
     function vc_remove_wp_edit_post_link()
     {
-        cms_filter_remove('edit_post_link', array(vc_frontend_editor(), 'renderEditButton'));
+        foldery_remove_filter('edit_post_link', array(vc_frontend_editor(), 'renderEditButton'));
     }
 }
 
@@ -50,8 +50,8 @@ if(!function_exists('vc_remove_frontend_links')){
 /**
   * Get post type list for VC
 */
-if (!function_exists('monaco_get_post_types_for_vc')) {
-    function monaco_get_post_types_for_vc()
+if (!function_exists('foldery_get_post_types_for_vc')) {
+    function foldery_get_post_types_for_vc()
     {
         $post_types = get_post_types(['public' => true], 'object');
         $excludedPostTypes = array(
@@ -83,8 +83,8 @@ if (!function_exists('monaco_get_post_types_for_vc')) {
  *
  * Filter to replace default css class names for vc_row shortcode and vc_column
 */
-//add_filter( 'vc_shortcodes_css_class', 'monaco_css_classes_for_vc_row_and_vc_column', 10, 2 );
-function monaco_css_classes_for_vc_row_and_vc_column( $class_string, $tag ) {
+//add_filter( 'vc_shortcodes_css_class', 'foldery_css_classes_for_vc_row_and_vc_column', 10, 2 );
+function foldery_css_classes_for_vc_row_and_vc_column( $class_string, $tag ) {
   if ( $tag == 'vc_row' || $tag == 'vc_row_inner' ) {
     $class_string = str_replace( 'vc_row-fluid', 'row', $class_string ); // This will replace "vc_row-fluid" with "my_row-fluid"
   }
@@ -100,8 +100,8 @@ function monaco_css_classes_for_vc_row_and_vc_column( $class_string, $tag ) {
 /**
  * Custom VC shortcode output
  */
-add_filter('vc_shortcode_output', 'monaco_vc_shortcode_output', 10, 3);
-function monaco_vc_shortcode_output($html = '', $sc_obj = '', $atts = [])
+add_filter('vc_shortcode_output', 'foldery_vc_shortcode_output', 10, 3);
+function foldery_vc_shortcode_output($html = '', $sc_obj = '', $atts = [])
 {
     extract($atts);
     //modify shortcode use div as container
@@ -209,8 +209,8 @@ function monaco_vc_shortcode_output($html = '', $sc_obj = '', $atts = [])
  * https://kb.wpbakery.com/docs/filters/vc_shortcodes_css_class/
  *
  */
-add_filter('vc_shortcodes_css_class', 'monaco_vc_shortcodes_css_class', 10, 3);
-function monaco_vc_shortcodes_css_class($class_string, $tag, $atts = '')
+add_filter('vc_shortcodes_css_class', 'foldery_vc_shortcodes_css_class', 10, 3);
+function foldery_vc_shortcodes_css_class($class_string, $tag, $atts = '')
 {
     $custom_class = array();
     extract($atts);
@@ -266,7 +266,7 @@ function monaco_vc_shortcodes_css_class($class_string, $tag, $atts = '')
 /*
  * Grid Settings 
 */
-function monaco_grid_settings(array $args = array())
+function foldery_grid_settings(array $args = array())
 {
     extract($arr = array_merge(array(
         'group'      => '',
@@ -339,7 +339,7 @@ function monaco_grid_settings(array $args = array())
 /* OWL Carousel Setting
  * All option will use in element use OWL Carousel Libs
 */
-function monaco_owl_settings(array $args = array())
+function foldery_owl_settings(array $args = array())
 {
     extract($arr = array_merge(array(
         'group'      => '',
@@ -517,7 +517,7 @@ function monaco_owl_settings(array $args = array())
             'type'             => 'dropdown',
             'heading'          => esc_html__('Nav Style', 'foldery'),
             'param_name'       => 'nav_style',
-            'value'            => monaco_carousel_nav_style(),
+            'value'            => foldery_carousel_nav_style(),
             'std'              => '',
             'dependency'       => array(
                 'element' => 'nav',
@@ -530,7 +530,7 @@ function monaco_owl_settings(array $args = array())
             'type'             => 'dropdown',
             'heading'          => esc_html__('Nav Position', 'foldery'),
             'param_name'       => 'nav_pos',
-            'value'            => monaco_carousel_nav_pos(),
+            'value'            => foldery_carousel_nav_pos(),
             'std'              => '',
             'dependency'       => array(
                 'element'            => 'nav_style',
@@ -556,7 +556,7 @@ function monaco_owl_settings(array $args = array())
             'type'             => 'dropdown',
             'heading'          => esc_html__('Dots Style', 'foldery'),
             'param_name'       => 'dot_style',
-            'value'            => monaco_carousel_dots_style(),
+            'value'            => foldery_carousel_dots_style(),
             'std'              => '',
             'dependency'       => array(
                 'element' => 'dots',
@@ -573,7 +573,7 @@ function monaco_owl_settings(array $args = array())
             'type'             => 'dropdown',
             'heading'          => esc_html__('Dots Position', 'foldery'),
             'param_name'       => 'dot_pos',
-            'value'            => monaco_carousel_dot_pos(),
+            'value'            => foldery_carousel_dot_pos(),
             'std'              => '',
             'dependency'       => array(
                 'element' => 'dots',
@@ -681,11 +681,11 @@ function monaco_owl_settings(array $args = array())
 
 /**
  * OWL Nav & Dots
- * Nav Position monaco_carousel_nav_pos(),
- * Nav Style monaco_carousel_nav_style(),
- * Dot style monaco_carousel_dots_style()
+ * Nav Position foldery_carousel_nav_pos(),
+ * Nav Style foldery_carousel_nav_style(),
+ * Dot style foldery_carousel_dots_style()
  */
-function monaco_carousel_nav_pos()
+function foldery_carousel_nav_pos()
 {
     $carousel_nav_pos = array(
         esc_html__('Default', 'foldery')          => '',
@@ -695,7 +695,7 @@ function monaco_carousel_nav_pos()
     return $carousel_nav_pos;
 }
 
-function monaco_carousel_nav_style()
+function foldery_carousel_nav_style()
 {
     $carousel_nav_style = array(
         esc_html__('Default', 'foldery')     => '',
@@ -704,7 +704,7 @@ function monaco_carousel_nav_style()
     return $carousel_nav_style;
 }
 
-function monaco_carousel_dots_style()
+function foldery_carousel_dots_style()
 {
     $carousel_dots_style = array(
         esc_html__('Default', 'foldery')   => '',
@@ -714,7 +714,7 @@ function monaco_carousel_dots_style()
     return $carousel_dots_style;
 }
 
-function monaco_carousel_dot_pos()
+function foldery_carousel_dot_pos()
 {
     return array(
         esc_html__('Default', 'foldery') => '',
@@ -722,12 +722,12 @@ function monaco_carousel_dot_pos()
     );
 }
 
-function monaco_owl_preload($layout_type)
+function foldery_owl_preload($layout_type)
 {
     if ($layout_type === 'carousel') echo '<div class="owl-preload"></div>';
 }
 
-function monaco_owl_nav($layout_type, $nav_style, $nav_pos)
+function foldery_owl_nav($layout_type, $nav_style, $nav_pos)
 {
     if ($layout_type === 'carousel') :
         if ($nav_style !== '1'): ?>
@@ -736,7 +736,7 @@ function monaco_owl_nav($layout_type, $nav_style, $nav_pos)
     endif;
 }
 
-function monaco_owl_dots($layout_type, $dot_style, $dot_pos)
+function foldery_owl_dots($layout_type, $dot_style, $dot_pos)
 {
     if ($layout_type === 'carousel') :
         if ($dot_pos !== '1'): ?>
@@ -745,7 +745,7 @@ function monaco_owl_dots($layout_type, $dot_style, $dot_pos)
     endif;
 }
 
-function monaco_owl_dots_in_nav($layout_type, $nav_style)
+function foldery_owl_dots_in_nav($layout_type, $nav_style)
 {
     if ($layout_type === 'carousel' && $nav_style === '1') :
         ?>
@@ -755,13 +755,13 @@ function monaco_owl_dots_in_nav($layout_type, $nav_style)
     <?php endif;
 }
 
-function monaco_owl_dots_top($layout_type, $dot_pos, $dot_style)
+function foldery_owl_dots_top($layout_type, $dot_pos, $dot_style)
 {
     if ($layout_type === 'carousel' && $dot_pos === '1') echo '<div class="owl-dots ' . $dot_style . '"></div>';
 }
 
 /* Call OWL Settings */
-function monaco_owl_call_settings($atts)
+function foldery_owl_call_settings($atts)
 {
     extract($atts);
     if ($layout_type !== 'carousel') return;
@@ -826,7 +826,7 @@ function monaco_owl_call_settings($atts)
 }
 
 /* Call Masonry Settings */
-function monaco_masonry_call_settings($atts)
+function foldery_masonry_call_settings($atts)
 {
     extract($atts);
     if ($layout_type !== 'masonry') return;
@@ -844,7 +844,7 @@ function monaco_masonry_call_settings($atts)
  * @author Chinh Duong Manh
  * @since 1.0.0
  */
-function monaco_icon_libs($args = array())
+function foldery_icon_libs($args = array())
 {
     $args = wp_parse_args($args, array(
         'group'        => esc_html__('Icon', 'foldery'),
@@ -891,7 +891,7 @@ function monaco_icon_libs($args = array())
     return $icons_params;
 }
 
-function monaco_icon_libs_icon($args = array())
+function foldery_icon_libs_icon($args = array())
 {
     $args = wp_parse_args($args, array(
         'group'        => esc_html__('Icon', 'foldery'),
@@ -923,30 +923,30 @@ function monaco_icon_libs_icon($args = array())
 /**
  * Register icons for Visual Composer
  */
-function monaco_vc_icon_fonts_register()
+function foldery_vc_icon_fonts_register()
 {
     wp_register_style('font-themify', get_template_directory_uri() . '/vc_customs/themify-icons/font-themify.min.css', array(), wp_get_theme()->get('Version'));
 }
 
-add_action('wp_enqueue_scripts', 'monaco_vc_icon_fonts_register');
-add_action('admin_enqueue_scripts', 'monaco_vc_icon_fonts_register');
+add_action('wp_enqueue_scripts', 'foldery_vc_icon_fonts_register');
+add_action('admin_enqueue_scripts', 'foldery_vc_icon_fonts_register');
 
 /**
  * Enqueues icons for Visual Composer
  */
-function monaco_vc_icon_fonts_enqueue()
+function foldery_vc_icon_fonts_enqueue()
 {
     wp_enqueue_style('font-themify');
 }
 
-add_action('vc_backend_editor_enqueue_js_css', 'monaco_vc_icon_fonts_enqueue');
-add_action('vc_frontend_editor_enqueue_js_css', 'monaco_vc_icon_fonts_enqueue');
+add_action('vc_backend_editor_enqueue_js_css', 'foldery_vc_icon_fonts_enqueue');
+add_action('vc_frontend_editor_enqueue_js_css', 'foldery_vc_icon_fonts_enqueue');
 
 /**
  * Call icons for Visual Composer
  */
-add_action('vc_enqueue_font_icon_element', 'monaco_vc_icon_font');
-function monaco_vc_icon_font($font)
+add_action('vc_enqueue_font_icon_element', 'foldery_vc_icon_font');
+function foldery_vc_icon_font($font)
 {
     switch ($font) {
         case 'themify':
@@ -956,10 +956,10 @@ function monaco_vc_icon_font($font)
 }
 
 /* Load new icon font */
-monaco_require_folder('vc_customs/themify-icons', get_template_directory());
+foldery_require_folder('vc_customs/themify-icons', get_template_directory());
 
 
-function monaco_btn_types()
+function foldery_btn_types()
 {
     return array(
         esc_html__('Default', 'foldery')     => 'btn',
@@ -972,7 +972,7 @@ function monaco_btn_types()
     );
 }
 
-function monaco_btn_size()
+function foldery_btn_size()
 {
     return array(
         esc_html__('Default', 'foldery')     => '',
@@ -988,7 +988,7 @@ function monaco_btn_size()
  * @since 1.0.0
  * @author Chinh Duong Manh
  */
-function monaco_thumbnail_sizes()
+function foldery_thumbnail_sizes()
 {
     return array(
         esc_html__('Thumbnail', 'foldery')      => 'thumbnail',

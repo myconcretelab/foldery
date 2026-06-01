@@ -32,23 +32,23 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 	add_filter( 'woocommerce_show_page_title', '__return_false' );
 	add_action( 'woocommerce_before_main_content', 'cms_shop_page_title', 0 );
 	/* Custom archive layout */
-	if(!function_exists('zk_monaco_wc_content_open')){
-		function zk_monaco_wc_content_open(){
+	if(!function_exists('foldery_wc_content_open')){
+		function foldery_wc_content_open(){
 			echo '<div class="container"><div class="row">';
 		}
 	}
-	add_action( 'woocommerce_before_main_content', 'zk_monaco_wc_content_open', 1);
-	if(!function_exists('zk_monaco_wc_content_close')){
-		function zk_monaco_wc_content_close(){
+	add_action( 'woocommerce_before_main_content', 'foldery_wc_content_open', 1);
+	if(!function_exists('foldery_wc_content_close')){
+		function foldery_wc_content_close(){
 			echo '</div></div>';
 		}
 	}
-	add_action( 'woocommerce_sidebar', 'zk_monaco_wc_content_close', 99999);
-	if(!function_exists('zk_monaco_wc_content_class')){
-		function zk_monaco_wc_content_class($echo = false){
+	add_action( 'woocommerce_sidebar', 'foldery_wc_content_close', 99999);
+	if(!function_exists('foldery_wc_content_class')){
+		function foldery_wc_content_class($echo = false){
 			global $smof_data;
 			if(is_archive()){
-				if(isset($smof_data['zk_monaco_wc_archive_sidebar']) && !empty($smof_data['zk_monaco_wc_archive_sidebar'])){
+				if(isset($smof_data['foldery_wc_archive_sidebar']) && !empty($smof_data['foldery_wc_archive_sidebar'])){
 					if($echo){
 						echo 'content-area wc-content col-md-9 pull-right';
 					} else {
@@ -62,7 +62,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 					}
 				}
 			} elseif (is_singular('product')) {
-				if(isset($smof_data['zk_monaco_wc_single_sidebar']) && !empty($smof_data['zk_monaco_wc_single_sidebar'])){
+				if(isset($smof_data['foldery_wc_single_sidebar']) && !empty($smof_data['foldery_wc_single_sidebar'])){
 					if($echo){
 						echo 'content-area wc-content col-md-9 pull-right';
 					} else {
@@ -78,13 +78,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 			}
 		}
 	}
-	if(!function_exists('zk_monaco_wc_sidebar')){
-		function zk_monaco_wc_sidebar(){
+	if(!function_exists('foldery_wc_sidebar')){
+		function foldery_wc_sidebar(){
 			global $smof_data;
 			if(is_active_sidebar( 'sidebar-9' )){
-				if(is_archive() && isset($smof_data['zk_monaco_wc_archive_sidebar']) && !empty($smof_data['zk_monaco_wc_archive_sidebar']) ){
+				if(is_archive() && isset($smof_data['foldery_wc_archive_sidebar']) && !empty($smof_data['foldery_wc_archive_sidebar']) ){
 				 	return true;
-				} elseif (is_singular('product') && isset($smof_data['zk_monaco_wc_single_sidebar']) && !empty($smof_data['zk_monaco_wc_single_sidebar'])) {
+				} elseif (is_singular('product') && isset($smof_data['foldery_wc_single_sidebar']) && !empty($smof_data['foldery_wc_single_sidebar'])) {
 					return true;
 				} else {
 					return false;
@@ -119,8 +119,8 @@ if (!function_exists('loop_columns')) {
 }
 add_filter('loop_shop_columns', 'loop_columns');
 /* add shop columns to body */
-if (!function_exists('zk_monaco_body_loop_columns')) {
-	function zk_monaco_body_loop_columns($classes) {
+if (!function_exists('foldery_body_loop_columns')) {
+	function foldery_body_loop_columns($classes) {
 		global $smof_data;
 		if(isset($_REQUEST['column']) && !empty($_REQUEST['column'])){
 			$classes[] = 'columns-'.$_REQUEST['column'];
@@ -130,7 +130,7 @@ if (!function_exists('zk_monaco_body_loop_columns')) {
 		return $classes; 
 	}
 }
-add_filter('body_class', 'zk_monaco_body_loop_columns');
+add_filter('body_class', 'foldery_body_loop_columns');
 
 /**
  * Change number of products per page to 12
@@ -142,7 +142,7 @@ function cms_loop_shop_per_page(){
 	if(isset($_REQUEST['loop_shop_per_page']) && !empty($_REQUEST['loop_shop_per_page'])) {
 		return $_REQUEST['loop_shop_per_page'];
 	} else {
-		return isset($smof_data['zk_monaco_wc_archive_per_page']) ? $smof_data['zk_monaco_wc_archive_per_page'] : '12' ;
+		return isset($smof_data['foldery_wc_archive_per_page']) ? $smof_data['foldery_wc_archive_per_page'] : '12' ;
 	}
 }
 add_filter( 'loop_shop_per_page', 'cms_loop_shop_per_page' );
@@ -154,8 +154,8 @@ add_filter( 'loop_shop_per_page', 'cms_loop_shop_per_page' );
  * @since 1.3.0
  * @author Chinh Duong Manh 
 */
-if (!function_exists('zk_monaco_wc_template_loop_product_open')) {
-	function zk_monaco_wc_template_loop_product_open() {
+if (!function_exists('foldery_wc_template_loop_product_open')) {
+	function foldery_wc_template_loop_product_open() {
 	?>
 		<div class="product-item-wrap overlay-wrap">
 			<div class="product-item-media">
@@ -175,13 +175,13 @@ if (!function_exists('zk_monaco_wc_template_loop_product_open')) {
 	<?php
 	}
 }
-add_action('woocommerce_before_shop_loop_item', 'zk_monaco_wc_template_loop_product_open' , 10);
+add_action('woocommerce_before_shop_loop_item', 'foldery_wc_template_loop_product_open' , 10);
 remove_action('woocommerce_before_shop_loop_item','woocommerce_template_loop_product_link_open', 10);
 remove_action('woocommerce_before_shop_loop_item_title','woocommerce_show_product_loop_sale_flash', 10);
 remove_action('woocommerce_before_shop_loop_item_title','woocommerce_template_loop_product_thumbnail', 10);
 
-if (!function_exists('zk_monaco_wc_template_loop_product_title')) {
-	function zk_monaco_wc_template_loop_product_title() {
+if (!function_exists('foldery_wc_template_loop_product_title')) {
+	function foldery_wc_template_loop_product_title() {
 	?>
 		<div class="product-item-info text-center">
 			<h5><a  href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h5>
@@ -194,7 +194,7 @@ if (!function_exists('zk_monaco_wc_template_loop_product_title')) {
 	<?php
 	}
 }
-add_action('woocommerce_shop_loop_item_title', 'zk_monaco_wc_template_loop_product_title' , 10);
+add_action('woocommerce_shop_loop_item_title', 'foldery_wc_template_loop_product_title' , 10);
 remove_action('woocommerce_shop_loop_item_title', 'woocommerce_template_loop_product_title' , 10);
 remove_action('woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_rating' , 5);
 remove_action('woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price' , 10);
@@ -215,14 +215,14 @@ remove_action( 'woocommerce_proceed_to_checkout', 'woocommerce_button_proceed_to
 
 /* Display Cross Sells on 2 columns instead of default 4 */
  
-add_filter( 'woocommerce_cross_sells_columns', 'zk_monaco_change_cross_sells_columns' );
-function zk_monaco_change_cross_sells_columns( $columns ) {
+add_filter( 'woocommerce_cross_sells_columns', 'foldery_change_cross_sells_columns' );
+function foldery_change_cross_sells_columns( $columns ) {
 	return 2;
 }
 /* Display Only 2 Cross Sells instead of default 4 */
  
-add_filter( 'woocommerce_cross_sells_total', 'zk_monaco_change_cross_sells_product_no' ); 
-function zk_monaco_change_cross_sells_product_no( $columns ) {
+add_filter( 'woocommerce_cross_sells_total', 'foldery_change_cross_sells_product_no' ); 
+function foldery_change_cross_sells_product_no( $columns ) {
 	return 2;
 }
 
@@ -247,8 +247,8 @@ function zk_monaco_change_cross_sells_product_no( $columns ) {
 	/* Hooked woocommerce_output_related_products_args 
 	 * Change related product column, number to show
 	*/
-	add_filter( 'woocommerce_output_related_products_args', 'zk_monaco_related_products_args' );
-	function zk_monaco_related_products_args( $args ) {
+	add_filter( 'woocommerce_output_related_products_args', 'foldery_related_products_args' );
+	function foldery_related_products_args( $args ) {
 		$args = array(
 			'posts_per_page' => 3, /* 3 related products */
 			'columns'		 => 3 /* 3 columns */

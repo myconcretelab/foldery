@@ -5,7 +5,7 @@
  * Used for both single and index/archive/search.
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 ?>

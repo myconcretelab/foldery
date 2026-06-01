@@ -26,7 +26,7 @@
 				<figure class="<?php echo $classes ?>" id="frame_<?php echo $post->ID ?>" style="width:<?php echo $img[1] * $ratio ?>px;">
 				<?php
 					// Display full-size image in lightbox when clicked.
-					if ( function_exists( 'slb_activate' ) ) echo slb_activate($imgtag );
+					if ( function_exists('foldery_lightbox_activate') ) echo foldery_lightbox_activate($imgtag );
 				?>
 				</figure>
 				<?php if($di = get_field('dimension',$post,true)) :?><h5><?php print_r( $di)?></h5><?php endif ?>

@@ -1,10 +1,10 @@
 <?php
 
-if(!function_exists('cms_widget_register')) return;
+if(!function_exists('foldery_register_widget')) return;
 
 add_action('widgets_init', 'ww_news_tabs_load_widgets');
 function ww_news_tabs_load_widgets() {
-    cms_widget_register('WW_News_Tabs_Widget');
+    foldery_register_widget('WW_News_Tabs_Widget');
 }
 
 class WW_News_Tabs_Widget extends WP_Widget {

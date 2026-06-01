@@ -26,7 +26,7 @@
             $posts->the_post();
             $groups = array();
             $groups[] = '"all"';
-            foreach(cmsGetCategoriesByPostID(get_the_ID(),$taxo) as $category){
+            foreach(foldery_get_categories_by_post_id(get_the_ID(),$taxo) as $category){
                 $groups[] = '"category-'.$category->slug.'"';
             }
             ?>
@@ -39,12 +39,10 @@
                         $image_url = $image[0];
                     else:
                         $class = ' no-image';
-                        $thumbnail = '<img src="'.CMS_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
-                        $image_url = CMS_IMAGES.'no-image.jpg';
+                        $thumbnail = '<img src="'.FOLDERY_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
+                        $image_url = FOLDERY_IMAGES.'no-image.jpg';
                     endif;
                     /* Load Pretty Photo */
-                    wp_enqueue_script('prettyphoto');
-                    wp_enqueue_style('prettyphoto');
                     $overlay_content = '<div class="overlay"><div class="overlay-content"><a class="icon circle" href="'.get_the_permalink().'"><i class="fa fa-link"></i></a><a class="icon circle prettyphoto"  href="'.$image_url.'"><i class="fa fa-search"></i></a></div></div>';
                     echo '<div class="cms-grid-media overlay-wrap'.esc_attr($class).'">'.$thumbnail.$overlay_content.'</div>';
                 ?>

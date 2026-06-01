@@ -1,7 +1,7 @@
 <?php
 /**
  * @name : Default
- * @package : CMSSuperHeroes
+ * @package : Foldery
  * @author : Fox
  */
 ?>
@@ -11,7 +11,7 @@
 <div id="cms-header" class="cms-header <?php cms_header_class();?>">
     <div class="<?php echo esc_attr($smof_data['header_fullwidth'])?'no-container':'container';?>">
         <div id="cms-header-logo" class="main-navigation pull-left">
-            <?php zk_monaco_main_logo(); ?>
+            <?php foldery_main_logo(); ?>
         </div>
         <div id="cms-nav-extra" class="cms-nav-extra main-navigation pull-right">
             <?php if (is_page_template('page-templates/portfolio-masonry.php')) {?>

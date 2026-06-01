@@ -38,5 +38,5 @@
             'value' => 'pe7stroke',
         ),
         'description' => esc_html__( 'Select icon from library.', 'foldery' ),
-        "group" => esc_html__("Monaco Custom", 'foldery' )
+        "group" => esc_html__("Foldery Custom", 'foldery' )
     ));

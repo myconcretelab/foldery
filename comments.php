@@ -8,7 +8,7 @@
  * located in the functions.php file.
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  */
 

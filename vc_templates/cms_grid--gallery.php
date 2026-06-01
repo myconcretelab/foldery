@@ -17,7 +17,7 @@
 
     $atts['categories'] = $_category;
 
-    /* Extra params in Monaco Theme */
+    /* Extra params in Foldery Theme */
     $atts['filter']  = isset($atts['filter'] )? $atts['filter']  : '';
     $atts['layout']  = isset($atts['layout'] )? $atts['layout']  : '';
     $atts['show_image']  = isset($atts['show_image'] )? $atts['show_image']  : '1';
@@ -32,7 +32,7 @@
         wp_enqueue_style( 'wp-mediaelement' );
         wp_enqueue_script( 'wp-mediaelement' );
         /* js, css for load more */
-        wp_register_script( 'cms-loadmore-js', CMS_JS.'cms_loadmore.js', array('jquery') ,'1.0',true);
+        wp_register_script( 'cms-loadmore-js', FOLDERY_JS.'cms_loadmore.js', array('jquery') ,'1.0',true);
         // What page are we on? And what is the pages limit?
         global $wp_query;
         $max = $wp_query->max_num_pages;
@@ -73,12 +73,12 @@
                                 $title = '<span class="first-word">'.$title.'</span>';
                             }
 
-                            cms_allowed_html($title) ;
+                            foldery_allowed_html($title) ;
                         ?>
                     </h1>
                 </div>
-                <div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-                <div class="cms-element-desc"><?php cms_allowed_html($atts['element_title_desc']); ?></div>
+                <div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+                <div class="cms-element-desc"><?php foldery_allowed_html($atts['element_title_desc']); ?></div>
             <?php
                 break;
                 case '2' :
@@ -95,13 +95,13 @@
                                     $title = '<span class="first-word">'.$title.'</span>';
                                 }
 
-                                cms_allowed_html($title) ;
+                                foldery_allowed_html($title) ;
                             ?>
                         </h1>
                     </div>
                     <div class="col-xs-12 col-sm-8 col-md-8 col-lg-9 nopaddingleft">
-                        <div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-                        <div class="cms-element-desc"><?php cms_allowed_html($atts['element_title_desc']); ?></div>
+                        <div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+                        <div class="cms-element-desc"><?php foldery_allowed_html($atts['element_title_desc']); ?></div>
                     </div>
                 </div>
             <?php
@@ -121,13 +121,13 @@
                                     $title = '<span class="first-word">'.$title.'</span>';
                                 }
 
-                                cms_allowed_html($title) ;
+                                foldery_allowed_html($title) ;
                             ?>
                         </h1>
                     </div>
                     <div class="col-xs-12 col-sm-8 col-md-8 col-lg-9 nopaddingleft">
-                        <div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-                        <div class="cms-element-desc"><?php cms_allowed_html($atts['element_title_desc']); ?></div>
+                        <div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+                        <div class="cms-element-desc"><?php foldery_allowed_html($atts['element_title_desc']); ?></div>
                     </div>
                 </div>
                 </div>
@@ -146,12 +146,12 @@
                                 $title = '<span class="first-word">'.$title.'</span>';
                             }
 
-                            cms_allowed_html($title) ;
+                            foldery_allowed_html($title) ;
                         ?>
                     </h1>
                 </div>
-                <div class="cms-element-subtitle playfairdisplay"><?php cms_allowed_html($atts['element_sub_title']); ?></div>
-                <div class="cms-element-desc"><?php cms_allowed_html($atts['element_title_desc']); ?></div>
+                <div class="cms-element-subtitle playfairdisplay"><?php foldery_allowed_html($atts['element_sub_title']); ?></div>
+                <div class="cms-element-desc"><?php foldery_allowed_html($atts['element_title_desc']); ?></div>
             <?php
                 break;
             }
@@ -183,7 +183,7 @@
             $groups = array();
             $groups[] = '"all"';
             $pretty_rel_random = ' data-rel="prettyPhoto[rel-'.esc_attr($atts['html_id']).']"';
-            foreach(cmsGetCategoriesByPostID(get_the_ID(),$taxo) as $category){
+            foreach(foldery_get_categories_by_post_id(get_the_ID(),$taxo) as $category){
                 $groups[] = '"category-'.$category->slug.'"';
             }
             ?>
@@ -197,8 +197,8 @@
                             $image_url = $image[0];
                         else:
                             $class = ' no-image';
-                            $thumbnail = '<img src="'.CMS_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
-                            $image_url = CMS_IMAGES.'no-image.jpg';
+                            $thumbnail = '<img src="'.FOLDERY_IMAGES.'no-image.jpg" alt="'.get_the_title().'" />';
+                            $image_url = FOLDERY_IMAGES.'no-image.jpg';
                         endif;
                         $overlay_content = '<div class="overlay"><div class="overlay-content"><a class="icon circle prettyphoto"  href="'.$image_url.'" '.$pretty_rel_random.'><i class="fa fa-search"></i></a></div></div>';
                         echo '<div class="cms-grid-media overlay-wrap'.esc_attr($class).'">'.$thumbnail.$overlay_content.'</div>';

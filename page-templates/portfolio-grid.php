@@ -5,7 +5,7 @@
  * Template Name: Portfolio Grid
  *
  * @package ZookaStudio
- * @subpackage Monaco
+ * @subpackage Foldery
  * @since 1.0.0
  * @author Luan Nguyen
  */

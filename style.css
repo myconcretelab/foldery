@@ -2,7 +2,7 @@
 Theme Name: Foldery
 Theme URI: https://github.com/myconcretelab/foldery
 Author: Sebastien Jacqmin
-Description: Theme autonome pour sebastienj.com, base Monaco integree avec les personnalisations du theme enfant.
+Description: Theme autonome pour sebastienj.com avec logique, options et medias integres dans Foldery.
 Version: 1.0.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ Mode d'emploi :
 la page d'accueil
 -----------------
 
-Contient des 'blocs' CMS_GRID qui affichent des images liens vers des pages PORTFOLIO
+Contient des blocs de grille media qui affichent des images liens vers des pages PORTFOLIO
 ces blocs affiches les images grace a des templates situé dans /vc_templates :
 
 - cms_grid--dessin  ->      affiche des tas de trois images pioché dans un dossier de media dont l'ID est 
@@ -34,7 +34,7 @@ ces blocs affiches les images grace a des templates situé dans /vc_templates :
 Les pages de thematique (dessins,peinture,..) 
 ----------------------------------------------
 
-Sont des pages avec un CMS_GRID qui collecte des pages partfolio qui ont la catégorie associée  (dessins,peinture,..)                            
+Sont des pages avec une grille media qui collecte des pages portfolio qui ont la catégorie associée  (dessins,peinture,..)                            
 
                             
 Les pages PORTFOLIO
@@ -42,4 +42,3 @@ Les pages PORTFOLIO
 
 Ces pages affichent les medias contenu dans le dossier de média dont l'ID est associé a cette page 
 via l'attribut ACF 'id_categorie'
-

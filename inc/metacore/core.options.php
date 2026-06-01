@@ -520,7 +520,7 @@ class CsCoreControl
         echo ob_get_clean();
     }
     /**
-     * Save post update CMS data.
+     * Save post update Foldery data.
      * 
      * @author Fox
      * @param unknown $post_id

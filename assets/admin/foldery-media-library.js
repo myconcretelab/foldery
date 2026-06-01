@@ -156,7 +156,7 @@
 	function refreshMedia() {
 		var browser = mediaBrowser();
 		if (browser && browser.collection && browser.collection.props) {
-			browser.collection.props.set({ rml_folder: selectedFolder });
+			browser.collection.props.set({ foldery_media_folder: selectedFolder });
 			browser.collection.props.unset('paged');
 			browser.collection.reset();
 			browser.collection.more();
@@ -168,9 +168,9 @@
 		if ($('body').hasClass('upload-php')) {
 			var url = new URL(window.location.href);
 			if (selectedFolder === 0) {
-				url.searchParams.delete('rml_folder');
+				url.searchParams.delete('foldery_media_folder');
 			} else {
-				url.searchParams.set('rml_folder', selectedFolder);
+				url.searchParams.set('foldery_media_folder', selectedFolder);
 			}
 			window.location.href = url.toString();
 		}
@@ -215,10 +215,10 @@
 
 	function request(folderAction, data) {
 		return $.post(config.ajaxUrl, $.extend({
-			action: 'foldery_rml_admin',
+			action: 'foldery_media_admin',
 			nonce: config.nonce,
 			folder_action: folderAction,
-			rml_folder: selectedFolder
+			foldery_media_folder: selectedFolder
 		}, data || {})).done(function (response) {
 			if (response && response.success && response.data) {
 				config.tree = response.data.tree || config.tree;
@@ -235,13 +235,13 @@
 	}
 
 	function syncUploader() {
-		$('input[name="rml_folder"], input[name="rmlFolder"]').val(selectedFolder);
+		$('input[name="foldery_media_folder"], input[name="folderyMediaFolder"]').val(selectedFolder);
 		if (window.wpUploaderInit && window.wpUploaderInit.multipart_params) {
-			window.wpUploaderInit.multipart_params.rml_folder = selectedFolder;
+			window.wpUploaderInit.multipart_params.foldery_media_folder = selectedFolder;
 		}
 		if (wp && wp.Uploader && wp.Uploader.defaults) {
 			wp.Uploader.defaults.multipart_params = wp.Uploader.defaults.multipart_params || {};
-			wp.Uploader.defaults.multipart_params.rml_folder = selectedFolder;
+			wp.Uploader.defaults.multipart_params.foldery_media_folder = selectedFolder;
 		}
 	}
 
@@ -422,7 +422,7 @@
 					var prefix = folder.depth > 0 ? new Array(folder.depth + 1).join('- ') : '';
 					filters['foldery-' + folder.id] = {
 						text: prefix + folder.name,
-						props: { rml_folder: folder.id },
+						props: { foldery_media_folder: folder.id },
 						priority: 20 + folder.depth
 					};
 				});

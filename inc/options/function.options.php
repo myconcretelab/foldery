@@ -1,7 +1,7 @@
 <?php
-global $cms_base, $woocommerce, $mof_data;
+global $foldery_base, $woocommerce, $mof_data;
 /* get local fonts. */
-$local_fonts = is_admin() ? $cms_base->getListLocalFontsName() : array() ;
+$local_fonts = is_admin() ? $foldery_base->getListLocalFontsName() : array() ;
 $fontawesome_cheatsheet = 'http://fortawesome.github.io/Font-Awesome/cheatsheet/';
 
 /* Get menu position */
@@ -1560,7 +1560,7 @@ if($woocommerce){
                 'type' => 'text',
                 'title' => esc_html__('Shop Page Title', 'foldery'),
                 'subtitle' => esc_html__('Enter the text you want to show in shop page title.', 'foldery'),
-                'default' => 'Monaco Shop'
+                'default' => 'Foldery Shop'
             ),
             array(
                 'id' => 'shop_page_sub_title',
@@ -1612,7 +1612,7 @@ if($woocommerce){
             array(
                 'title'         => esc_html__('Number product per page', 'foldery'),
                 'desc'          => esc_html__('Choose number of product in product list.', 'foldery'),
-                'id'            => 'zk_monaco_wc_archive_per_page',
+                'id'            => 'foldery_wc_archive_per_page',
                 'type'          => 'slider',
                 'default'       => 12,
                 'min'           => 3,
@@ -1621,7 +1621,7 @@ if($woocommerce){
                 'display_value' => 'label',
             ),
             array(
-                'id'       => 'zk_monaco_wc_archive_sidebar',
+                'id'       => 'foldery_wc_archive_sidebar',
                 'type'     => 'switch',
                 'title'    => esc_html__('Enable Shop Sidebar', 'foldery'),
                 'subtitle' => esc_html__('This option will show sidebar on Archive product page.', 'foldery'),
@@ -1635,7 +1635,7 @@ if($woocommerce){
         'subsection' => true,
         'fields' => array(
             array(
-                'id' => 'zk_monaco_wc_single_sidebar',
+                'id' => 'foldery_wc_single_sidebar',
                 'type' => 'switch',
                 'title' => esc_html__('Enable Shop Sidebar', 'foldery'),
                 'subtitle' => esc_html__('This option will show sidebar on single product page.', 'foldery'),
@@ -1644,7 +1644,7 @@ if($woocommerce){
             array(
                 'title'   => esc_html__('Gallery', 'foldery'),
                 'desc'    => esc_html__('Choose style for product image', 'foldery'),
-                'id'      => 'zk_monaco_wc_single_gallery',
+                'id'      => 'foldery_wc_single_gallery',
                 'type'      => 'button_set',
                 'options'   => array(
                     '1'     => esc_html__('Lightbox','foldery'),
@@ -2149,6 +2149,167 @@ $this->sections[] = array(
             'type' => 'switch',
             'title' => esc_html__('Smooth Scroll', 'foldery'),
             'default' => false
+        ),
+    )
+);
+/**
+ * Lightbox
+ *
+ * Native Foldery image lightbox.
+ */
+$this->sections[] = array(
+    'title' => esc_html__('Lightbox', 'foldery'),
+    'icon' => 'el-icon-picture',
+    'fields' => array(
+        array(
+            'id' => 'lightbox_enabled',
+            'type' => 'switch',
+            'title' => esc_html__('Enable Lightbox', 'foldery'),
+            'subtitle' => esc_html__('Open image links in the Foldery lightbox.', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_enabled_home',
+            'type' => 'switch',
+            'title' => esc_html__('Enable on Home', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_enabled_post',
+            'type' => 'switch',
+            'title' => esc_html__('Enable on Posts', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_enabled_page',
+            'type' => 'switch',
+            'title' => esc_html__('Enable on Pages', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_enabled_archive',
+            'type' => 'switch',
+            'title' => esc_html__('Enable on Archives', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_enabled_widget',
+            'type' => 'switch',
+            'title' => esc_html__('Enable in Widgets', 'foldery'),
+            'default' => false,
+        ),
+        array(
+            'id' => 'lightbox_enabled_menu',
+            'type' => 'switch',
+            'title' => esc_html__('Enable in Menus', 'foldery'),
+            'default' => false,
+        ),
+        array(
+            'id' => 'lightbox_group_links',
+            'type' => 'switch',
+            'title' => esc_html__('Group Links', 'foldery'),
+            'subtitle' => esc_html__('Allow navigation between image links in the same group.', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_group_post',
+            'type' => 'switch',
+            'title' => esc_html__('Group by Post', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_group_gallery',
+            'type' => 'switch',
+            'title' => esc_html__('Group by Gallery', 'foldery'),
+            'subtitle' => esc_html__('When possible, keep navigation inside the current gallery block.', 'foldery'),
+            'default' => false,
+        ),
+        array(
+            'id' => 'lightbox_group_loop',
+            'type' => 'switch',
+            'title' => esc_html__('Loop Gallery', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_ui_autofit',
+            'type' => 'switch',
+            'title' => esc_html__('Resize to Fit', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_ui_animate',
+            'type' => 'switch',
+            'title' => esc_html__('Enable Animations', 'foldery'),
+            'default' => true,
+        ),
+        array(
+            'id' => 'lightbox_ui_overlay_opacity',
+            'type' => 'text',
+            'title' => esc_html__('Overlay Opacity', 'foldery'),
+            'subtitle' => esc_html__('Use a value from 0 to 1.', 'foldery'),
+            'default' => '0.8',
+        ),
+        array(
+            'id' => 'lightbox_ui_title_default',
+            'type' => 'switch',
+            'title' => esc_html__('Use Link Text as Title', 'foldery'),
+            'default' => false,
+        ),
+        array(
+            'id' => 'lightbox_slideshow_autostart',
+            'type' => 'switch',
+            'title' => esc_html__('Autostart Slideshow', 'foldery'),
+            'default' => false,
+        ),
+        array(
+            'id' => 'lightbox_slideshow_duration',
+            'type' => 'text',
+            'title' => esc_html__('Slideshow Duration', 'foldery'),
+            'subtitle' => esc_html__('Duration in seconds.', 'foldery'),
+            'default' => '6',
+        ),
+        array(
+            'id' => 'lightbox_label_close',
+            'type' => 'text',
+            'title' => esc_html__('Close Label', 'foldery'),
+            'default' => 'Close',
+        ),
+        array(
+            'id' => 'lightbox_label_loading',
+            'type' => 'text',
+            'title' => esc_html__('Loading Label', 'foldery'),
+            'default' => 'Loading',
+        ),
+        array(
+            'id' => 'lightbox_label_next',
+            'type' => 'text',
+            'title' => esc_html__('Next Label', 'foldery'),
+            'default' => 'Next',
+        ),
+        array(
+            'id' => 'lightbox_label_prev',
+            'type' => 'text',
+            'title' => esc_html__('Previous Label', 'foldery'),
+            'default' => 'Previous',
+        ),
+        array(
+            'id' => 'lightbox_label_slideshow_start',
+            'type' => 'text',
+            'title' => esc_html__('Start Slideshow Label', 'foldery'),
+            'default' => 'Start slideshow',
+        ),
+        array(
+            'id' => 'lightbox_label_slideshow_stop',
+            'type' => 'text',
+            'title' => esc_html__('Stop Slideshow Label', 'foldery'),
+            'default' => 'Stop slideshow',
+        ),
+        array(
+            'id' => 'lightbox_label_group_status',
+            'type' => 'text',
+            'title' => esc_html__('Group Status Label', 'foldery'),
+            'subtitle' => esc_html__('Available placeholders: %current% and %total%.', 'foldery'),
+            'default' => 'Image %current% of %total%',
         ),
     )
 );
