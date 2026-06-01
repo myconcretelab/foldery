@@ -5,6 +5,7 @@
 	var selectedFolder = parseInt(config.tree && config.tree.selected, 10) || 0;
 	var draggedAttachmentId = null;
 	var isSorting = false;
+	var isFolderSorting = false;
 
 	function labels(key) {
 		return config.labels && config.labels[key] ? config.labels[key] : key;
@@ -55,12 +56,15 @@
 			return treeNode(child, depth + 1);
 		}).join('');
 
-		return '<li>' +
-			'<button type="button" class="foldery-media-folder' + active + '" data-folder-id="' + id + '" style="--folder-depth:' + depth + '">' +
-				'<span class="foldery-media-folder__name">' + escapeHtml(folder.name) + '</span>' +
-				'<span class="foldery-media-folder__count">' + (parseInt(folder.count, 10) || 0) + '</span>' +
-			'</button>' +
-			(children ? '<ul>' + children + '</ul>' : '') +
+		return '<li class="foldery-media-folder-item" data-folder-id="' + id + '">' +
+			'<div class="foldery-media-folder-row" style="--folder-depth:' + depth + '">' +
+				'<span class="foldery-media-folder-handle" aria-hidden="true"></span>' +
+				'<button type="button" class="foldery-media-folder' + active + '" data-folder-id="' + id + '">' +
+					'<span class="foldery-media-folder__name">' + escapeHtml(folder.name) + '</span>' +
+					'<span class="foldery-media-folder__count">' + (parseInt(folder.count, 10) || 0) + '</span>' +
+				'</button>' +
+			'</div>' +
+			'<ul class="foldery-media-folder-list" data-parent-id="' + id + '">' + children + '</ul>' +
 		'</li>';
 	}
 
@@ -73,17 +77,21 @@
 				'<strong>' + escapeHtml(labels('title')) + '</strong>' +
 				'<button type="button" class="button button-small foldery-media-create">' + escapeHtml(labels('newFolder')) + '</button>' +
 			'</div>' +
-			'<ul class="foldery-media-tree">' +
-				'<li><button type="button" class="foldery-media-folder' + allActive + '" data-folder-id="0" style="--folder-depth:0">' +
+			'<div class="foldery-media-tree">' +
+				'<ul class="foldery-media-system">' +
+					'<li><button type="button" class="foldery-media-folder' + allActive + '" data-folder-id="0" style="--folder-depth:0">' +
 					'<span class="foldery-media-folder__name">' + escapeHtml((tree.all && tree.all.name) || labels('allFiles')) + '</span>' +
 					'<span class="foldery-media-folder__count">' + ((tree.all && tree.all.count) || 0) + '</span>' +
-				'</button></li>' +
-				'<li><button type="button" class="foldery-media-folder' + rootActive + '" data-folder-id="' + parseInt(config.rootId, 10) + '" style="--folder-depth:0">' +
+					'</button></li>' +
+					'<li><button type="button" class="foldery-media-folder' + rootActive + '" data-folder-id="' + parseInt(config.rootId, 10) + '" style="--folder-depth:0">' +
 					'<span class="foldery-media-folder__name">' + escapeHtml((tree.unorganized && tree.unorganized.name) || labels('unorganized')) + '</span>' +
 					'<span class="foldery-media-folder__count">' + ((tree.unorganized && tree.unorganized.count) || 0) + '</span>' +
-				'</button></li>' +
-				((tree.folders || []).map(function (folder) { return treeNode(folder, 0); }).join('')) +
-			'</ul>' +
+					'</button></li>' +
+				'</ul>' +
+				'<ul class="foldery-media-folder-list foldery-media-folder-list-root" data-parent-id="' + parseInt(config.rootId, 10) + '">' +
+					((tree.folders || []).map(function (folder) { return treeNode(folder, 0); }).join('')) +
+				'</ul>' +
+			'</div>' +
 			'<div class="foldery-media-actions">' +
 				'<button type="button" class="button foldery-media-move">' + escapeHtml(labels('moveSelected')) + '</button>' +
 				'<button type="button" class="button foldery-media-rename">' + escapeHtml(labels('rename')) + '</button>' +
@@ -106,6 +114,7 @@
 			($target.length ? $target : $('.wrap').first()).before(html);
 		}
 		updateButtons();
+		window.setTimeout(initFolderSorting, 0);
 	}
 
 	function updateButtons() {
@@ -243,6 +252,85 @@
 		});
 	}
 
+	function refreshFolderDepths() {
+		function updateList($list, depth) {
+			$list.children('.foldery-media-folder-item').each(function () {
+				var $item = $(this);
+				$item.children('.foldery-media-folder-row').css('--folder-depth', depth);
+				updateList($item.children('.foldery-media-folder-list').first(), depth + 1);
+			});
+		}
+		updateList($('.foldery-media-folder-list-root').first(), 0);
+	}
+
+	function folderTreePayload() {
+		var rows = [];
+		$('.foldery-media-folder-list').each(function () {
+			var parent = parseInt($(this).attr('data-parent-id'), 10);
+			$(this).children('.foldery-media-folder-item').each(function (index) {
+				var id = parseInt($(this).attr('data-folder-id'), 10);
+				if (id) {
+					rows.push({
+						id: id,
+						parent: parent,
+						ord: index + 1
+					});
+				}
+			});
+		});
+		return rows;
+	}
+
+	function saveFolderOrder() {
+		var rows = folderTreePayload();
+		if (!rows.length) {
+			return;
+		}
+		request('reorder_folders', { tree: JSON.stringify(rows) }).done(function () {
+			$('.foldery-media-message').text(labels('folderOrderSaved'));
+			refreshFolderDepths();
+		});
+	}
+
+	function initFolderSorting() {
+		var $lists = $('.foldery-media-folder-list');
+		if (!$lists.length || !$.fn.sortable) {
+			return;
+		}
+
+		$lists.each(function () {
+			var $list = $(this);
+			if ($list.data('ui-sortable')) {
+				$list.sortable('refresh');
+				return;
+			}
+
+			$list.sortable({
+				connectWith: '.foldery-media-folder-list',
+				handle: '.foldery-media-folder-handle',
+				items: '> .foldery-media-folder-item',
+				placeholder: 'foldery-media-folder-placeholder',
+				tolerance: 'pointer',
+				start: function (event, ui) {
+					isFolderSorting = true;
+					ui.placeholder.height(ui.item.children('.foldery-media-folder-row').outerHeight());
+				},
+				sort: refreshFolderDepths,
+				stop: function () {
+					refreshFolderDepths();
+					window.setTimeout(function () {
+						isFolderSorting = false;
+					}, 0);
+				},
+				update: function (event, ui) {
+					if (this === ui.item.parent()[0]) {
+						saveFolderOrder();
+					}
+				}
+			});
+		});
+	}
+
 	function enableDragOnAttachments() {
 		if (canReorder()) {
 			$('.attachments .attachment').removeAttr('draggable');
@@ -334,6 +422,9 @@
 		}, 800);
 
 		$(document).on('click', '.foldery-media-folder', function () {
+			if (isFolderSorting) {
+				return;
+			}
 			setFolder(parseInt($(this).attr('data-folder-id'), 10));
 		});
 

@@ -848,6 +848,97 @@ function foldery_rml_rename_folder( $name, $id ) {
 	return true;
 }
 
+function foldery_rml_reorder_folders( $tree ) {
+	global $wpdb;
+
+	if ( ! foldery_rml_has_tables() || ! is_array( $tree ) ) {
+		return array( __( 'Folder order could not be saved.', 'foldery' ) );
+	}
+
+	$folders = wp_rml_objects();
+	$known   = array();
+	foreach ( $folders as $folder ) {
+		if ( is_rml_folder( $folder ) && $folder->getId() > 0 ) {
+			$known[ $folder->getId() ] = $folder;
+		}
+	}
+
+	$updates = array();
+	foreach ( $tree as $row ) {
+		if ( ! is_array( $row ) || ! isset( $row['id'], $row['parent'] ) ) {
+			continue;
+		}
+
+		$id     = (int) $row['id'];
+		$parent = (int) $row['parent'];
+		$ord    = isset( $row['ord'] ) ? (int) $row['ord'] : count( $updates ) + 1;
+		if ( ! isset( $known[ $id ] ) ) {
+			return array( __( 'Folder does not exist.', 'foldery' ) );
+		}
+		if ( _wp_rml_root() !== $parent && ! isset( $known[ $parent ] ) ) {
+			return array( __( 'Parent folder does not exist.', 'foldery' ) );
+		}
+
+		$updates[ $id ] = array(
+			'parent' => $parent,
+			'ord'    => max( 1, $ord ),
+		);
+	}
+
+	if ( empty( $updates ) ) {
+		return array( __( 'Folder order could not be saved.', 'foldery' ) );
+	}
+
+	foreach ( $updates as $id => $update ) {
+		$parent = $update['parent'];
+		while ( _wp_rml_root() !== $parent ) {
+			if ( $parent === $id ) {
+				return array( __( 'A folder cannot be moved into itself.', 'foldery' ) );
+			}
+			if ( isset( $updates[ $parent ] ) ) {
+				$parent = $updates[ $parent ]['parent'];
+			} elseif ( isset( $known[ $parent ] ) ) {
+				$parent = $known[ $parent ]->getParent();
+			} else {
+				return array( __( 'Parent folder does not exist.', 'foldery' ) );
+			}
+		}
+	}
+
+	$names_by_parent = array();
+	foreach ( $known as $id => $folder ) {
+		$parent = isset( $updates[ $id ] ) ? $updates[ $id ]['parent'] : $folder->getParent();
+		$name   = function_exists( 'mb_strtolower' ) ? mb_strtolower( $folder->getName() ) : strtolower( $folder->getName() );
+		$key    = $parent . '|' . $name;
+		if ( isset( $names_by_parent[ $key ] ) ) {
+			return array( __( 'A folder with this name already exists here.', 'foldery' ) );
+		}
+		$names_by_parent[ $key ] = true;
+	}
+
+	$table = foldery_rml_table_name();
+	foreach ( $updates as $id => $update ) {
+		$folder   = $known[ $id ];
+		$slug     = foldery_rml_unique_slug( $folder->getName(), $update['parent'], $id );
+		$wpdb->update(
+			$table,
+			array(
+				'parent' => $update['parent'],
+				'ord'    => $update['ord'],
+				'slug'   => $slug,
+			),
+			array( 'id' => $id ),
+			array( '%d', '%d', '%s' ),
+			array( '%d' )
+		);
+	}
+
+	foldery_rml_clear_runtime_cache();
+	foldery_rml_refresh_child_absolute_paths( _wp_rml_root() );
+	foldery_rml_clear_runtime_cache();
+	return true;
+}
+
 function foldery_rml_delete_folder( $id ) {
 	global $wpdb;
 
@@ -1139,6 +1230,7 @@ function foldery_rml_admin_enqueue( $hook ) {
 				'moved'          => __( 'Media moved.', 'foldery' ),
 				'orderSaved'     => __( 'Media order saved.', 'foldery' ),
 				'orderDisabled'  => __( 'Select a folder to reorder media.', 'foldery' ),
+				'folderOrderSaved' => __( 'Folder order saved.', 'foldery' ),
 			),
 		)
 	);
@@ -1186,6 +1278,14 @@ function foldery_rml_admin_ajax() {
 			$ids      = isset( $_POST['ids'] ) ? (array) $_POST['ids'] : array();
 			$result   = foldery_rml_reorder_attachments( $id, $ids );
 			$selected = $id;
+			break;
+		case 'reorder_folders':
+			$tree = array();
+			if ( isset( $_POST['tree'] ) ) {
+				$decoded = json_decode( wp_unslash( $_POST['tree'] ), true );
+				$tree    = is_array( $decoded ) ? $decoded : array();
+			}
+			$result = foldery_rml_reorder_folders( $tree );
 			break;
 		default:
 			wp_send_json_error( array( 'message' => __( 'Unknown action.', 'foldery' ) ), 400 );
