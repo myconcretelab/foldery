@@ -89,6 +89,11 @@
 
 .foldery-media-actions {
 	justify-content: flex-start;
+	flex-wrap: wrap;
+}
+
+.foldery-media-actions .button {
+	text-align: center;
 }
 
 .foldery-media-message {
@@ -102,19 +107,51 @@
 }
 
 @media (min-width: 1120px) {
-	.upload-php .foldery-media-panel {
-		float: left;
-		margin-right: 16px;
-		width: 260px;
+	.upload-php .wrap {
+		position: relative;
 	}
 
-	.upload-php .foldery-media-panel + .wp-filter,
-	.upload-php .foldery-media-panel + form#posts-filter,
-	.upload-php .foldery-media-panel ~ .media-frame {
-		margin-left: 276px;
+	.upload-php .media-frame.mode-grid .attachments-browser {
+		box-sizing: border-box;
+		padding-left: 316px;
+		position: relative;
+	}
+
+	.upload-php .foldery-media-panel {
+		display: flex;
+		flex-direction: column;
+		left: 0;
+		margin: 0;
+		max-height: calc(100vh - 150px);
+		max-width: none;
+		position: absolute;
+		top: 64px;
+		width: 300px;
+		z-index: 2;
+	}
+
+	.upload-php .media-frame.mode-grid .foldery-media-panel {
+		top: 12px;
+	}
+
+	.upload-php .media-frame.mode-grid .wp-filter {
+		margin-left: 0;
+		max-width: none;
+	}
+
+	.upload-php .wp-filter,
+	.upload-php form#posts-filter {
+		margin-left: 316px;
+		max-width: calc(100% - 316px);
 	}
 
 	.upload-php .foldery-media-tree {
-		max-height: calc(100vh - 290px);
+		flex: 1 1 auto;
+		max-height: none;
+		min-height: 0;
+	}
+
+	.upload-php .foldery-media-actions .button {
+		flex: 1 1 100%;
 	}
 }
