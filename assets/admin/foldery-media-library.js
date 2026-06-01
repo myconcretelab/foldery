@@ -6,6 +6,7 @@
 	var draggedAttachmentId = null;
 	var isSorting = false;
 	var isFolderSorting = false;
+	var collapsedFolders = loadCollapsedFolders();
 
 	function labels(key) {
 		return config.labels && config.labels[key] ? config.labels[key] : key;
@@ -13,6 +14,20 @@
 
 	function escapeHtml(value) {
 		return $('<div/>').text(value).html();
+	}
+
+	function loadCollapsedFolders() {
+		try {
+			return JSON.parse(window.localStorage.getItem('folderyCollapsedFolders') || '{}');
+		} catch (e) {
+			return {};
+		}
+	}
+
+	function saveCollapsedFolders() {
+		try {
+			window.localStorage.setItem('folderyCollapsedFolders', JSON.stringify(collapsedFolders));
+		} catch (e) {}
 	}
 
 	function flattenFolders(folders, depth, out) {
@@ -52,12 +67,15 @@
 	function treeNode(folder, depth) {
 		var id = parseInt(folder.id, 10);
 		var active = id === selectedFolder ? ' is-active' : '';
+		var hasChildren = folder.children && folder.children.length;
+		var collapsed = hasChildren && collapsedFolders[id] ? ' is-collapsed' : '';
 		var children = (folder.children || []).map(function (child) {
 			return treeNode(child, depth + 1);
 		}).join('');
 
-		return '<li class="foldery-media-folder-item" data-folder-id="' + id + '">' +
+		return '<li class="foldery-media-folder-item' + collapsed + '" data-folder-id="' + id + '">' +
 			'<div class="foldery-media-folder-row" style="--folder-depth:' + depth + '">' +
+				'<button type="button" class="foldery-media-toggle" data-folder-id="' + id + '"' + (hasChildren ? '' : ' disabled') + ' aria-expanded="' + (collapsed ? 'false' : 'true') + '"></button>' +
 				'<span class="foldery-media-folder-handle" aria-hidden="true"></span>' +
 				'<button type="button" class="foldery-media-folder' + active + '" data-folder-id="' + id + '">' +
 					'<span class="foldery-media-folder__name">' + escapeHtml(folder.name) + '</span>' +
@@ -263,6 +281,19 @@
 		updateList($('.foldery-media-folder-list-root').first(), 0);
 	}
 
+	function applyCollapsedFolders() {
+		$('.foldery-media-folder-item').each(function () {
+			var $item = $(this);
+			var id = parseInt($item.attr('data-folder-id'), 10);
+			var collapsed = !!collapsedFolders[id];
+			var hasChildren = $item.children('.foldery-media-folder-list').children('.foldery-media-folder-item').length > 0;
+			$item.toggleClass('is-collapsed', collapsed && hasChildren);
+			$item.children('.foldery-media-folder-row').find('.foldery-media-toggle')
+				.prop('disabled', !hasChildren)
+				.attr('aria-expanded', collapsed && hasChildren ? 'false' : 'true');
+		});
+	}
+
 	function folderTreePayload() {
 		var rows = [];
 		$('.foldery-media-folder-list').each(function () {
@@ -318,6 +349,7 @@
 				sort: refreshFolderDepths,
 				stop: function () {
 					refreshFolderDepths();
+					applyCollapsedFolders();
 					window.setTimeout(function () {
 						isFolderSorting = false;
 					}, 0);
@@ -426,6 +458,23 @@
 				return;
 			}
 			setFolder(parseInt($(this).attr('data-folder-id'), 10));
+		});
+
+		$(document).on('click', '.foldery-media-toggle', function (event) {
+			event.preventDefault();
+			event.stopPropagation();
+			var id = parseInt($(this).attr('data-folder-id'), 10);
+			var $item = $('.foldery-media-folder-item[data-folder-id="' + id + '"]').first();
+			if (!id || !$item.length || $(this).prop('disabled')) {
+				return;
+			}
+			if ($item.hasClass('is-collapsed')) {
+				delete collapsedFolders[id];
+			} else {
+				collapsedFolders[id] = true;
+			}
+			saveCollapsedFolders();
+			applyCollapsedFolders();
 		});
 
 		$(document).on('click', '.foldery-media-create', function () {
