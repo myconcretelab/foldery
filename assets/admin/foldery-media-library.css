@@ -22,8 +22,8 @@
 .foldery-media-tree {
 	border: 1px solid #dcdcde;
 	margin: 10px 0;
-	max-height: 280px;
-	overflow: auto;
+	max-height: none;
+	overflow: visible;
 	padding: 6px 4px;
 }
 
@@ -240,18 +240,18 @@
 
 	.upload-php .media-frame.mode-grid .attachments-browser {
 		box-sizing: border-box;
-		padding-left: 316px;
-		position: relative;
+		column-gap: 16px;
+		display: grid;
+		grid-template-columns: 300px minmax(0, 1fr);
+		padding-left: 0;
 	}
 
 	.upload-php .foldery-media-panel {
 		display: flex;
 		flex-direction: column;
-		height: calc(100vh - 150px);
 		left: 0;
 		margin: 0;
 		max-width: none;
-		overflow: hidden;
 		position: absolute;
 		top: 64px;
 		width: 300px;
@@ -259,13 +259,12 @@
 	}
 
 	.upload-php .media-frame.mode-grid .foldery-media-panel {
-		height: calc(100vh - 120px);
-		top: 12px;
-	}
-
-	.upload-php .media-frame.mode-grid .wp-filter {
-		margin-left: 0;
-		max-width: none;
+		grid-column: 1;
+		grid-row: 1 / span 4;
+		height: auto;
+		position: static;
+		width: auto;
+		z-index: auto;
 	}
 
 	.upload-php .wp-filter,
@@ -274,16 +273,25 @@
 		max-width: calc(100% - 316px);
 	}
 
-	.upload-php .foldery-media-tree {
-		flex: 1 1 auto;
-		max-height: none;
-		min-height: 0;
+	.upload-php .media-frame.mode-grid .wp-filter {
+		grid-column: 2;
+		grid-row: 1;
+		margin-left: 0;
+		max-width: none;
+		min-width: 0;
 	}
 
-	.upload-php .foldery-media-panel__header,
-	.upload-php .foldery-media-actions,
-	.upload-php .foldery-media-message {
+	.upload-php .media-frame.mode-grid .attachments-wrapper,
+	.upload-php .media-frame.mode-grid .media-views-heading,
+	.upload-php .media-frame.mode-grid .no-media {
+		grid-column: 2;
+		min-width: 0;
+	}
+
+	.upload-php .foldery-media-tree {
 		flex: 0 0 auto;
+		max-height: none;
+		overflow: visible;
 	}
 
 	.upload-php .foldery-media-actions .button {
