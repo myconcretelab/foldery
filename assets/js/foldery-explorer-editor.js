@@ -3,6 +3,7 @@
 
   var el = element.createElement;
   var InspectorControls = blockEditor.InspectorControls;
+  var useBlockProps = blockEditor.useBlockProps;
   var PanelBody = components.PanelBody;
   var TextControl = components.TextControl;
   var ToggleControl = components.ToggleControl;
@@ -29,6 +30,7 @@
     edit: function(props) {
       var attrs = props.attributes;
       var setAttributes = props.setAttributes;
+      var blockProps = useBlockProps ? useBlockProps({ className: 'foldery-explorer-editor-preview' }) : { className: 'foldery-explorer-editor-preview' };
 
       return el(
         element.Fragment,
@@ -89,12 +91,16 @@
           )
         ),
         el(
-          Disabled,
-          null,
-          el(ServerSideRender, {
-            block: 'foldery/explorer',
-            attributes: attrs
-          })
+          'div',
+          blockProps,
+          el(
+            Disabled,
+            null,
+            el(ServerSideRender, {
+              block: 'foldery/explorer',
+              attributes: attrs
+            })
+          )
         )
       );
     },
