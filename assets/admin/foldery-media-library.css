@@ -197,6 +197,22 @@
 	flex-wrap: wrap;
 }
 
+.foldery-media-page-link {
+	align-items: center;
+	display: grid;
+	gap: 6px;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	margin-top: 10px;
+}
+
+.foldery-media-page-link label {
+	font-weight: 600;
+}
+
+.foldery-media-linked-page {
+	max-width: 100%;
+}
+
 .foldery-media-actions .button {
 	text-align: center;
 }

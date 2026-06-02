@@ -318,6 +318,82 @@ if ( ! function_exists( 'foldery_media_get_folder_meta' ) ) {
 	}
 }
 
+if ( ! function_exists( 'foldery_media_update_folder_meta' ) ) {
+	function foldery_media_update_folder_meta( $folder_id, $key, $value ) {
+		global $wpdb;
+
+		if ( ! foldery_media_has_tables() || ! is_numeric( $folder_id ) || '' === (string) $key ) {
+			return false;
+		}
+
+		$table_meta       = foldery_media_table_name( 'meta' );
+		$folder_id_column = foldery_media_folder_meta_id_column();
+		$folder_id        = (int) $folder_id;
+		$key              = (string) $key;
+		$value            = maybe_serialize( $value );
+		$existing_id      = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT meta_id FROM {$table_meta} WHERE {$folder_id_column} = %d AND meta_key = %s ORDER BY meta_id ASC LIMIT 1",
+				$folder_id,
+				$key
+			)
+		);
+
+		if ( $existing_id ) {
+			$updated = $wpdb->update(
+				$table_meta,
+				array( 'meta_value' => $value ),
+				array( 'meta_id' => (int) $existing_id ),
+				array( '%s' ),
+				array( '%d' )
+			);
+
+			$wpdb->query(
+				$wpdb->prepare(
+					"DELETE FROM {$table_meta} WHERE {$folder_id_column} = %d AND meta_key = %s AND meta_id <> %d",
+					$folder_id,
+					$key,
+					(int) $existing_id
+				)
+			);
+
+			return false !== $updated;
+		}
+
+		return (bool) $wpdb->insert(
+			$table_meta,
+			array(
+				$folder_id_column => $folder_id,
+				'meta_key'        => $key,
+				'meta_value'      => $value,
+			),
+			array( '%d', '%s', '%s' )
+		);
+	}
+}
+
+if ( ! function_exists( 'foldery_media_delete_folder_meta' ) ) {
+	function foldery_media_delete_folder_meta( $folder_id, $key ) {
+		global $wpdb;
+
+		if ( ! foldery_media_has_tables() || ! is_numeric( $folder_id ) || '' === (string) $key ) {
+			return false;
+		}
+
+		$table_meta       = foldery_media_table_name( 'meta' );
+		$folder_id_column = foldery_media_folder_meta_id_column();
+
+		return false !== $wpdb->delete(
+			$table_meta,
+			array(
+				$folder_id_column => (int) $folder_id,
+				'meta_key'        => (string) $key,
+			),
+			array( '%d', '%s' )
+		);
+	}
+}
+
 if ( ! function_exists( 'foldery_media_dropdown' ) ) {
 	function foldery_media_dropdown( $selected, $disabled = array(), $useAll = true ) {
 		$selected_values = array_map( 'strval', (array) $selected );

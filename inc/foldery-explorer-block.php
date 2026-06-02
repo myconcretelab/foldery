@@ -3,6 +3,10 @@
  * Gutenberg explorer block for media-folder navigation.
  */
 
+if ( ! defined( 'FOLDERY_EXPLORER_LINKED_PAGE_META' ) ) {
+    define( 'FOLDERY_EXPLORER_LINKED_PAGE_META', 'foldery_linked_page_id' );
+}
+
 function foldery_explorer_default_attributes() {
     return array(
         'showHomeSelection' => true,
@@ -20,7 +24,21 @@ function foldery_explorer_parse_ids( $ids ) {
     return array_filter( array_map( 'absint', explode( ',', (string) $ids ) ) );
 }
 
-function foldery_explorer_folder_page( $folder_id ) {
+function foldery_explorer_folder_linked_page_id( $folder_id ) {
+    $folder_id = absint( $folder_id );
+    if ( ! $folder_id ) {
+        return 0;
+    }
+
+    $page_id = absint( foldery_media_get_folder_meta( $folder_id, FOLDERY_EXPLORER_LINKED_PAGE_META, true ) );
+    if ( $page_id && 'page' === get_post_type( $page_id ) && 'trash' !== get_post_status( $page_id ) ) {
+        return $page_id;
+    }
+
+    return 0;
+}
+
+function foldery_explorer_folder_page_fallback( $folder_id ) {
     $pages = get_posts(
         array(
             'post_type'      => 'page',
@@ -36,13 +54,90 @@ function foldery_explorer_folder_page( $folder_id ) {
     return count( $pages ) ? $pages[0] : null;
 }
 
+function foldery_explorer_folder_page( $folder_id ) {
+    $page_id = foldery_explorer_folder_linked_page_id( $folder_id );
+    if ( $page_id ) {
+        $page = get_post( $page_id );
+        if ( $page instanceof WP_Post ) {
+            return $page;
+        }
+    }
+
+    return foldery_explorer_folder_page_fallback( $folder_id );
+}
+
+function foldery_explorer_page_folder_id( $page_id ) {
+    global $wpdb;
+
+    $page_id = absint( $page_id );
+    if ( ! $page_id || ! foldery_media_has_tables() ) {
+        return 0;
+    }
+
+    $table_meta       = foldery_media_table_name( 'meta' );
+    $folder_id_column = foldery_media_folder_meta_id_column();
+    $folder_id        = absint(
+        $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT {$folder_id_column} FROM {$table_meta} WHERE meta_key = %s AND meta_value = %s ORDER BY meta_id ASC LIMIT 1",
+                FOLDERY_EXPLORER_LINKED_PAGE_META,
+                (string) $page_id
+            )
+        )
+    );
+
+    if ( $folder_id && foldery_is_media_folder( foldery_media_get_folder( $folder_id ) ) ) {
+        return $folder_id;
+    }
+
+    $legacy_folder_id = absint( get_post_meta( $page_id, 'folder', true ) );
+    if ( $legacy_folder_id && foldery_is_media_folder( foldery_media_get_folder( $legacy_folder_id ) ) ) {
+        return $legacy_folder_id;
+    }
+
+    return 0;
+}
+
+function foldery_explorer_link_folder_to_page( $folder_id, $page_id ) {
+    global $wpdb;
+
+    $folder_id = absint( $folder_id );
+    $page_id   = absint( $page_id );
+    if ( ! $folder_id || ! foldery_is_media_folder( foldery_media_get_folder( $folder_id ) ) ) {
+        return array( __( 'Folder does not exist.', 'foldery' ) );
+    }
+
+    if ( $page_id && ( 'page' !== get_post_type( $page_id ) || 'trash' === get_post_status( $page_id ) ) ) {
+        return array( __( 'Selected page does not exist.', 'foldery' ) );
+    }
+
+    $table_meta = foldery_media_table_name( 'meta' );
+    $wpdb->delete(
+        $table_meta,
+        array(
+            'meta_key'   => FOLDERY_EXPLORER_LINKED_PAGE_META,
+            'meta_value' => (string) $page_id,
+        ),
+        array( '%s', '%s' )
+    );
+
+    if ( ! $page_id ) {
+        foldery_media_delete_folder_meta( $folder_id, FOLDERY_EXPLORER_LINKED_PAGE_META );
+        return true;
+    }
+
+    return foldery_media_update_folder_meta( $folder_id, FOLDERY_EXPLORER_LINKED_PAGE_META, (string) $page_id )
+        ? true
+        : array( __( 'Page link could not be saved.', 'foldery' ) );
+}
+
 function foldery_explorer_folder_url( $folder ) {
     if ( ! foldery_is_media_folder( $folder ) ) {
         return foldery_make_relative_dev_url( home_url( '/' ) );
     }
 
     $page = foldery_explorer_folder_page( $folder->getId() );
-    if ( $page && foldery_media_root_id() === $folder->getParent() ) {
+    if ( $page ) {
         return foldery_make_relative_dev_url( get_permalink( $page ) );
     }
 
@@ -50,6 +145,7 @@ function foldery_explorer_folder_url( $folder ) {
 }
 
 function foldery_explorer_clean_page_content( $content ) {
+    $content = preg_replace( '/<!-- wp:foldery\/explorer\b[^>]*(?:\/-->|-->.*?<!-- \/wp:foldery\/explorer -->)/is', '', $content );
     $content = preg_replace( '/<!-- wp:shortcode -->\s*\[(foldery_series|serie|foldery_serie_detail|masonry|last_pics)[^\]]*\]\s*<!-- \/wp:shortcode -->/i', '', $content );
     $content = preg_replace( '/\[(foldery_series|serie|foldery_serie_detail|masonry|last_pics)[^\]]*\]/i', '', $content );
 
@@ -57,6 +153,8 @@ function foldery_explorer_clean_page_content( $content ) {
 }
 
 function foldery_explorer_page_content( $folder_id ) {
+    global $foldery_explorer_rendering_page_content;
+
     $page = foldery_explorer_folder_page( $folder_id );
     if ( ! $page ) {
         return '';
@@ -69,7 +167,9 @@ function foldery_explorer_page_content( $folder_id ) {
 
     $GLOBALS['post'] = $page;
     setup_postdata( $page );
+    $foldery_explorer_rendering_page_content = true;
     $html = apply_filters( 'the_content', $content );
+    $foldery_explorer_rendering_page_content = false;
     wp_reset_postdata();
 
     return '<div class="foldery-explorer-page-content">' . $html . '</div>';
@@ -229,7 +329,7 @@ function foldery_explorer_menu_map() {
 
     foreach ( wp_get_nav_menu_items( $menu_id ) as $item ) {
         $page_id   = isset( $item->object_id ) ? absint( $item->object_id ) : 0;
-        $folder_id = $page_id ? absint( get_post_meta( $page_id, 'folder', true ) ) : 0;
+        $folder_id = $page_id ? foldery_explorer_page_folder_id( $page_id ) : 0;
         if ( ! $folder_id ) {
             continue;
         }
@@ -247,9 +347,15 @@ function foldery_explorer_menu_map() {
 }
 
 function foldery_explorer_render_block( $attributes ) {
+    foldery_explorer_enqueue_front_assets();
+
     $attributes = wp_parse_args( $attributes, foldery_explorer_default_attributes() );
     $path       = get_query_var( 'foldery_path' );
     $folder     = $path ? foldery_media_get_by_absolute_path( $path ) : null;
+    if ( ! foldery_is_media_folder( $folder ) && is_page() ) {
+        $linked_folder_id = foldery_explorer_page_folder_id( get_queried_object_id() );
+        $folder           = $linked_folder_id ? foldery_media_get_folder( $linked_folder_id ) : null;
+    }
     $html       = foldery_is_media_folder( $folder )
         ? foldery_explorer_render_folder( $folder->getId(), ! empty( $attributes['includePageContent'] ) )
         : foldery_explorer_render_home( $attributes );
@@ -263,6 +369,22 @@ function foldery_explorer_render_block( $attributes ) {
         $html
     );
 }
+
+function foldery_explorer_filter_linked_page_content( $content ) {
+    global $foldery_explorer_rendering_page_content;
+
+    if ( is_admin() || ! is_singular( 'page' ) || ! in_the_loop() || ! is_main_query() || ! empty( $foldery_explorer_rendering_page_content ) ) {
+        return $content;
+    }
+
+    $folder_id = foldery_explorer_page_folder_id( get_the_ID() );
+    if ( ! $folder_id ) {
+        return $content;
+    }
+
+    return foldery_explorer_render_block( array( 'includePageContent' => true ) );
+}
+add_filter( 'the_content', 'foldery_explorer_filter_linked_page_content', 11 );
 
 function foldery_explorer_response_data( $folder_id, $include_page ) {
     $folder = foldery_media_get_folder( $folder_id );
@@ -337,6 +459,10 @@ function foldery_explorer_register_block() {
     );
 }
 add_action( 'init', 'foldery_explorer_register_block' );
+
+function foldery_explorer_enqueue_front_assets() {
+    wp_enqueue_script( 'foldery-explorer-front' );
+}
 
 function foldery_explorer_enqueue_block_editor_assets() {
     if ( function_exists( 'foldery_register_shared_styles' ) ) {

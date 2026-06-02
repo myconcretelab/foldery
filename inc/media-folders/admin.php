@@ -1,12 +1,46 @@
 <?php
 function foldery_media_plain_folder( $folder ) {
+	$linked_page_id = function_exists( 'foldery_explorer_folder_linked_page_id' ) ? foldery_explorer_folder_linked_page_id( $folder->getId() ) : 0;
+
 	return array(
-		'id'       => $folder->getId(),
-		'parent'   => $folder->getParent(),
-		'name'     => $folder->getName(),
-		'path'     => $folder->getAbsolutePath(),
-		'count'    => foldery_media_count_attachments_in_folder( $folder->getId() ),
-		'children' => array_map( 'foldery_media_plain_folder', $folder->getChildren() ),
+		'id'              => $folder->getId(),
+		'parent'          => $folder->getParent(),
+		'name'            => $folder->getName(),
+		'path'            => $folder->getAbsolutePath(),
+		'count'           => foldery_media_count_attachments_in_folder( $folder->getId() ),
+		'linkedPageId'    => $linked_page_id,
+		'linkedPageTitle' => $linked_page_id ? get_the_title( $linked_page_id ) : '',
+		'children'        => array_map( 'foldery_media_plain_folder', $folder->getChildren() ),
+	);
+}
+
+function foldery_media_admin_page_data() {
+	if ( ! current_user_can( 'edit_pages' ) ) {
+		return array();
+	}
+
+	$pages = get_posts(
+		array(
+			'post_type'      => 'page',
+			'post_status'    => array( 'publish', 'private', 'draft', 'pending' ),
+			'posts_per_page' => -1,
+			'orderby'        => array(
+				'menu_order' => 'ASC',
+				'title'      => 'ASC',
+			),
+			'order'          => 'ASC',
+		)
+	);
+
+	return array_map(
+		function ( $page ) {
+			return array(
+				'id'     => (int) $page->ID,
+				'title'  => get_the_title( $page ),
+				'status' => get_post_status( $page ),
+			);
+		},
+		$pages
 	);
 }
 
@@ -154,12 +188,17 @@ function foldery_media_admin_enqueue( $hook ) {
 			'nonce'    => wp_create_nonce( 'foldery-media-admin' ),
 			'rootId'   => foldery_media_root_id(),
 			'tree'     => foldery_media_admin_tree_data(),
+			'pages'    => foldery_media_admin_page_data(),
 			'labels'   => array(
 				'title'          => __( 'Folders', 'foldery' ),
 				'newFolder'      => __( 'New folder', 'foldery' ),
 				'rename'         => __( 'Rename', 'foldery' ),
 				'delete'         => __( 'Delete', 'foldery' ),
 				'moveSelected'   => __( 'Move selection here', 'foldery' ),
+				'linkedPage'     => __( 'Linked page', 'foldery' ),
+				'noLinkedPage'   => __( 'No linked page', 'foldery' ),
+				'savePageLink'   => __( 'Save page link', 'foldery' ),
+				'pageLinkSaved'  => __( 'Page link saved.', 'foldery' ),
 				'folderName'     => __( 'Folder name', 'foldery' ),
 				'confirmDelete'  => __( 'Delete this folder? Files will become unorganized.', 'foldery' ),
 				'selectFiles'    => __( 'Select media first.', 'foldery' ),
@@ -225,6 +264,19 @@ function foldery_media_admin_ajax() {
 				$tree    = is_array( $decoded ) ? $decoded : array();
 			}
 			$result = foldery_media_reorder_folders( $tree );
+			break;
+		case 'link_page':
+			if ( ! current_user_can( 'edit_pages' ) ) {
+				$result = array( __( 'Insufficient permissions.', 'foldery' ) );
+				break;
+			}
+
+			$id      = isset( $_POST['id'] ) ? (int) $_POST['id'] : $selected;
+			$page_id = isset( $_POST['page_id'] ) ? (int) $_POST['page_id'] : 0;
+			$result  = function_exists( 'foldery_explorer_link_folder_to_page' )
+				? foldery_explorer_link_folder_to_page( $id, $page_id )
+				: array( __( 'Explorer is not available.', 'foldery' ) );
+			$selected = $id;
 			break;
 		default:
 			wp_send_json_error( array( 'message' => __( 'Unknown action.', 'foldery' ) ), 400 );

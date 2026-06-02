@@ -43,6 +43,39 @@
 		return out;
 	}
 
+	function findFolderById(folders, id) {
+		var found = null;
+		(folders || []).some(function (folder) {
+			if (parseInt(folder.id, 10) === id) {
+				found = folder;
+				return true;
+			}
+			found = findFolderById(folder.children || [], id);
+			return !!found;
+		});
+		return found;
+	}
+
+	function currentFolder() {
+		return findFolderById(config.tree ? config.tree.folders : [], selectedFolder);
+	}
+
+	function currentLinkedPageId() {
+		var folder = currentFolder();
+		return folder ? (parseInt(folder.linkedPageId, 10) || 0) : 0;
+	}
+
+	function pageOptions(selectedPageId) {
+		var html = '<option value="0">' + escapeHtml(labels('noLinkedPage')) + '</option>';
+		(config.pages || []).forEach(function (page) {
+			var id = parseInt(page.id, 10);
+			var title = page.title || ('#' + id);
+			var status = page.status && page.status !== 'publish' ? ' [' + page.status + ']' : '';
+			html += '<option value="' + id + '"' + (id === selectedPageId ? ' selected' : '') + '>' + escapeHtml(title + status) + '</option>';
+		});
+		return html;
+	}
+
 	function allFilterOptions() {
 		var all = [];
 		if (config.tree && config.tree.all) {
@@ -115,6 +148,11 @@
 				'<button type="button" class="button foldery-media-rename">' + escapeHtml(labels('rename')) + '</button>' +
 				'<button type="button" class="button foldery-media-delete">' + escapeHtml(labels('delete')) + '</button>' +
 			'</div>' +
+			'<div class="foldery-media-page-link">' +
+				'<label for="foldery-media-linked-page">' + escapeHtml(labels('linkedPage')) + '</label>' +
+				'<select id="foldery-media-linked-page" class="foldery-media-linked-page">' + pageOptions(currentLinkedPageId()) + '</select>' +
+				'<button type="button" class="button foldery-media-save-page-link">' + escapeHtml(labels('savePageLink')) + '</button>' +
+			'</div>' +
 			'<p class="foldery-media-message" aria-live="polite"></p>' +
 		'</div>';
 
@@ -139,6 +177,8 @@
 		var canEditFolder = selectedFolder > 0;
 		$('.foldery-media-rename, .foldery-media-delete').prop('disabled', !canEditFolder);
 		$('.foldery-media-move').prop('disabled', selectedFolder === 0);
+		$('.foldery-media-linked-page, .foldery-media-save-page-link').prop('disabled', !canEditFolder);
+		$('.foldery-media-linked-page').val(String(currentLinkedPageId()));
 		$('.attachments-browser').toggleClass('foldery-media-can-reorder', canReorder());
 	}
 
@@ -511,6 +551,18 @@
 			request('move', { to: selectedFolder, ids: ids }).done(function () {
 				$('.foldery-media-message').text(labels('moved'));
 				refreshMedia();
+			});
+		});
+
+		$(document).on('click', '.foldery-media-save-page-link', function () {
+			if (selectedFolder <= 0) {
+				return;
+			}
+			request('link_page', {
+				id: selectedFolder,
+				page_id: parseInt($('.foldery-media-linked-page').val(), 10) || 0
+			}).done(function () {
+				$('.foldery-media-message').text(labels('pageLinkSaved'));
 			});
 		});
 
