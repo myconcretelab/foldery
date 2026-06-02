@@ -72,9 +72,9 @@
 
       if (animate) {
         stage.classList.add('is-entering');
-        window.requestAnimationFrame(function() {
+        window.setTimeout(function() {
           stage.classList.remove('is-entering');
-        });
+        }, 980);
       }
     }
 
