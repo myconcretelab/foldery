@@ -12,6 +12,7 @@
   var __ = i18n.__;
 
   blocks.registerBlockType('foldery/explorer', {
+    apiVersion: 3,
     title: __('Foldery Explorer', 'foldery'),
     icon: 'images-alt2',
     category: 'widgets',

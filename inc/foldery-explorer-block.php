@@ -239,7 +239,10 @@ function foldery_explorer_response_data( $folder_id, $include_page ) {
 }
 
 function foldery_explorer_register_block() {
-    wp_register_style( 'foldery-explorer', get_template_directory_uri() . '/assets/css/foldery-explorer.css', array(), FOLDERY_VERSION );
+    if ( function_exists( 'foldery_register_shared_styles' ) ) {
+        foldery_register_shared_styles();
+    }
+
     wp_register_script( 'foldery-explorer-front', get_template_directory_uri() . '/assets/js/foldery-explorer.js', array(), FOLDERY_VERSION, true );
     wp_register_script(
         'foldery-explorer-editor',
@@ -252,10 +255,11 @@ function foldery_explorer_register_block() {
     register_block_type(
         'foldery/explorer',
         array(
-            'api_version'     => 2,
+            'api_version'     => 3,
             'editor_script'   => 'foldery-explorer-editor',
-            'script'          => 'foldery-explorer-front',
-            'style'           => 'foldery-explorer',
+            'editor_style'    => 'foldery-site',
+            'view_script'     => 'foldery-explorer-front',
+            'style'           => 'foldery-site',
             'render_callback' => 'foldery_explorer_render_block',
             'attributes'      => array(
                 'showHomeSelection' => array( 'type' => 'boolean', 'default' => true ),

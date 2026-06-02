@@ -4,12 +4,22 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '2.0.8' );
+    define( 'FOLDERY_VERSION', '2.0.9' );
 }
 
 if ( ! isset( $content_width ) ) {
     $content_width = 1170;
 }
+
+function foldery_register_shared_styles() {
+    wp_register_style( 'bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css', array(), '3.3.4' );
+    wp_register_style( 'font-awesome', get_template_directory_uri() . '/assets/css/font-awesome.min.css', array(), '4.7.0' );
+    wp_register_style( 'foldery-style', get_stylesheet_uri(), array( 'bootstrap' ), FOLDERY_VERSION );
+    wp_register_style( 'foldery-static', get_template_directory_uri() . '/assets/css/static.css', array( 'foldery-style' ), FOLDERY_VERSION );
+    wp_register_style( 'foldery-explorer', get_template_directory_uri() . '/assets/css/foldery-explorer.css', array( 'foldery-static' ), FOLDERY_VERSION );
+    wp_register_style( 'foldery-site', get_template_directory_uri() . '/assets/css/foldery-child.css', array( 'foldery-explorer' ), FOLDERY_VERSION );
+}
+add_action( 'init', 'foldery_register_shared_styles', 5 );
 
 require get_template_directory() . '/inc/media-folders/bootstrap.php';
 require get_template_directory() . '/inc/lightbox/bootstrap.php';
@@ -26,6 +36,7 @@ function foldery_setup() {
     add_theme_support( 'editor-styles' );
     add_theme_support( 'wp-block-styles' );
     add_theme_support( 'html5', array( 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script', 'navigation-widgets' ) );
+    add_editor_style( array( 'assets/css/static.css', 'assets/css/foldery-child.css', 'assets/css/foldery-explorer.css' ) );
 
     register_nav_menus(
         array(
@@ -181,12 +192,10 @@ remove_action( 'wp_head', 'rsd_link' );
 remove_action( 'wp_head', 'wlwmanifest_link' );
 
 function foldery_scripts_styles() {
-    wp_enqueue_style( 'bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css', array(), '3.3.4' );
-    wp_enqueue_style( 'font-awesome', get_template_directory_uri() . '/assets/css/font-awesome.min.css', array(), '4.7.0' );
-    wp_enqueue_style( 'foldery-style', get_stylesheet_uri(), array( 'bootstrap' ), FOLDERY_VERSION );
-    wp_enqueue_style( 'foldery-static', get_template_directory_uri() . '/assets/css/static.css', array( 'foldery-style' ), FOLDERY_VERSION );
-    wp_enqueue_style( 'foldery-explorer', get_template_directory_uri() . '/assets/css/foldery-explorer.css', array( 'foldery-static' ), FOLDERY_VERSION );
-    wp_enqueue_style( 'foldery-site', get_template_directory_uri() . '/assets/css/foldery-child.css', array( 'foldery-explorer' ), FOLDERY_VERSION );
+    foldery_register_shared_styles();
+
+    wp_enqueue_style( 'font-awesome' );
+    wp_enqueue_style( 'foldery-site' );
 
     wp_enqueue_script( 'foldery-menu', get_template_directory_uri() . '/assets/js/menu.js', array( 'jquery' ), FOLDERY_VERSION, true );
     wp_enqueue_script( 'foldery-masonry', get_template_directory_uri() . '/js/masonry.pkgd.min.js', array(), '4.2.2', true );
