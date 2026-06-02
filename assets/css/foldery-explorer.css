@@ -7,24 +7,6 @@
   min-height: 180px;
 }
 
-.foldery-explorer-stage:before {
-  content: "";
-  position: absolute;
-  z-index: 6;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 34px;
-  pointer-events: none;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0));
-  opacity: 0;
-}
-
-.foldery-explorer.is-loading .foldery-explorer-stage:before,
-.foldery-explorer-stage.is-entering:before {
-  opacity: 1;
-}
-
 .foldery-explorer-heading {
   margin: 0 0 34px;
 }
@@ -207,14 +189,9 @@
 
 @media screen and (max-width: 767px), (prefers-reduced-motion: reduce) {
   .foldery-explorer-stage,
-  .foldery-explorer-stage *,
-  .foldery-explorer-stage:before {
+  .foldery-explorer-stage * {
     animation: none !important;
     transition: none !important;
-  }
-
-  .foldery-explorer-stage:before {
-    display: none;
   }
 
   .foldery-explorer-heading {

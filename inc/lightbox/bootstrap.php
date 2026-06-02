@@ -30,7 +30,15 @@ function foldery_lightbox_options() {
 
 function foldery_lightbox_is_enabled() {
     $options = foldery_lightbox_options();
-    if ( empty( $options['enabled'] ) || is_admin() || is_feed() ) {
+    if ( empty( $options['enabled'] ) || is_feed() ) {
+        return false;
+    }
+
+    if ( is_admin() ) {
+        if ( wp_doing_ajax() && isset( $_REQUEST['action'] ) && 'foldery_explorer' === sanitize_key( wp_unslash( $_REQUEST['action'] ) ) ) {
+            return true;
+        }
+
         return false;
     }
 
