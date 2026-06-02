@@ -1,0 +1,114 @@
+.editor-styles-wrapper .foldery-explorer {
+  position: relative;
+  max-width: none;
+}
+
+.editor-styles-wrapper .foldery-explorer-stage {
+  position: relative;
+  min-height: 180px;
+}
+
+.editor-styles-wrapper .foldery-explorer-heading {
+  margin: 0 0 34px;
+}
+
+.editor-styles-wrapper .foldery-explorer-heading h3,
+.editor-styles-wrapper .foldery-explorer .wp-block-heading {
+  margin-bottom: 34px;
+}
+
+.editor-styles-wrapper .foldery-explorer-page-content {
+  margin-bottom: 46px;
+}
+
+.editor-styles-wrapper .foldery-explorer .stack-wrapper:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.editor-styles-wrapper .foldery-explorer .stack-link {
+  display: block;
+  text-decoration: none;
+}
+
+.editor-styles-wrapper .foldery-explorer .stack-link h5 {
+  color: #a8a8a8;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.editor-styles-wrapper .foldery-explorer .stack-item {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  float: left;
+  height: 370px;
+  margin: 20px;
+  padding-top: 15px;
+}
+
+.editor-styles-wrapper .foldery-explorer .img-area {
+  padding: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.editor-styles-wrapper .foldery-explorer .img-area img {
+  background: #fff;
+  border: 10px solid #fff;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  display: block;
+  height: auto;
+  position: relative;
+  z-index: 4;
+}
+
+.editor-styles-wrapper .foldery-explorer .img-area:before,
+.editor-styles-wrapper .foldery-explorer .img-area:after {
+  background: #fff;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+  content: "";
+  position: absolute;
+  z-index: -1;
+}
+
+.editor-styles-wrapper .foldery-explorer .img-area:before {
+  left: -10px;
+  top: 0;
+  transform: rotate(-5deg);
+}
+
+.editor-styles-wrapper .foldery-explorer .img-area:after {
+  left: 0;
+  top: 5px;
+  transform: rotate(4deg);
+}
+
+.editor-styles-wrapper .foldery-explorer .expo td {
+  border: 0;
+  padding: 20px 0;
+  position: relative;
+  width: 50%;
+}
+
+.editor-styles-wrapper .foldery-explorer .expo figure {
+  margin: 10px 70px 50px 50px;
+}
+
+.editor-styles-wrapper .foldery-explorer .expo h5 {
+  color: #a8a8a8;
+  margin-left: 20px;
+}
+
+.editor-styles-wrapper .foldery-explorer .frame {
+  display: block;
+  position: relative;
+}
+
+.editor-styles-wrapper .foldery-explorer .frame img {
+  background: #fff;
+  display: block;
+  height: auto;
+  position: relative;
+  z-index: 4;
+}

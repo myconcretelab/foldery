@@ -4,7 +4,7 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '2.0.9' );
+    define( 'FOLDERY_VERSION', '2.0.10' );
 }
 
 if ( ! isset( $content_width ) ) {
@@ -18,6 +18,7 @@ function foldery_register_shared_styles() {
     wp_register_style( 'foldery-static', get_template_directory_uri() . '/assets/css/static.css', array( 'foldery-style' ), FOLDERY_VERSION );
     wp_register_style( 'foldery-explorer', get_template_directory_uri() . '/assets/css/foldery-explorer.css', array( 'foldery-static' ), FOLDERY_VERSION );
     wp_register_style( 'foldery-site', get_template_directory_uri() . '/assets/css/foldery-child.css', array( 'foldery-explorer' ), FOLDERY_VERSION );
+    wp_register_style( 'foldery-explorer-editor-style', get_template_directory_uri() . '/assets/css/foldery-explorer-editor.css', array(), FOLDERY_VERSION );
 }
 add_action( 'init', 'foldery_register_shared_styles', 5 );
 
@@ -36,7 +37,6 @@ function foldery_setup() {
     add_theme_support( 'editor-styles' );
     add_theme_support( 'wp-block-styles' );
     add_theme_support( 'html5', array( 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script', 'navigation-widgets' ) );
-    add_editor_style( array( 'assets/css/static.css', 'assets/css/foldery-child.css', 'assets/css/foldery-explorer.css' ) );
 
     register_nav_menus(
         array(

@@ -257,9 +257,8 @@ function foldery_explorer_register_block() {
         array(
             'api_version'     => 3,
             'editor_script'   => 'foldery-explorer-editor',
-            'editor_style'    => 'foldery-site',
+            'editor_style'    => 'foldery-explorer-editor-style',
             'view_script'     => 'foldery-explorer-front',
-            'style'           => 'foldery-site',
             'render_callback' => 'foldery_explorer_render_block',
             'attributes'      => array(
                 'showHomeSelection' => array( 'type' => 'boolean', 'default' => true ),
