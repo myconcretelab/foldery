@@ -1,0 +1,116 @@
+.foldery-explorer {
+  position: relative;
+}
+
+.foldery-explorer-stage {
+  position: relative;
+  min-height: 180px;
+}
+
+.foldery-explorer-stage:before {
+  content: "";
+  position: absolute;
+  z-index: 6;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 34px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0));
+  opacity: 0;
+}
+
+.foldery-explorer.is-loading .foldery-explorer-stage:before,
+.foldery-explorer-stage.is-entering:before {
+  opacity: 1;
+}
+
+.foldery-explorer-heading {
+  margin: 0 0 34px;
+}
+
+.foldery-explorer-heading h3,
+.foldery-explorer .wp-block-heading {
+  margin-bottom: 34px;
+}
+
+.foldery-explorer-page-content {
+  margin-bottom: 46px;
+}
+
+.foldery-explorer-page-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.foldery-explorer-stack .stack-link {
+  display: block;
+}
+
+.foldery-explorer-stack .stack-link:focus {
+  outline: 2px solid #5f5f5f;
+  outline-offset: 8px;
+}
+
+@media screen and (min-width: 768px) {
+  .foldery-explorer-stage {
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .foldery-explorer-stage.is-leaving {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  .foldery-explorer-stage.is-entering .foldery-explorer-item,
+  .foldery-explorer-stage.is-entering .grid-item,
+  .foldery-explorer-stage.is-entering .expo tr {
+    animation: folderyExplorerSlide 360ms ease both;
+  }
+
+  .foldery-explorer-stage.is-entering .foldery-explorer-item:nth-child(2),
+  .foldery-explorer-stage.is-entering .grid-item:nth-child(2),
+  .foldery-explorer-stage.is-entering .expo tr:nth-child(2) {
+    animation-delay: 45ms;
+  }
+
+  .foldery-explorer-stage.is-entering .foldery-explorer-item:nth-child(3),
+  .foldery-explorer-stage.is-entering .grid-item:nth-child(3),
+  .foldery-explorer-stage.is-entering .expo tr:nth-child(3) {
+    animation-delay: 90ms;
+  }
+
+  .foldery-explorer-stage.is-entering .foldery-explorer-item:nth-child(4),
+  .foldery-explorer-stage.is-entering .grid-item:nth-child(4),
+  .foldery-explorer-stage.is-entering .expo tr:nth-child(4) {
+    animation-delay: 135ms;
+  }
+}
+
+@keyframes folderyExplorerSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-42px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media screen and (max-width: 767px), (prefers-reduced-motion: reduce) {
+  .foldery-explorer-stage,
+  .foldery-explorer-stage *,
+  .foldery-explorer-stage:before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  .foldery-explorer-stage:before {
+    display: none;
+  }
+
+  .foldery-explorer-heading {
+    margin-bottom: 22px;
+  }
+}
