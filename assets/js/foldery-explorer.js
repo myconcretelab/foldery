@@ -4,9 +4,18 @@
   function normalizeUrl(url) {
     try {
       var parsed = new URL(url, window.location.origin);
-      return parsed.origin + parsed.pathname.replace(/\/$/, '');
+      return parsed.pathname.replace(/\/$/, '') || '/';
     } catch (error) {
       return url.replace(/\/$/, '');
+    }
+  }
+
+  function currentProtocolUrl(url) {
+    try {
+      var parsed = new URL(url, window.location.origin);
+      return parsed.pathname + parsed.search + parsed.hash;
+    } catch (error) {
+      return url;
     }
   }
 
@@ -91,7 +100,7 @@
   }
 
   function loadFolder(explorer, folderId, targetUrl, push) {
-    var apiUrl = new URL(explorer.dataset.apiUrl);
+    var apiUrl = new URL(explorer.dataset.apiUrl, window.location.origin);
     apiUrl.searchParams.set('folder_id', folderId);
     apiUrl.searchParams.set('include_page', explorer.dataset.includePage || '1');
 
@@ -109,7 +118,7 @@
         explorer.classList.remove('is-loading');
 
         if (push && targetUrl) {
-          window.history.pushState({ folderyExplorer: true, folderId: folderId }, payload.title || document.title, targetUrl);
+          window.history.pushState({ folderyExplorer: true, folderId: folderId }, payload.title || document.title, currentProtocolUrl(targetUrl));
         }
       })
       .catch(function() {

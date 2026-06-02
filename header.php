@@ -24,6 +24,10 @@ if ( ! $foldery_logo_url ) {
     $foldery_logo_url = content_url( 'uploads/logo-pt.png' );
 }
 
+if ( function_exists( 'foldery_make_relative_dev_url' ) ) {
+    $foldery_logo_url = foldery_make_relative_dev_url( $foldery_logo_url );
+}
+
 $foldery_menu_args = array(
     'menu_class'  => 'nav-menu menu-main-menu',
     'container'   => false,
@@ -45,7 +49,7 @@ if ( ! empty( $foldery_menu_locations['primary'] ) ) {
             <div id="cms-header" class="cms-header header-v1 clearfix">
                 <div id="cms-header-inner">
                     <div id="cms-header-logo">
-                        <a href="<?php echo esc_url( home_url( '/' ) ); ?>">
+                        <a href="<?php echo esc_url( foldery_make_relative_dev_url( home_url( '/' ) ) ); ?>">
                             <img alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" src="<?php echo esc_url( $foldery_logo_url ); ?>">
                         </a>
                     </div>

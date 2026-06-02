@@ -4,7 +4,7 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '2.0.5' );
+    define( 'FOLDERY_VERSION', '2.0.8' );
 }
 
 if ( ! isset( $content_width ) ) {
@@ -43,6 +43,142 @@ function foldery_body_classes( $classes ) {
     return $classes;
 }
 add_filter( 'body_class', 'foldery_body_classes' );
+
+function foldery_should_use_relative_dev_urls() {
+    if ( ! is_admin() ) {
+        return true;
+    }
+
+    if ( wp_doing_ajax() && isset( $_REQUEST['action'] ) && 'foldery_explorer' === $_REQUEST['action'] ) {
+        return true;
+    }
+
+    return false;
+}
+
+function foldery_make_relative_dev_url( $url ) {
+    if ( ! foldery_should_use_relative_dev_urls() || ! is_string( $url ) || '' === $url ) {
+        return $url;
+    }
+
+    $parts = wp_parse_url( $url );
+    if ( empty( $parts['host'] ) ) {
+        return $url;
+    }
+
+    $home = wp_parse_url( get_option( 'home' ) );
+    if ( empty( $home['host'] ) || $parts['host'] !== $home['host'] ) {
+        return $url;
+    }
+
+    $url_port  = isset( $parts['port'] ) ? (int) $parts['port'] : null;
+    $home_port = isset( $home['port'] ) ? (int) $home['port'] : null;
+    if ( $url_port !== $home_port ) {
+        return $url;
+    }
+
+    $relative = isset( $parts['path'] ) ? $parts['path'] : '/';
+    if ( isset( $parts['query'] ) ) {
+        $relative .= '?' . $parts['query'];
+    }
+    if ( isset( $parts['fragment'] ) ) {
+        $relative .= '#' . $parts['fragment'];
+    }
+
+    return $relative;
+}
+
+function foldery_make_relative_dev_srcset( $sources ) {
+    if ( ! is_array( $sources ) ) {
+        return $sources;
+    }
+
+    foreach ( $sources as $width => $source ) {
+        if ( isset( $source['url'] ) ) {
+            $sources[ $width ]['url'] = foldery_make_relative_dev_url( $source['url'] );
+        }
+    }
+
+    return $sources;
+}
+
+function foldery_make_relative_dev_image_attrs( $attr ) {
+    foreach ( array( 'src', 'data-src' ) as $key ) {
+        if ( isset( $attr[ $key ] ) ) {
+            $attr[ $key ] = foldery_make_relative_dev_url( $attr[ $key ] );
+        }
+    }
+
+    return $attr;
+}
+
+function foldery_make_relative_dev_menu_items( $items ) {
+    foreach ( $items as $item ) {
+        if ( isset( $item->url ) ) {
+            $item->url = foldery_make_relative_dev_url( $item->url );
+        }
+    }
+
+    return $items;
+}
+
+add_filter( 'template_directory_uri', 'foldery_make_relative_dev_url' );
+add_filter( 'stylesheet_directory_uri', 'foldery_make_relative_dev_url' );
+add_filter( 'theme_file_uri', 'foldery_make_relative_dev_url' );
+add_filter( 'style_loader_src', 'foldery_make_relative_dev_url' );
+add_filter( 'script_loader_src', 'foldery_make_relative_dev_url' );
+add_filter( 'wp_get_attachment_url', 'foldery_make_relative_dev_url' );
+add_filter( 'content_url', 'foldery_make_relative_dev_url' );
+add_filter( 'wp_calculate_image_srcset', 'foldery_make_relative_dev_srcset' );
+add_filter( 'wp_get_attachment_image_attributes', 'foldery_make_relative_dev_image_attrs' );
+add_filter( 'wp_nav_menu_objects', 'foldery_make_relative_dev_menu_items' );
+
+function foldery_is_local_dev_host() {
+    $home = wp_parse_url( get_option( 'home' ) );
+    return ! empty( $home['host'] ) && in_array( $home['host'], array( '127.0.0.1', 'localhost' ), true );
+}
+
+function foldery_force_local_admin_http( $url ) {
+    if ( ! foldery_is_local_dev_host() || ! is_string( $url ) || '' === $url ) {
+        return $url;
+    }
+
+    $parts = wp_parse_url( $url );
+    if ( empty( $parts['host'] ) || ! in_array( $parts['host'], array( '127.0.0.1', 'localhost' ), true ) ) {
+        return $url;
+    }
+
+    $path = isset( $parts['path'] ) ? $parts['path'] : '/';
+    if ( isset( $parts['query'] ) ) {
+        $path .= '?' . $parts['query'];
+    }
+    if ( isset( $parts['fragment'] ) ) {
+        $path .= '#' . $parts['fragment'];
+    }
+
+    $port = isset( $parts['port'] ) ? ':' . (int) $parts['port'] : '';
+    return 'http://' . $parts['host'] . $port . $path;
+}
+add_filter( 'admin_url', 'foldery_force_local_admin_http' );
+add_filter( 'login_url', 'foldery_force_local_admin_http' );
+
+function foldery_redirect_local_https_admin_to_http() {
+    if ( ! foldery_is_local_dev_host() || ! is_ssl() || headers_sent() ) {
+        return;
+    }
+
+    $host = isset( $_SERVER['HTTP_HOST'] ) ? sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) : '';
+    $uri  = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '/';
+
+    if ( $host && 0 === strpos( $uri, '/wp-admin/' ) ) {
+        wp_safe_redirect( 'http://' . $host . $uri );
+        exit;
+    }
+}
+add_action( 'admin_init', 'foldery_redirect_local_https_admin_to_http', 1 );
+
+remove_action( 'wp_head', 'rsd_link' );
+remove_action( 'wp_head', 'wlwmanifest_link' );
 
 function foldery_scripts_styles() {
     wp_enqueue_style( 'bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css', array(), '3.3.4' );

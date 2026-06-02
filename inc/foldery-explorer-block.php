@@ -38,15 +38,15 @@ function foldery_explorer_folder_page( $folder_id ) {
 
 function foldery_explorer_folder_url( $folder ) {
     if ( ! foldery_is_media_folder( $folder ) ) {
-        return home_url( '/' );
+        return foldery_make_relative_dev_url( home_url( '/' ) );
     }
 
     $page = foldery_explorer_folder_page( $folder->getId() );
     if ( $page && foldery_media_root_id() === $folder->getParent() ) {
-        return get_permalink( $page );
+        return foldery_make_relative_dev_url( get_permalink( $page ) );
     }
 
-    return home_url( '/explorer/' . trim( $folder->getAbsolutePath(), '/' ) . '/' );
+    return foldery_make_relative_dev_url( home_url( '/explorer/' . trim( $folder->getAbsolutePath(), '/' ) . '/' ) );
 }
 
 function foldery_explorer_clean_page_content( $content ) {
@@ -193,9 +193,11 @@ function foldery_explorer_menu_map() {
             continue;
         }
 
-        $map[ untrailingslashit( $item->url ) ] = array(
+        $url = foldery_make_relative_dev_url( $item->url );
+
+        $map[ untrailingslashit( $url ) ] = array(
             'folderId' => $folder_id,
-            'url'      => $item->url,
+            'url'      => $url,
             'title'    => $item->title,
         );
     }
@@ -213,7 +215,7 @@ function foldery_explorer_render_block( $attributes ) {
 
     return sprintf(
         '<div class="foldery-explorer" data-api-url="%1$s" data-include-page="%2$d" data-animate="%3$d" data-menu-map="%4$s"><div class="foldery-explorer-stage">%5$s</div></div>',
-        esc_url( admin_url( 'admin-ajax.php?action=foldery_explorer' ) ),
+        esc_url( foldery_make_relative_dev_url( admin_url( 'admin-ajax.php?action=foldery_explorer' ) ) ),
         empty( $attributes['includePageContent'] ) ? 0 : 1,
         empty( $attributes['animate'] ) ? 0 : 1,
         esc_attr( wp_json_encode( foldery_explorer_menu_map() ) ),
