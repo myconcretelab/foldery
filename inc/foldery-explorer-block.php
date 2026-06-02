@@ -10,7 +10,7 @@ function foldery_explorer_default_attributes() {
         'homeTitle'         => 'Series en cours...',
         'showRecent'        => true,
         'recentTitle'       => "Recemment cree a l'atelier (ou dehors !)",
-        'recentLimit'       => 3,
+        'recentImageIds'    => '',
         'includePageContent'=> true,
         'animate'           => true,
     );
@@ -143,6 +143,44 @@ function foldery_explorer_render_folder( $folder_id, $include_page_content = tru
     return $html;
 }
 
+function foldery_explorer_render_selected_images( $ids, $columns = 3 ) {
+    $ids = foldery_explorer_parse_ids( $ids );
+    if ( ! count( $ids ) ) {
+        return '';
+    }
+
+    $has_cells = false;
+    $html      = '<table class="expo foldery-selected-pics">';
+    foreach ( array_chunk( $ids, max( 1, (int) $columns ) ) as $row ) {
+        $cells = '';
+        foreach ( $row as $attachment_id ) {
+            if ( 'attachment' !== get_post_type( $attachment_id ) ) {
+                continue;
+            }
+
+            $attachment_html = foldery_render_framed_attachment( $attachment_id );
+            if ( '' === $attachment_html ) {
+                continue;
+            }
+
+            $cells .= '<td>' . $attachment_html;
+            $display_dimension = foldery_attachment_field( 'dimension', $attachment_id, true );
+            if ( $display_dimension ) {
+                $cells .= '<h5>' . esc_html( $display_dimension ) . '</h5>';
+            }
+            $cells .= '</td>';
+        }
+
+        if ( '' !== $cells ) {
+            $has_cells = true;
+            $html .= '<tr>' . $cells . '</tr>';
+        }
+    }
+    $html .= '</table>';
+
+    return $has_cells ? $html : '';
+}
+
 function foldery_explorer_render_home( $attributes ) {
     $attributes = wp_parse_args( $attributes, foldery_explorer_default_attributes() );
     $html       = '<section class="foldery-explorer-view foldery-explorer-home">';
@@ -163,8 +201,11 @@ function foldery_explorer_render_home( $attributes ) {
     }
 
     if ( $attributes['showRecent'] ) {
-        $html .= '<h3 class="wp-block-heading">' . esc_html( $attributes['recentTitle'] ) . '</h3>';
-        $html .= do_shortcode( '[last_pics limit="' . absint( $attributes['recentLimit'] ) . '"]' );
+        $recent_html = foldery_explorer_render_selected_images( $attributes['recentImageIds'] );
+        if ( '' !== $recent_html ) {
+            $html .= '<h3 class="wp-block-heading">' . esc_html( $attributes['recentTitle'] ) . '</h3>';
+            $html .= $recent_html;
+        }
     }
 
     $html .= '</section>';
@@ -238,6 +279,28 @@ function foldery_explorer_response_data( $folder_id, $include_page ) {
     );
 }
 
+function foldery_explorer_editor_folder_tree( $folders = null ) {
+    if ( null === $folders ) {
+        $folders = foldery_media_root_children();
+    }
+
+    return array_values(
+        array_map(
+            function ( $folder ) {
+                return array(
+                    'id'       => $folder->getId(),
+                    'parent'   => $folder->getParent(),
+                    'name'     => $folder->getName(),
+                    'path'     => $folder->getPath( ' / ', null ),
+                    'count'    => $folder->getCnt(),
+                    'children' => foldery_explorer_editor_folder_tree( $folder->getChildren() ),
+                );
+            },
+            array_filter( (array) $folders, 'foldery_is_media_folder' )
+        )
+    );
+}
+
 function foldery_explorer_register_block() {
     if ( function_exists( 'foldery_register_shared_styles' ) ) {
         foldery_register_shared_styles();
@@ -266,7 +329,7 @@ function foldery_explorer_register_block() {
                 'homeTitle'         => array( 'type' => 'string', 'default' => 'Series en cours...' ),
                 'showRecent'        => array( 'type' => 'boolean', 'default' => true ),
                 'recentTitle'       => array( 'type' => 'string', 'default' => "Recemment cree a l'atelier (ou dehors !)" ),
-                'recentLimit'       => array( 'type' => 'number', 'default' => 3 ),
+                'recentImageIds'    => array( 'type' => 'string', 'default' => '' ),
                 'includePageContent'=> array( 'type' => 'boolean', 'default' => true ),
                 'animate'           => array( 'type' => 'boolean', 'default' => true ),
             ),
@@ -274,6 +337,24 @@ function foldery_explorer_register_block() {
     );
 }
 add_action( 'init', 'foldery_explorer_register_block' );
+
+function foldery_explorer_enqueue_block_editor_assets() {
+    if ( function_exists( 'foldery_register_shared_styles' ) ) {
+        foldery_register_shared_styles();
+    }
+
+    wp_enqueue_style( 'foldery-explorer-editor-style' );
+    wp_add_inline_script(
+        'foldery-explorer-editor',
+        'window.FolderyExplorerEditor = ' . wp_json_encode(
+            array(
+                'folders' => foldery_media_active() ? foldery_explorer_editor_folder_tree() : array(),
+            )
+        ) . ';',
+        'before'
+    );
+}
+add_action( 'enqueue_block_editor_assets', 'foldery_explorer_enqueue_block_editor_assets' );
 
 function foldery_explorer_register_routes() {
     register_rest_route(

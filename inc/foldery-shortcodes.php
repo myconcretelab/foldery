@@ -207,32 +207,6 @@ function foldery_shortcode_serie_detail( $atts = array(), $content = null, $tag 
     return $html;
 }
 
-function foldery_attachments_from_source( $source = 'attr', $field = 'mise_en_avant', $limit = -1 ) {
-    $query = array(
-        'post_type'      => 'attachment',
-        'post_status'    => 'inherit',
-        'posts_per_page' => (int) $limit,
-    );
-
-    if ( 'dir_id' === $source ) {
-        $ids = foldery_media_get_attachments( (int) $field );
-        if ( ! count( $ids ) ) {
-            return array();
-        }
-        $query['post__in'] = $ids;
-        $query['orderby'] = 'post__in';
-    } else {
-        $query['meta_query'] = array(
-            array(
-                'key'   => sanitize_key( $field ),
-                'value' => '1',
-            ),
-        );
-    }
-
-    return get_posts( $query );
-}
-
 function foldery_frame_classes( $attachment_id ) {
     $frame = foldery_attachment_field( 'cadre_presentation', $attachment_id, false );
     $classes = in_array( (string) $frame, array( '15', '25', '35' ), true ) ? 'frame' : '';
@@ -272,49 +246,6 @@ function foldery_render_framed_attachment( $attachment_id, $ratio = 0.5 ) {
         (int) ( $width + 20 ),
         (int) ( $height + 20 )
     );
-}
-
-function foldery_shortcode_last_pics( $atts = array(), $content = null, $tag = 'last_pics' ) {
-    $atts = foldery_shortcode_atts(
-        array(
-            'source'      => 'attr',
-            'id'          => 'mise_en_avant',
-            'limit'       => 3,
-            'col'         => 3,
-            'details'     => 0,
-            'proportions' => 0,
-        ),
-        $atts,
-        $tag
-    );
-
-    $attachments = foldery_attachments_from_source( $atts['source'], $atts['id'], $atts['limit'] );
-    if ( ! count( $attachments ) ) {
-        return '';
-    }
-
-    $html = '<table class="expo foldery-last-pics">';
-    foreach ( array_chunk( $attachments, max( 1, (int) $atts['col'] ) ) as $row ) {
-        $html .= '<tr>';
-        foreach ( $row as $attachment ) {
-            $ratio = 0.5;
-            $dimension = foldery_attachment_field( 'dimension', $attachment->ID, false );
-            if ( $dimension && $atts['proportions'] ) {
-                $ratio = (float) $dimension / 100;
-            }
-
-            $html .= '<td>' . foldery_render_framed_attachment( $attachment->ID, $ratio );
-            $display_dimension = foldery_attachment_field( 'dimension', $attachment->ID, true );
-            if ( $display_dimension ) {
-                $html .= '<h5>' . esc_html( $display_dimension ) . '</h5>';
-            }
-            $html .= '</td>';
-        }
-        $html .= '</tr>';
-    }
-    $html .= '</table>';
-
-    return $html;
 }
 
 function foldery_shortcode_reproductions() {
@@ -501,7 +432,6 @@ function foldery_register_shortcodes() {
     add_shortcode( 'foldery_reproductions', 'foldery_shortcode_reproductions' );
     add_shortcode( 'serie', 'foldery_shortcode_series' );
     add_shortcode( 'masonry', 'foldery_shortcode_masonry' );
-    add_shortcode( 'last_pics', 'foldery_shortcode_last_pics' );
 
     add_shortcode( 'vc_row', 'foldery_passthrough_shortcode' );
     add_shortcode( 'vc_column', 'foldery_passthrough_shortcode' );
