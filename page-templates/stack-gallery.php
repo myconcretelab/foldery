@@ -1,6 +1,6 @@
 <?php
 /**
- * Template Name: Galerie de series
+ * Template Name: Galerie de series globale
  */
 
 get_header();
@@ -13,7 +13,7 @@ get_header();
                 <?php the_content(); ?>
                 <?php
                 if ( ! has_shortcode( get_the_content(), 'foldery_series' ) && ! has_shortcode( get_the_content(), 'serie' ) ) {
-                    echo do_shortcode( '[foldery_series]' );
+                    echo do_shortcode( '[foldery_series folder_id="-1"]' );
                 }
                 ?>
             </div>

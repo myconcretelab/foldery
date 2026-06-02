@@ -2,8 +2,8 @@
 Theme Name: Foldery
 Theme URI: https://github.com/myconcretelab/foldery
 Author: Sebastien Jacqmin
-Description: Theme autonome pour sebastienj.com avec logique, options et medias integres dans Foldery.
-Version: 1.0.0
+Description: Theme Gutenberg leger pour sebastienj.com avec shortcodes medias integres.
+Version: 2.0.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: one-column, two-columns, right-sidebar, custom-header, custom-menu, editor-style, featured-images, microformats, post-formats, rtl-language-support, sticky-post, translation-ready
@@ -17,28 +17,11 @@ Use it to make something cool, have fun, and share what you've learned with othe
 
 Mode d'emploi :
 
-la page d'accueil
------------------
+Le contenu est edite dans Gutenberg. Les parties dynamiques du site passent
+par les shortcodes du theme :
 
-Contient des blocs de grille media qui affichent des images liens vers des pages PORTFOLIO
-ces blocs affiches les images grace a des templates situé dans /vc_templates :
-
-- cms_grid--dessin  ->      affiche des tas de trois images pioché dans un dossier de media dont l'ID est 
-                            associé à la page PORTFOLIO via un champs ACF nomé 'id_categorie' 
-                            et présent dans l'édition de la page PORTFOLIO
-
-- cms_grid__last-pictures ->affiche des images, tous dossiers media confondu, qui on l'attribut ACF 'mise_en_avant'
-                            de coché. Les images sont affichés avec un cadre.
-                            
-
-Les pages de thematique (dessins,peinture,..) 
-----------------------------------------------
-
-Sont des pages avec une grille media qui collecte des pages portfolio qui ont la catégorie associée  (dessins,peinture,..)                            
-
-                            
-Les pages PORTFOLIO
--------------------
-
-Ces pages affichent les medias contenu dans le dossier de média dont l'ID est associé a cette page 
-via l'attribut ACF 'id_categorie'
+- [foldery_series] affiche les sous-series du dossier media ACF "folder".
+- [foldery_series folder_id="-1"] affiche les series de premier niveau.
+- [foldery_serie_detail] affiche la galerie d'une serie depuis l'URL.
+- [last_pics] affiche les images marquees "mise_en_avant".
+- [foldery_reproductions] affiche les reproductions disponibles.

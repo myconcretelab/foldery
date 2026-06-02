@@ -1,0 +1,90 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - link "Sébastien Jacqmin" [ref=e7] [cursor=pointer]:
+        - /url: http://127.0.0.1:8093/
+        - img "Sébastien Jacqmin" [ref=e8]
+      - navigation [ref=e10]:
+        - list [ref=e11]:
+          - listitem [ref=e12]:
+            - link "Dessins" [ref=e13] [cursor=pointer]:
+              - /url: http://127.0.0.1:8093/dessins/
+          - listitem [ref=e14]:
+            - link "SketchBook" [ref=e15] [cursor=pointer]:
+              - /url: http://127.0.0.1:8093/sketchbook/
+          - listitem [ref=e16]:
+            - link "Peintures" [ref=e17] [cursor=pointer]:
+              - /url: http://127.0.0.1:8093/peintures/
+          - listitem [ref=e18]:
+            - link "Reproductions" [ref=e19] [cursor=pointer]:
+              - /url: http://127.0.0.1:8093/reproductions/
+      - generic: 
+  - main [ref=e21]:
+    - article [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]:
+            - heading "Jacqmin Sebastien" [level=3] [ref=e26]
+            - paragraph [ref=e27]:
+              - text: Artiste travaillant en Bretagne – France
+              - text: "Instagram :"
+              - link "sebastienjacqmin" [ref=e28] [cursor=pointer]:
+                - /url: https://www.instagram.com/sebastienjacqmin/
+          - generic [ref=e29]:
+            - heading "Contact" [level=3] [ref=e30]
+            - paragraph [ref=e31]:
+              - text: +33.(0)6.20.72.60.10
+              - link "contact@sebastienj.com" [ref=e32] [cursor=pointer]:
+                - /url: mailto:contact@sebastienj.com
+          - link "Mes reproductions…" [ref=e36] [cursor=pointer]:
+            - /url: /reproductions/
+        - blockquote [ref=e37]:
+          - text: “
+          - paragraph [ref=e38]: Il y a plusieurs facons de fuir. Certains utilisent les drogues dites psychotogenes. D’autres la psychose. D’autres le suicide. D’autres la navigation en solitaire. Il y a peut-etre une autre facon encore fuir dans un monde qui n’est pas de ce monde, le monde de l’imaginaire.
+          - generic [ref=e39]: Henri Laborit [Eloge de la fuite]
+        - heading "Series en cours…" [level=3] [ref=e40]
+        - generic [ref=e41]:
+          - link "Houses of Imagine" [ref=e43] [cursor=pointer]:
+            - /url: http://127.0.0.1:8093/serie/houses-of-imagine/45/
+            - heading "Houses of Imagine" [level=5] [ref=e44]
+            - figure [ref=e45]
+          - link "Maisons" [ref=e47] [cursor=pointer]:
+            - /url: http://127.0.0.1:8093/serie/maisons/49/
+            - heading "Maisons" [level=5] [ref=e48]
+            - figure [ref=e49]
+          - link "Croquis 2025" [ref=e51] [cursor=pointer]:
+            - /url: http://127.0.0.1:8093/serie/croquis-2025/56/
+            - heading "Croquis 2025" [level=5] [ref=e52]
+            - figure [ref=e53]
+          - link "Les nus" [ref=e55] [cursor=pointer]:
+            - /url: http://127.0.0.1:8093/serie/les-nus/38/
+            - heading "Les nus" [level=5] [ref=e56]
+            - figure [ref=e57]
+          - link "Portraits" [ref=e59] [cursor=pointer]:
+            - /url: http://127.0.0.1:8093/serie/portraits/2/
+            - heading "Portraits" [level=5] [ref=e60]
+            - figure [ref=e61]
+          - link "Les oubliés" [ref=e63] [cursor=pointer]:
+            - /url: http://127.0.0.1:8093/serie/les-oublies/12/
+            - heading "Les oubliés" [level=5] [ref=e64]
+            - figure [ref=e65]
+          - link "Les Vacances" [ref=e67] [cursor=pointer]:
+            - /url: http://127.0.0.1:8093/serie/les-vacances/1/
+            - heading "Les Vacances" [level=5] [ref=e68]
+            - figure [ref=e69]:
+              - img "Dessin au fusain et pastel représentant un paysage de campagne" [ref=e70]
+        - heading "Recemment cree a l’atelier (ou dehors !)" [level=3] [ref=e71]
+        - table [ref=e72]:
+          - rowgroup [ref=e73]:
+            - row "50 x 65 cm (Raisin) 50 x 65 cm (Raisin)" [ref=e74]:
+              - cell "50 x 65 cm (Raisin)" [ref=e75]:
+                - figure [ref=e76]:
+                  - link [ref=e77] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8093/wp-content/uploads/img_9788-1.jpg
+                - heading "50 x 65 cm (Raisin)" [level=5] [ref=e78]
+              - cell "50 x 65 cm (Raisin)" [ref=e79]:
+                - figure [ref=e80]:
+                  - link "Branches mortes abandonnées dans une lande" [ref=e81] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8093/wp-content/uploads/img_9800-1.jpg
+                    - img "Branches mortes abandonnées dans une lande" [ref=e82]
+                - heading "50 x 65 cm (Raisin)" [level=5] [ref=e83]

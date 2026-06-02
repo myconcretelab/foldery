@@ -4,9 +4,7 @@
  */
 
 function foldery_lightbox_options() {
-    global $smof_data;
-
-    $defaults = array(
+    return array(
         'enabled' => true,
         'groupLinks' => true,
         'groupByPost' => true,
@@ -28,61 +26,12 @@ function foldery_lightbox_options() {
             'groupStatus' => __( 'Image %current% of %total%', 'foldery' ),
         ),
     );
-
-    $settings = is_array( $smof_data ) ? $smof_data : array();
-
-    $options = array(
-        'enabled' => ! empty( $settings['lightbox_enabled'] ),
-        'groupLinks' => ! empty( $settings['lightbox_group_links'] ),
-        'groupByPost' => ! empty( $settings['lightbox_group_post'] ),
-        'groupGallery' => ! empty( $settings['lightbox_group_gallery'] ),
-        'loop' => ! empty( $settings['lightbox_group_loop'] ),
-        'autofit' => ! empty( $settings['lightbox_ui_autofit'] ),
-        'animate' => ! empty( $settings['lightbox_ui_animate'] ),
-        'overlayOpacity' => isset( $settings['lightbox_ui_overlay_opacity'] ) ? (float) $settings['lightbox_ui_overlay_opacity'] : $defaults['overlayOpacity'],
-        'titleDefault' => ! empty( $settings['lightbox_ui_title_default'] ),
-        'slideshowAutostart' => ! empty( $settings['lightbox_slideshow_autostart'] ),
-        'slideshowDuration' => isset( $settings['lightbox_slideshow_duration'] ) ? max( 1, (int) $settings['lightbox_slideshow_duration'] ) : $defaults['slideshowDuration'],
-        'labels' => array(
-            'close' => isset( $settings['lightbox_label_close'] ) ? $settings['lightbox_label_close'] : $defaults['labels']['close'],
-            'loading' => isset( $settings['lightbox_label_loading'] ) ? $settings['lightbox_label_loading'] : $defaults['labels']['loading'],
-            'next' => isset( $settings['lightbox_label_next'] ) ? $settings['lightbox_label_next'] : $defaults['labels']['next'],
-            'prev' => isset( $settings['lightbox_label_prev'] ) ? $settings['lightbox_label_prev'] : $defaults['labels']['prev'],
-            'slideshowStart' => isset( $settings['lightbox_label_slideshow_start'] ) ? $settings['lightbox_label_slideshow_start'] : $defaults['labels']['slideshowStart'],
-            'slideshowStop' => isset( $settings['lightbox_label_slideshow_stop'] ) ? $settings['lightbox_label_slideshow_stop'] : $defaults['labels']['slideshowStop'],
-            'groupStatus' => isset( $settings['lightbox_label_group_status'] ) ? $settings['lightbox_label_group_status'] : $defaults['labels']['groupStatus'],
-        ),
-    );
-
-    $options['overlayOpacity'] = min( 1, max( 0, $options['overlayOpacity'] ) );
-
-    return apply_filters( 'foldery_lightbox_options', wp_parse_args( $options, $defaults ) );
 }
 
 function foldery_lightbox_is_enabled() {
-    global $smof_data;
-
     $options = foldery_lightbox_options();
     if ( empty( $options['enabled'] ) || is_admin() || is_feed() ) {
         return false;
-    }
-
-    $settings = is_array( $smof_data ) ? $smof_data : array();
-
-    if ( is_front_page() || is_home() ) {
-        return ! empty( $settings['lightbox_enabled_home'] );
-    }
-
-    if ( is_page() ) {
-        return ! empty( $settings['lightbox_enabled_page'] );
-    }
-
-    if ( is_singular() ) {
-        return ! empty( $settings['lightbox_enabled_post'] );
-    }
-
-    if ( is_archive() || is_search() ) {
-        return ! empty( $settings['lightbox_enabled_archive'] );
     }
 
     return true;
@@ -173,17 +122,13 @@ function foldery_lightbox_filter_content( $content ) {
 add_filter( 'the_content', 'foldery_lightbox_filter_content', 99 );
 
 function foldery_lightbox_filter_widget_content( $content ) {
-    global $smof_data;
-
-    return ! empty( $smof_data['lightbox_enabled_widget'] ) ? foldery_lightbox_activate( $content, 'widget' ) : $content;
+    return foldery_lightbox_activate( $content, 'widget' );
 }
 add_filter( 'widget_text', 'foldery_lightbox_filter_widget_content', 99 );
 add_filter( 'widget_text_content', 'foldery_lightbox_filter_widget_content', 99 );
 
 function foldery_lightbox_filter_menu_content( $content ) {
-    global $smof_data;
-
-    return ! empty( $smof_data['lightbox_enabled_menu'] ) ? foldery_lightbox_activate( $content, 'menu' ) : $content;
+    return foldery_lightbox_activate( $content, 'menu' );
 }
 add_filter( 'wp_nav_menu', 'foldery_lightbox_filter_menu_content', 99 );
 

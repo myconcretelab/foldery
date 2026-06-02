@@ -1,33 +1,15 @@
 /*
-Theme Name: Foldery Child
+Theme Name: Foldery Site
 Author: Sebastien Jacqmin
-Description: Modifications du thème ZK-monaco
-Version: 1.0.0
+Description: Styles du theme Gutenberg Foldery.
+Version: 2.0.0
 */
 /*
 
 Mode d'emploi :
 
-la page d'accueil
------------------
-
-Contient des 'blocs' grille media qui affichent des images liens vers des pages PORTFOLIO
-ces blocs affiches les images grace a des templates situé dans /vc_templates :
-
-- cms_grid--dessin  ->      affiche des tas de trois images pioché dans un dossier de media dont l'ID est 
-                            associé à la page PORTFOLIO via un champs ACF nomé 'id_categorie' 
-                            et présent dans l'édition de la page PORTFOLIO
-
-- cms_grid__last-pictures ->affiche des images, tous dossiers media confondu, qui on l'attribut ACF 'mise_en_avant'
-                            de coché. Les images sont affichés avec un cadre.
-
-                            
-Les pages PORTFOLIO
--------------------
-
-Ces pages affichent les medias contenu dans le dossier de média dont l'ID est associé a cette page 
-via l'attribut ACF 'id_categorie'
-
+Les styles ci-dessous servent aux shortcodes medias du theme :
+[foldery_series], [foldery_serie_detail], [last_pics], [foldery_reproductions].
 
 */
 
@@ -79,7 +61,6 @@ body {
 	top: -30px;
 	left: -30px;
 	background: rgba(226, 188, 147, 1);
-	background-image:url("../images/wood.jpg");
 	z-index: 1;
 	box-shadow:
 		0px 1em 2em -1em rgba(0,0,0,.4),
@@ -322,6 +303,93 @@ h2.padding {
 .clear {
   clear: both;
     
+}
+
+/* Header actuel du site */
+@media screen and (min-width: 992px) {
+  .monaco-home #cms-content-wrapper.home {
+    padding-top: 62px;
+  }
+
+  #masthead.header-v1.header-left {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 260px;
+    min-height: 100vh;
+    background: #f1f1f1;
+  }
+
+  .admin-bar #masthead.header-v1.header-left {
+    top: 32px;
+  }
+
+  #masthead.header-v1 #cms-header-inner {
+    min-height: 100%;
+  }
+
+  #masthead.header-v1 #cms-header-logo {
+    width: auto;
+    padding: 62px 34px 0;
+    text-align: left;
+  }
+
+  #masthead.header-v1 #cms-header-logo img {
+    display: block;
+    width: 225px;
+    max-width: 100%;
+    height: auto;
+  }
+
+  #masthead.header-v1 #cms-header-navigation {
+    margin-top: 235px;
+  }
+
+  #masthead.header-v1 .main-navigation > ul,
+  #masthead.header-v1 .main-navigation > div > ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #masthead.header-v1 .main-navigation > ul > li,
+  #masthead.header-v1 .main-navigation > div > ul > li {
+    display: block;
+    float: none;
+    margin: 0 0 33px;
+    padding: 0;
+    text-align: center;
+  }
+
+  #masthead.header-v1 .main-navigation > ul > li > a,
+  #masthead.header-v1 .main-navigation > div > ul > li > a {
+    display: inline-block;
+    color: #5f5f5f;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 1.2;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+}
+
+@media screen and (max-width: 991px) {
+  #masthead.header-v1 {
+    background: #f1f1f1;
+  }
+
+  #masthead.header-v1 #cms-header-logo {
+    width: 180px;
+    padding: 22px 18px;
+  }
+
+  #masthead.header-v1 #cms-header-logo img {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
 }
  
  

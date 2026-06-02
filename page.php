@@ -1,32 +1,13 @@
-<?php
-/**
- * The template for displaying all pages
- *
- * This is the template that displays all pages by default.
- * Please note that this is the WordPress construct of pages
- * and that other 'pages' on your WordPress site will use a
- * different template.
- *
- * @package ZookaStudio
- * @subpackage Foldery
- * @since 1.0.0
- * @author Fox
- */
-global $smof_data, $cms_meta;
-get_header(); 
-?>
-<div id="cms-page-content" class="<?php cms_main_class(); ?>">
-	<div id="primary">
-		<div id="content" role="main">
+<?php get_header(); ?>
 
-			<?php while ( have_posts() ) : the_post(); ?>
-				<?php  get_template_part( 'single-templates/content', 'page' ); ?>
-				<?php if($smof_data['page_comment']=='1'):?>
-					<?php comments_template( '', true ); ?>
-				<?php endif; ?>
-			<?php endwhile; // end of the loop. ?>
+<main id="main" class="site-main container">
+    <?php while ( have_posts() ) : the_post(); ?>
+        <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+            <div class="entry-content">
+                <?php the_content(); ?>
+            </div>
+        </article>
+    <?php endwhile; ?>
+</main>
 
-		</div><!-- #content -->
-	</div><!-- #primary -->
-</div>
 <?php get_footer(); ?>

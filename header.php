@@ -1,64 +1,66 @@
-<?php
-/**
- * The Header template for our theme
- *
- * Displays all of the <head> section and everything up till <div id="main">
- *
- * @package ZookaStudio
- * @subpackage Foldery
- * @since 1.0.0
- */
-?><!DOCTYPE html>
+<!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
-<meta charset="<?php bloginfo( 'charset' ); ?>" />
-<meta name="viewport" content="width=device-width" />
-<link rel="profile" href="http://gmpg.org/xfn/11" />
-<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
-
-<?php wp_head(); global $smof_data, $cms_meta, $woocommerce;  ?>
+<meta charset="<?php bloginfo( 'charset' ); ?>">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<?php wp_head(); ?>
 </head>
-<body <?php body_class(); ?>><?php if ( function_exists( 'wp_body_open' ) ) wp_body_open(); else  do_action( 'wp_body_open' ); ?>
-<div id="cms-page" class="<?php cms_page_class(); ?> <?php cms_header_wrap_class();?> ">
-    <section id="cms-header-wrapper" class="clearfix">
-        <?php if (is_front_page() && is_active_sidebar( 'sidebar-11' )):?>
-            <?php dynamic_sidebar( 'sidebar-11' ); ?>
-            <!-- #cms-showcase -->
-        <?php endif; ?>
-    	<?php if($smof_data['header_widget_search']){?>
-    	<section id="cms-search" class="clearfix">
-    		<div class="cms-search-inner container">
-                <div class="cms-search-content">
-                    <form role="search" method="get" action="<?php echo esc_url( home_url( '/'  ) );?>">
-                        <div class="row">
-                            <div class="col-xs-12 col-sm-9 col-md-9 col-lg-9 nopaddingright">
-                                <input type="text" value="<?php echo get_search_query();?>" name="s" placeholder="Type your search" autofocus/>
-                            </div>
-                            <div class="col-xs-10 col-sm-2 col-md-2 col-lg-2">
-                                <input class="btn btn-primary btn-block submit nopaddingleft nopaddingright" type="submit" value="<?php echo esc_attr__( 'Search', 'foldery' )?>" />
-                                <?php if($woocommerce):?>
-                                    <?php if(is_woocommerce()):?>
-                                    <input type="hidden" name="post_type" value="product" />
-                                    <?php endif;?>
-                                <?php endif;?>
-                                
-                            </div>
-                            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 text-right">
-                            	<a id="header-widget-search-close" style="margin-right:15px;"><i class="fa fa-times"></i></a>
-                            </div>
-                        </div>
-                    </form>
+<body <?php body_class( 'ltr cms-header-v1 cms-custom-vc-row-stretch-content' ); ?>>
+<?php wp_body_open(); ?>
+<?php
+$foldery_logo_url = '';
+$custom_logo_id   = get_theme_mod( 'custom_logo' );
 
+if ( $custom_logo_id ) {
+    $foldery_logo_url = wp_get_attachment_image_url( $custom_logo_id, 'full' );
+}
+
+if ( ! $foldery_logo_url ) {
+    $legacy_options = get_option( 'smof_data' );
+    $foldery_logo_url = $legacy_options['main_logo']['url'] ?? '';
+}
+
+if ( ! $foldery_logo_url ) {
+    $foldery_logo_url = content_url( 'uploads/logo-pt.png' );
+}
+
+$foldery_menu_args = array(
+    'menu_class'  => 'nav-menu menu-main-menu',
+    'container'   => false,
+    'fallback_cb' => false,
+);
+
+$foldery_menu_locations = get_nav_menu_locations();
+
+if ( ! empty( $foldery_menu_locations['primary'] ) ) {
+    $foldery_menu_args['theme_location'] = 'primary';
+} else {
+    $foldery_menu_args['menu'] = 'Main menu';
+}
+?>
+
+<div id="cms-page" class="cs-wide header-v1 header-left clearfix">
+    <section id="cms-header-wrapper" class="clearfix">
+        <header id="masthead" class="site-header header-v1 header-left clearfix" role="banner">
+            <div id="cms-header" class="cms-header header-v1 clearfix">
+                <div id="cms-header-inner">
+                    <div id="cms-header-logo">
+                        <a href="<?php echo esc_url( home_url( '/' ) ); ?>">
+                            <img alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>" src="<?php echo esc_url( $foldery_logo_url ); ?>">
+                        </a>
+                    </div>
+                    <div id="cms-header-navigation">
+                        <nav id="site-navigation" class="main-navigation" role="navigation">
+                            <?php
+                            wp_nav_menu( $foldery_menu_args );
+                            ?>
+                        </nav>
+                    </div>
+                    <div id="cms-nav-extra" class="cms-nav-extra main-navigation">
+                        <div id="cms-menu-mobile" class="pull-left"><ul><li><a><i class="fa fa-bars"></i></a></li></ul></div>
+                    </div>
                 </div>
             </div>
-    	</section>
-        <!-- #cms-search -->
-    	<?php } ?>
-	
-    	<header id="masthead" class="site-header <?php cms_header_wrap_class();?>" role="banner">
-    		<?php cms_header(); ?>
-    	</header><!-- #masthead -->
-    </section><!-- #cms-header-wrapper -->
-	<section id="cms-content-wrapper" class="<?php echo is_front_page()?'home':''; ?> clearfix">
-    <?php cms_page_title(); ?>
-	<div id="main" class="main clearfix">
+        </header>
+    </section>
+    <section id="cms-content-wrapper" class="<?php echo is_front_page() ? 'home' : ''; ?> clearfix">
