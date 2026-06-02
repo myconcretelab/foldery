@@ -37,6 +37,15 @@ function foldery_setup() {
     add_theme_support( 'editor-styles' );
     add_theme_support( 'wp-block-styles' );
     add_theme_support( 'html5', array( 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script', 'navigation-widgets' ) );
+    add_editor_style(
+        array(
+            'assets/css/bootstrap.min.css',
+            'assets/css/static.css',
+            'assets/css/foldery-explorer.css',
+            'assets/css/foldery-child.css',
+            'assets/css/foldery-explorer-editor.css',
+        )
+    );
 
     register_nav_menus(
         array(
