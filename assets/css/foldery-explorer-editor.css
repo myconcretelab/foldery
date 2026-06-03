@@ -8,6 +8,55 @@
   min-height: 180px;
 }
 
+.editor-styles-wrapper .foldery-explorer-view {
+  position: relative;
+}
+
+.editor-styles-wrapper .foldery-explorer-folder.has-parent-link {
+  padding-top: 58px;
+}
+
+.editor-styles-wrapper .foldery-explorer-back {
+  align-items: center;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  color: #333;
+  display: inline-flex;
+  gap: 10px;
+  height: 42px;
+  justify-content: center;
+  left: 0;
+  max-width: min(360px, 100%);
+  padding: 0 16px 0 14px;
+  position: absolute;
+  text-decoration: none;
+  top: 0;
+  z-index: 5;
+}
+
+.editor-styles-wrapper .foldery-explorer-back-icon {
+  border-bottom: 2px solid currentColor;
+  border-left: 2px solid currentColor;
+  display: block;
+  flex: 0 0 auto;
+  height: 11px;
+  margin-left: 4px;
+  transform: rotate(45deg);
+  width: 11px;
+}
+
+.editor-styles-wrapper .foldery-explorer-back-label {
+  display: block;
+  font-size: 13px;
+  line-height: 1;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .editor-styles-wrapper .foldery-explorer-heading {
   margin: 0 0 34px;
 }

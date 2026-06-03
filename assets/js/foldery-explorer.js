@@ -75,7 +75,7 @@
     var stage = explorer.querySelector('.foldery-explorer-stage');
     var animate = animationsEnabled(explorer);
 
-    function replaceContent() {
+    function replaceContent(resolve) {
       stage.innerHTML = html;
       initMasonry(stage);
 
@@ -85,21 +85,192 @@
           stage.classList.remove('is-entering');
         }, 980);
       }
+
+      resolve();
     }
 
-    if (!animate) {
-      replaceContent();
+    return new Promise(function(resolve) {
+      if (!animate) {
+        replaceContent(resolve);
+        return;
+      }
+
+      stage.classList.add('is-leaving');
+      window.setTimeout(function() {
+        stage.classList.remove('is-leaving');
+        replaceContent(resolve);
+      }, 180);
+    });
+  }
+
+  function linkLabel(link) {
+    var label = link.querySelector('.foldery-explorer-back-label, h5');
+    return label ? label.textContent.trim() : link.textContent.trim();
+  }
+
+  function currentFolderLabel(explorer) {
+    var heading = explorer.querySelector('.foldery-explorer-folder .foldery-explorer-heading h3, .foldery-explorer-folder .foldery-explorer-page-content h1, .foldery-explorer-folder .foldery-explorer-page-content h2, .foldery-explorer-folder .foldery-explorer-page-content h3');
+    return heading ? heading.textContent.trim() : document.title;
+  }
+
+  function readCurrentView(explorer, homeView) {
+    var stage = explorer.querySelector('.foldery-explorer-stage');
+    var home = stage.querySelector('.foldery-explorer-home');
+    var folder = stage.querySelector('.foldery-explorer-folder[data-folder-id]');
+
+    if (home && homeView) {
+      return homeView;
+    }
+
+    if (folder) {
+      return {
+        type: 'folder',
+        folderId: folder.dataset.folderId,
+        url: currentProtocolUrl(window.location.href),
+        label: currentFolderLabel(explorer),
+        backTarget: null
+      };
+    }
+
+    return null;
+  }
+
+  function serializeView(view) {
+    if (!view) {
+      return null;
+    }
+
+    return {
+      type: view.type,
+      folderId: view.folderId || null,
+      url: view.url || null,
+      label: view.label || null,
+      backTarget: serializeView(view.backTarget)
+    };
+  }
+
+  function deserializeView(data, homeView) {
+    if (!data) {
+      return null;
+    }
+
+    if (data.type === 'home') {
+      return homeView;
+    }
+
+    if (data.type === 'folder' && data.folderId) {
+      return {
+        type: 'folder',
+        folderId: data.folderId,
+        url: data.url,
+        label: data.label || '',
+        backTarget: deserializeView(data.backTarget, homeView)
+      };
+    }
+
+    return null;
+  }
+
+  function writeExplorerState(view, replace) {
+    var state = {
+      folderyExplorer: true,
+      view: serializeView(view)
+    };
+    var url = view && view.url ? view.url : currentProtocolUrl(window.location.href);
+
+    if (replace) {
+      window.history.replaceState(state, document.title, url);
+    } else {
+      window.history.pushState(state, document.title, url);
+    }
+  }
+
+  function ensureBackLink(explorer) {
+    var view = explorer.querySelector('.foldery-explorer-folder');
+    var link;
+
+    if (!view) {
+      return null;
+    }
+
+    link = view.querySelector('.foldery-explorer-back');
+    if (!link) {
+      link = document.createElement('a');
+      link.className = 'foldery-explorer-back foldery-explorer-link';
+      link.innerHTML = '<span class="foldery-explorer-back-icon" aria-hidden="true"></span><span class="foldery-explorer-back-label"></span>';
+      view.insertBefore(link, view.firstChild);
+    }
+
+    view.classList.add('has-parent-link');
+    return link;
+  }
+
+  function configureBackLink(explorer, target) {
+    var link;
+    var label;
+
+    if (!target) {
       return;
     }
 
-    stage.classList.add('is-leaving');
-    window.setTimeout(function() {
-      stage.classList.remove('is-leaving');
-      replaceContent();
-    }, 180);
+    link = ensureBackLink(explorer);
+    if (!link) {
+      return;
+    }
+
+    label = target.label || 'Accueil';
+    link.href = target.url || currentProtocolUrl(window.location.href);
+    link.dataset.folderyBack = '1';
+    link.setAttribute('aria-label', 'Revenir a ' + label);
+    link.setAttribute('title', 'Revenir a ' + label);
+    link.querySelector('.foldery-explorer-back-label').textContent = label;
+
+    if (target.type === 'home') {
+      delete link.dataset.folderId;
+      link.dataset.folderyHome = '1';
+    } else {
+      link.dataset.folderId = target.folderId;
+      delete link.dataset.folderyHome;
+    }
   }
 
-  function loadFolder(explorer, folderId, targetUrl, push) {
+  function viewFromBackLink(link, homeView) {
+    var label;
+
+    if (link.dataset.folderyHome === '1') {
+      return homeView;
+    }
+
+    if (!link.dataset.folderId) {
+      return null;
+    }
+
+    label = linkLabel(link).replace(/^Revenir a\s+/, '');
+    return {
+      type: 'folder',
+      folderId: link.dataset.folderId,
+      url: link.href,
+      label: label,
+      backTarget: null
+    };
+  }
+
+  function renderHome(explorer, homeView, push) {
+    if (!homeView) {
+      window.location.reload();
+      return Promise.resolve(null);
+    }
+
+    return renderStage(explorer, homeView.html).then(function() {
+      explorer._folderyCurrentView = homeView;
+      if (push) {
+        writeExplorerState(homeView, false);
+      }
+      return homeView;
+    });
+  }
+
+  function loadFolder(explorer, folderId, targetUrl, push, backTarget, fallbackLabel) {
     var apiUrl = new URL(explorer.dataset.apiUrl, window.location.origin);
     apiUrl.searchParams.set('folder_id', folderId);
     apiUrl.searchParams.set('include_page', explorer.dataset.includePage || '1');
@@ -114,16 +285,41 @@
         return response.json();
       })
       .then(function(payload) {
-        renderStage(explorer, payload.html || '');
-        explorer.classList.remove('is-loading');
+        return renderStage(explorer, payload.html || '').then(function() {
+          var view = {
+            type: 'folder',
+            folderId: String(folderId),
+            url: currentProtocolUrl(payload.url || targetUrl || window.location.href),
+            label: payload.title || fallbackLabel || '',
+            backTarget: backTarget || null
+          };
 
-        if (push && targetUrl) {
-          window.history.pushState({ folderyExplorer: true, folderId: folderId }, payload.title || document.title, currentProtocolUrl(targetUrl));
-        }
+          configureBackLink(explorer, view.backTarget);
+          explorer._folderyCurrentView = view;
+          explorer.classList.remove('is-loading');
+
+          if (push && targetUrl) {
+            writeExplorerState(view, false);
+          }
+
+          return view;
+        });
       })
       .catch(function() {
         explorer.classList.remove('is-loading');
       });
+  }
+
+  function navigateToView(explorer, view, push, homeView) {
+    if (!view) {
+      return Promise.resolve(null);
+    }
+
+    if (view.type === 'home') {
+      return renderHome(explorer, homeView, push);
+    }
+
+    return loadFolder(explorer, view.folderId, view.url, push, view.backTarget, view.label);
   }
 
   function readMenuMap(explorer) {
@@ -136,21 +332,51 @@
 
   function initExplorer(explorer) {
     var menuMap = readMenuMap(explorer);
+    var stage = explorer.querySelector('.foldery-explorer-stage');
+    var hasHome = !!stage.querySelector('.foldery-explorer-home');
+    var homeView = hasHome ? {
+      type: 'home',
+      url: currentProtocolUrl(window.location.href),
+      label: 'Accueil',
+      html: stage.innerHTML,
+      backTarget: null
+    } : null;
 
     initMasonry(explorer);
+    explorer._folderyCurrentView = readCurrentView(explorer, homeView);
+    writeExplorerState(explorer._folderyCurrentView, true);
 
     explorer.addEventListener('click', function(event) {
-      var link = event.target.closest('.foldery-explorer-link[data-folder-id]');
+      var backLink = event.target.closest('.foldery-explorer-back[data-foldery-back]');
+      var targetView;
+      var link;
+
+      if (backLink) {
+        targetView = explorer._folderyCurrentView && explorer._folderyCurrentView.backTarget
+          ? explorer._folderyCurrentView.backTarget
+          : viewFromBackLink(backLink, homeView);
+
+        if (!targetView) {
+          return;
+        }
+
+        event.preventDefault();
+        navigateToView(explorer, targetView, true, homeView);
+        return;
+      }
+
+      link = event.target.closest('.foldery-explorer-link[data-folder-id]');
       if (!link) {
         return;
       }
 
       event.preventDefault();
-      loadFolder(explorer, link.dataset.folderId, link.href, true);
+      loadFolder(explorer, link.dataset.folderId, link.href, true, explorer._folderyCurrentView, linkLabel(link));
     });
 
     document.addEventListener('click', function(event) {
       var link = event.target.closest('#site-navigation a');
+      var previousView = explorer._folderyCurrentView;
       if (!link || !explorer.isConnected) {
         return;
       }
@@ -161,12 +387,15 @@
       }
 
       event.preventDefault();
-      loadFolder(explorer, match.folderId, link.href, true);
+      loadFolder(explorer, match.folderId, link.href, true, previousView, match.title);
     });
 
     window.addEventListener('popstate', function(event) {
-      if (event.state && event.state.folderyExplorer && event.state.folderId) {
-        loadFolder(explorer, event.state.folderId, window.location.href, false);
+      var view = event.state && event.state.folderyExplorer ? deserializeView(event.state.view, homeView) : null;
+      if (view) {
+        navigateToView(explorer, view, false, homeView);
+      } else if (event.state && event.state.folderyExplorer && event.state.folderId) {
+        loadFolder(explorer, event.state.folderId, window.location.href, false, null);
       } else {
         window.location.reload();
       }

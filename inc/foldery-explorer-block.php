@@ -195,6 +195,33 @@ function foldery_explorer_render_stack( $folders ) {
     return $html;
 }
 
+function foldery_explorer_render_parent_link( $folder ) {
+    if ( ! foldery_is_media_folder( $folder ) ) {
+        return '';
+    }
+
+    $parent_id = $folder->getParent();
+    if ( ! $parent_id || foldery_media_root_id() === (int) $parent_id ) {
+        return '';
+    }
+
+    $parent = foldery_media_get_folder( $parent_id );
+    if ( ! foldery_is_media_folder( $parent ) ) {
+        return '';
+    }
+
+    $name  = $parent->getName();
+    $label = sprintf( 'Revenir a %s', $name );
+
+    return sprintf(
+        '<a href="%1$s" class="foldery-explorer-back foldery-explorer-link" data-folder-id="%2$d" data-foldery-back="1" aria-label="%3$s" title="%3$s"><span class="foldery-explorer-back-icon" aria-hidden="true"></span><span class="foldery-explorer-back-label">%4$s</span></a>',
+        esc_url( foldery_explorer_folder_url( $parent ) ),
+        (int) $parent->getId(),
+        esc_attr( $label ),
+        esc_html( $name )
+    );
+}
+
 function foldery_explorer_render_folder( $folder_id, $include_page_content = true ) {
     $folder = foldery_media_get_folder( $folder_id );
     if ( ! foldery_is_media_folder( $folder ) ) {
@@ -203,7 +230,10 @@ function foldery_explorer_render_folder( $folder_id, $include_page_content = tru
 
     $children     = $folder->getChildren();
     $page_content = $include_page_content ? foldery_explorer_page_content( $folder->getId() ) : '';
-    $html         = '<section class="foldery-explorer-view foldery-explorer-folder" data-folder-id="' . (int) $folder->getId() . '">';
+    $parent_link  = foldery_explorer_render_parent_link( $folder );
+    $html         = '<section class="foldery-explorer-view foldery-explorer-folder' . ( $parent_link ? ' has-parent-link' : '' ) . '" data-folder-id="' . (int) $folder->getId() . '">';
+
+    $html .= $parent_link;
 
     if ( '' === $page_content ) {
         $html .= '<header class="foldery-explorer-heading"><h3>' . esc_html( $folder->getName() ) . '</h3></header>';
