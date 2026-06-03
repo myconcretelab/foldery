@@ -450,6 +450,154 @@ function foldery_explorer_menu_map() {
     return $map;
 }
 
+function foldery_explorer_menu_default_attributes() {
+    return array(
+        'rootFolderId' => foldery_media_root_id(),
+        'folderIds'    => '',
+        'maxDepth'     => 0,
+        'showSubmenus' => true,
+        'includeEmpty' => true,
+        'ariaLabel'    => 'Explorer',
+    );
+}
+
+function foldery_explorer_current_folder_id() {
+    $path = get_query_var( 'foldery_path' );
+    if ( $path ) {
+        $folder = foldery_media_get_by_absolute_path( $path );
+        if ( foldery_is_media_folder( $folder ) ) {
+            return $folder->getId();
+        }
+    }
+
+    if ( is_page() ) {
+        return foldery_explorer_page_folder_id( get_queried_object_id() );
+    }
+
+    return 0;
+}
+
+function foldery_explorer_folder_ancestor_ids( $folder_id ) {
+    $ids    = array();
+    $folder = foldery_media_get_folder( $folder_id );
+
+    while ( foldery_is_media_folder( $folder ) ) {
+        $parent_id = $folder->getParent();
+        if ( ! $parent_id || foldery_media_root_id() === (int) $parent_id ) {
+            break;
+        }
+
+        $ids[]  = (int) $parent_id;
+        $folder = foldery_media_get_folder( $parent_id );
+    }
+
+    return $ids;
+}
+
+function foldery_explorer_folder_menu_title( $folder ) {
+    if ( ! foldery_is_media_folder( $folder ) ) {
+        return '';
+    }
+
+    $page = foldery_explorer_folder_page( $folder->getId() );
+    return $page ? get_the_title( $page ) : $folder->getName();
+}
+
+function foldery_explorer_folder_has_menu_content( $folder ) {
+    if ( ! foldery_is_media_folder( $folder ) ) {
+        return false;
+    }
+
+    if ( $folder->getCnt() ) {
+        return true;
+    }
+
+    foreach ( $folder->getChildren() as $child ) {
+        if ( foldery_explorer_folder_has_menu_content( $child ) ) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function foldery_explorer_menu_items( $folders, $attributes, $depth = 1, $current_folder_id = 0, $current_ancestor_ids = array() ) {
+    $html      = '';
+    $max_depth = max( 0, (int) $attributes['maxDepth'] );
+
+    foreach ( array_filter( (array) $folders, 'foldery_is_media_folder' ) as $folder ) {
+        if ( empty( $attributes['includeEmpty'] ) && ! foldery_explorer_folder_has_menu_content( $folder ) ) {
+            continue;
+        }
+
+        $children = ( ! empty( $attributes['showSubmenus'] ) && ( ! $max_depth || $depth < $max_depth ) )
+            ? foldery_explorer_menu_items( $folder->getChildren(), $attributes, $depth + 1, $current_folder_id, $current_ancestor_ids )
+            : '';
+        $classes  = array( 'foldery-explorer-menu-item' );
+        if ( $current_folder_id === $folder->getId() ) {
+            $classes[] = 'current-menu-item';
+        }
+        if ( in_array( $folder->getId(), $current_ancestor_ids, true ) ) {
+            $classes[] = 'current-menu-ancestor';
+        }
+        if ( '' !== $children ) {
+            $classes[] = 'menu-item-has-children';
+        }
+
+        $html .= sprintf(
+            '<li class="%1$s"><a href="%2$s" class="foldery-explorer-menu-link foldery-explorer-link" data-folder-id="%3$d">%4$s</a>%5$s</li>',
+            esc_attr( implode( ' ', $classes ) ),
+            esc_url( foldery_explorer_folder_url( $folder ) ),
+            (int) $folder->getId(),
+            esc_html( foldery_explorer_folder_menu_title( $folder ) ),
+            $children ? '<ul class="sub-menu foldery-explorer-submenu">' . $children . '</ul>' : ''
+        );
+    }
+
+    return $html;
+}
+
+function foldery_explorer_render_menu_block( $attributes ) {
+    $attributes = wp_parse_args( $attributes, foldery_explorer_menu_default_attributes() );
+    $root_id    = isset( $attributes['rootFolderId'] ) ? (int) $attributes['rootFolderId'] : foldery_media_root_id();
+    $folders    = array();
+    $folder_ids = foldery_explorer_parse_ids( $attributes['folderIds'] );
+
+    if ( count( $folder_ids ) ) {
+        foreach ( $folder_ids as $folder_id ) {
+            $folder = foldery_media_get_folder( $folder_id );
+            if ( foldery_is_media_folder( $folder ) ) {
+                $folders[] = $folder;
+            }
+        }
+    } elseif ( foldery_media_root_id() === $root_id ) {
+        $folders = foldery_media_root_children();
+    } else {
+        $root = foldery_media_get_folder( $root_id );
+        if ( foldery_is_media_folder( $root ) ) {
+            $folders = $root->getChildren();
+        }
+    }
+
+    $current_folder_id = foldery_explorer_current_folder_id();
+    $items             = foldery_explorer_menu_items( $folders, $attributes, 1, $current_folder_id, foldery_explorer_folder_ancestor_ids( $current_folder_id ) );
+    if ( '' === $items ) {
+        return '';
+    }
+
+    $classes = 'foldery-explorer-menu';
+    if ( ! empty( $attributes['className'] ) ) {
+        $classes .= ' ' . $attributes['className'];
+    }
+
+    return sprintf(
+        '<nav class="%1$s" aria-label="%2$s"><ul class="foldery-explorer-menu-list">%3$s</ul></nav>',
+        esc_attr( trim( $classes ) ),
+        esc_attr( $attributes['ariaLabel'] ),
+        $items
+    );
+}
+
 function foldery_explorer_render_block( $attributes ) {
     foldery_explorer_enqueue_front_assets();
 
@@ -498,10 +646,11 @@ function foldery_explorer_response_data( $folder_id, $include_page ) {
     }
 
     return array(
-        'folderId' => $folder->getId(),
-        'title'    => $folder->getName(),
-        'url'      => foldery_explorer_folder_url( $folder ),
-        'html'     => foldery_explorer_render_folder( $folder->getId(), (bool) $include_page ),
+        'folderId'    => $folder->getId(),
+        'ancestorIds' => foldery_explorer_folder_ancestor_ids( $folder->getId() ),
+        'title'       => $folder->getName(),
+        'url'         => foldery_explorer_folder_url( $folder ),
+        'html'        => foldery_explorer_render_folder( $folder->getId(), (bool) $include_page ),
     );
 }
 
@@ -558,6 +707,25 @@ function foldery_explorer_register_block() {
                 'recentImageIds'    => array( 'type' => 'string', 'default' => '' ),
                 'includePageContent'=> array( 'type' => 'boolean', 'default' => true ),
                 'animate'           => array( 'type' => 'boolean', 'default' => true ),
+            ),
+        )
+    );
+
+    register_block_type(
+        'foldery/explorer-menu',
+        array(
+            'api_version'     => 3,
+            'editor_script'   => 'foldery-explorer-editor',
+            'editor_style'    => 'foldery-explorer-editor-style',
+            'render_callback' => 'foldery_explorer_render_menu_block',
+            'attributes'      => array(
+                'rootFolderId' => array( 'type' => 'number', 'default' => foldery_media_root_id() ),
+                'folderIds'    => array( 'type' => 'string', 'default' => '' ),
+                'maxDepth'     => array( 'type' => 'number', 'default' => 0 ),
+                'showSubmenus' => array( 'type' => 'boolean', 'default' => true ),
+                'includeEmpty' => array( 'type' => 'boolean', 'default' => true ),
+                'ariaLabel'    => array( 'type' => 'string', 'default' => 'Explorer' ),
+                'className'    => array( 'type' => 'string' ),
             ),
         )
     );

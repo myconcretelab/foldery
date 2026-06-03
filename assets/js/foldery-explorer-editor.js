@@ -15,6 +15,7 @@
   var CheckboxControl = components.CheckboxControl;
   var Modal = components.Modal;
   var SearchControl = components.SearchControl;
+  var SelectControl = components.SelectControl;
   var ServerSideRender = wp.serverSideRender;
   var __ = i18n.__;
   var editorData = window.FolderyExplorerEditor || {};
@@ -343,6 +344,19 @@
       : ids.length + ' ' + __('images selectionnees', 'foldery');
   }
 
+  function folderSelectOptions() {
+    return [
+      { label: __('Racine des medias', 'foldery'), value: '-1' }
+    ].concat(
+      flattenFolders(editorData.folders || []).map(function(folder) {
+        return {
+          label: folder.path || folder.name || ('#' + folder.id),
+          value: String(folder.id)
+        };
+      })
+    );
+  }
+
   function normalizeMediaIds(media) {
     return (Array.isArray(media) ? media : [media])
       .map(function(item) {
@@ -522,6 +536,107 @@
             null,
             el(ServerSideRender, {
               block: 'foldery/explorer',
+              attributes: attrs
+            })
+          )
+        )
+      );
+    },
+    save: function() {
+      return null;
+    }
+  });
+
+  blocks.registerBlockType('foldery/explorer-menu', {
+    apiVersion: 3,
+    title: __('Foldery Explorer Menu', 'foldery'),
+    icon: 'menu',
+    category: 'widgets',
+    attributes: {
+      rootFolderId: { type: 'number', default: -1 },
+      folderIds: { type: 'string', default: '' },
+      maxDepth: { type: 'number', default: 0 },
+      showSubmenus: { type: 'boolean', default: true },
+      includeEmpty: { type: 'boolean', default: true },
+      ariaLabel: { type: 'string', default: 'Explorer' }
+    },
+    edit: function(props) {
+      var attrs = props.attributes;
+      var setAttributes = props.setAttributes;
+      var blockProps = useBlockProps ? useBlockProps({ className: 'foldery-explorer-menu-editor-preview' }) : { className: 'foldery-explorer-menu-editor-preview' };
+
+      return el(
+        element.Fragment,
+        null,
+        el(
+          InspectorControls,
+          null,
+          el(
+            PanelBody,
+            { title: __('Source du menu', 'foldery'), initialOpen: true },
+            SelectControl
+              ? el(SelectControl, {
+                  label: __('Dossier parent', 'foldery'),
+                  help: attrs.folderIds ? __('Ignore si une selection de dossiers est definie.', 'foldery') : null,
+                  value: String(attrs.rootFolderId),
+                  options: folderSelectOptions(),
+                  onChange: function(value) {
+                    setAttributes({ rootFolderId: parseInt(value, 10) });
+                  }
+                })
+              : el(TextControl, {
+                  label: __('ID du dossier parent', 'foldery'),
+                  value: String(attrs.rootFolderId),
+                  onChange: function(value) {
+                    setAttributes({ rootFolderId: parseInt(value, 10) || -1 });
+                  }
+                }),
+            el(FolderPicker, {
+              value: attrs.folderIds || '',
+              onChange: function(value) {
+                setAttributes({ folderIds: value });
+              }
+            }),
+            el(TextControl, {
+              label: __('Profondeur maximale', 'foldery'),
+              help: __('0 affiche toute la hierarchie.', 'foldery'),
+              disabled: !attrs.showSubmenus,
+              value: String(attrs.maxDepth),
+              onChange: function(value) {
+                setAttributes({ maxDepth: Math.max(0, parseInt(value, 10) || 0) });
+              }
+            }),
+            el(ToggleControl, {
+              label: __('Afficher les sous-menus', 'foldery'),
+              checked: attrs.showSubmenus,
+              onChange: function(value) {
+                setAttributes({ showSubmenus: value });
+              }
+            }),
+            el(ToggleControl, {
+              label: __('Afficher les dossiers vides', 'foldery'),
+              checked: attrs.includeEmpty,
+              onChange: function(value) {
+                setAttributes({ includeEmpty: value });
+              }
+            }),
+            el(TextControl, {
+              label: __('Libelle ARIA', 'foldery'),
+              value: attrs.ariaLabel,
+              onChange: function(value) {
+                setAttributes({ ariaLabel: value });
+              }
+            })
+          )
+        ),
+        el(
+          'div',
+          blockProps,
+          el(
+            Disabled,
+            null,
+            el(ServerSideRender, {
+              block: 'foldery/explorer-menu',
               attributes: attrs
             })
           )

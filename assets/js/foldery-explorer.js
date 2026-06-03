@@ -185,6 +185,44 @@
     }
   }
 
+  function updateActiveMenuItem(folderId, ancestorIds) {
+    var visibleMatch = false;
+
+    document.querySelectorAll('.foldery-explorer-menu .current-menu-item, .foldery-explorer-menu .current-menu-ancestor').forEach(function(item) {
+      item.classList.remove('current-menu-item');
+      item.classList.remove('current-menu-ancestor');
+    });
+
+    if (!folderId) {
+      return;
+    }
+
+    document.querySelectorAll('.foldery-explorer-menu a[data-folder-id="' + String(folderId) + '"]').forEach(function(link) {
+      var item = link.closest('li');
+      if (item) {
+        visibleMatch = true;
+        item.classList.add('current-menu-item');
+        while (item && item.parentElement && item.parentElement.classList.contains('sub-menu')) {
+          item = item.parentElement.closest('li');
+          if (item) {
+            item.classList.add('current-menu-ancestor');
+          }
+        }
+      }
+    });
+
+    if (!visibleMatch && Array.isArray(ancestorIds)) {
+      ancestorIds.forEach(function(ancestorId) {
+        document.querySelectorAll('.foldery-explorer-menu a[data-folder-id="' + String(ancestorId) + '"]').forEach(function(link) {
+          var item = link.closest('li');
+          if (item) {
+            item.classList.add('current-menu-ancestor');
+          }
+        });
+      });
+    }
+  }
+
   function ensureBackLink(explorer) {
     var view = explorer.querySelector('.foldery-explorer-folder');
     var link;
@@ -263,6 +301,7 @@
 
     return renderStage(explorer, homeView.html).then(function() {
       explorer._folderyCurrentView = homeView;
+      updateActiveMenuItem(null);
       if (push) {
         writeExplorerState(homeView, false);
       }
@@ -297,6 +336,7 @@
           configureBackLink(explorer, view.backTarget);
           explorer._folderyCurrentView = view;
           explorer.classList.remove('is-loading');
+          updateActiveMenuItem(folderId, payload.ancestorIds || []);
 
           if (push && targetUrl) {
             writeExplorerState(view, false);
@@ -375,19 +415,26 @@
     });
 
     document.addEventListener('click', function(event) {
-      var link = event.target.closest('#site-navigation a');
+      var link = event.target.closest('.foldery-explorer-menu a[data-folder-id], #site-navigation a');
       var previousView = explorer._folderyCurrentView;
+      var match;
+      var folderId;
+      var title;
+
       if (!link || !explorer.isConnected) {
         return;
       }
 
-      var match = menuMap[normalizeUrl(link.href)];
-      if (!match) {
+      match = link.dataset.folderId ? null : menuMap[normalizeUrl(link.href)];
+      folderId = link.dataset.folderId || (match && match.folderId);
+      title = link.textContent.trim() || (match && match.title);
+
+      if (!folderId) {
         return;
       }
 
       event.preventDefault();
-      loadFolder(explorer, match.folderId, link.href, true, previousView, match.title);
+      loadFolder(explorer, folderId, link.href, true, previousView, title);
     });
 
     window.addEventListener('popstate', function(event) {

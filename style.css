@@ -3,7 +3,7 @@ Theme Name: Foldery
 Theme URI: https://github.com/myconcretelab/foldery
 Author: Sebastien Jacqmin
 Description: Block theme leger pour sebastienj.com.
-Version: 3.0.1
+Version: 3.0.3
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Tags: one-column, two-columns, right-sidebar, custom-menu, editor-style, featured-images, translation-ready, block-theme, full-site-editing
@@ -54,13 +54,47 @@ body {
   text-transform: uppercase;
 }
 
+.foldery-navigation ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.foldery-navigation li {
+  position: relative;
+}
+
 .foldery-navigation a {
   color: #111;
 }
 
+.foldery-navigation .current-menu-item > a,
+.foldery-navigation .current-menu-ancestor > a,
 .foldery-navigation a:hover,
 .foldery-navigation a:focus {
   color: #b46d70;
+}
+
+.foldery-navigation .sub-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 20;
+  display: none;
+  min-width: 190px;
+  padding: 12px 14px;
+  background: rgba(246, 245, 238, 0.97);
+  border: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.foldery-navigation li:hover > .sub-menu,
+.foldery-navigation li:focus-within > .sub-menu {
+  display: grid;
+  justify-content: start;
 }
 
 .foldery-main {

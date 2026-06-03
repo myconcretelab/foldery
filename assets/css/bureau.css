@@ -216,10 +216,13 @@ body.bureau-template #wpadminbar {
 .bureau-navigation {
   position: relative;
   z-index: 5;
+  display: block;
   margin: 0 auto clamp(28px, 4vw, 46px);
 }
 
-.bureau-navigation ul {
+.bureau-navigation ul,
+.bureau-navigation .foldery-explorer-menu-list,
+.bureau-navigation .wp-block-navigation__container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -229,15 +232,20 @@ body.bureau-template #wpadminbar {
   list-style: none;
 }
 
-.bureau-navigation li {
+.bureau-navigation li,
+.bureau-navigation .wp-block-navigation-item {
   position: relative;
   display: block;
+  margin: 0;
+  padding: 0;
 }
 
-.bureau-navigation a {
+.bureau-navigation a,
+.bureau-navigation .wp-block-navigation-item__content {
   position: relative;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   min-height: 44px;
   padding: 10px 18px 9px;
   color: #211b17;
@@ -250,29 +258,39 @@ body.bureau-template #wpadminbar {
   font-size: 14px;
   line-height: 1.1;
   letter-spacing: 0;
+  text-decoration: none;
   text-transform: uppercase;
   transform: rotate(-1.8deg);
 }
 
-.bureau-navigation li:nth-child(2n) > a {
+.bureau-navigation li:nth-child(2n) > a,
+.bureau-navigation .wp-block-navigation-item:nth-child(2n) > .wp-block-navigation-item__content {
   transform: rotate(1.4deg);
   background-color: #fff8e9;
 }
 
-.bureau-navigation li:nth-child(3n) > a {
+.bureau-navigation li:nth-child(3n) > a,
+.bureau-navigation .wp-block-navigation-item:nth-child(3n) > .wp-block-navigation-item__content {
   transform: rotate(-0.5deg);
   background-color: #f2e1c5;
 }
 
 .bureau-navigation li.current-menu-item > a,
+.bureau-navigation li.current-menu-ancestor > a,
 .bureau-navigation li.current_page_item > a,
+.bureau-navigation .wp-block-navigation-item.current-menu-item > .wp-block-navigation-item__content,
+.bureau-navigation .wp-block-navigation-item.current-menu-ancestor > .wp-block-navigation-item__content,
+.bureau-navigation .wp-block-navigation-item.current_page_item > .wp-block-navigation-item__content,
 .bureau-navigation a:hover,
-.bureau-navigation a:focus {
+.bureau-navigation a:focus,
+.bureau-navigation .wp-block-navigation-item__content:hover,
+.bureau-navigation .wp-block-navigation-item__content:focus {
   color: #111;
   background-color: #fffdf3;
 }
 
-.bureau-navigation a:before {
+.bureau-navigation a:before,
+.bureau-navigation .wp-block-navigation-item__content:before {
   left: 50%;
   top: -14px;
   width: 66px;
@@ -280,7 +298,8 @@ body.bureau-template #wpadminbar {
   transform: translateX(-50%) rotate(2deg);
 }
 
-.bureau-navigation .sub-menu {
+.bureau-navigation .sub-menu,
+.bureau-navigation .wp-block-navigation__submenu-container {
   position: absolute;
   left: 50%;
   top: calc(100% + 8px);
@@ -293,7 +312,9 @@ body.bureau-template #wpadminbar {
 
 .bureau-navigation li:hover > .sub-menu,
 .bureau-navigation li:focus-within > .sub-menu,
-.bureau-navigation .sub-menu.submenu-open {
+.bureau-navigation .sub-menu.submenu-open,
+.bureau-navigation .wp-block-navigation-item:hover > .wp-block-navigation__submenu-container,
+.bureau-navigation .wp-block-navigation-item:focus-within > .wp-block-navigation__submenu-container {
   display: grid;
 }
 
