@@ -9,7 +9,7 @@ body.bureau-template #wpadminbar {
 }
 
 .bureau-page {
-  --bureau-bg: linear-gradient(135deg, #8d7a63 0%, #574637 46%, #2f271f 100%);
+  --bureau-bg: url("../images/bureau-bg.jpg");
   --bureau-paper: #fffdf3;
   --bureau-paper-warm: #f6eedc;
   --bureau-ink: #211b17;
