@@ -229,7 +229,7 @@ function foldery_media_admin_enqueue( $hook ) {
 	$script = get_template_directory() . '/assets/admin/foldery-media-library.js';
 	$style  = get_template_directory() . '/assets/admin/foldery-media-library.css';
 	wp_enqueue_style( 'foldery-media-library', get_template_directory_uri() . '/assets/admin/foldery-media-library.css', array(), file_exists( $style ) ? filemtime( $style ) : null );
-	wp_enqueue_script( 'foldery-media-library', get_template_directory_uri() . '/assets/admin/foldery-media-library.js', array( 'jquery', 'jquery-ui-sortable', 'media-views', 'wp-util' ), file_exists( $script ) ? filemtime( $script ) : null, true );
+	wp_enqueue_script( 'foldery-media-library', get_template_directory_uri() . '/assets/admin/foldery-media-library.js', array( 'jquery', 'jquery-ui-sortable', 'jquery-ui-draggable', 'jquery-ui-droppable', 'media-views', 'wp-util' ), file_exists( $script ) ? filemtime( $script ) : null, true );
 	wp_localize_script(
 		'foldery-media-library',
 		'folderyMediaLibrary',

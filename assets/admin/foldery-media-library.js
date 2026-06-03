@@ -8,6 +8,7 @@
 	var isFolderSorting = false;
 	var pageChooserOpen = false;
 	var collapsedFolders = loadCollapsedFolders();
+	var uploaderInstances = [];
 
 	function labels(key) {
 		return config.labels && config.labels[key] ? config.labels[key] : key;
@@ -200,6 +201,7 @@
 		}
 		updateButtons();
 		window.setTimeout(initFolderSorting, 0);
+		window.setTimeout(initFolderDroppables, 0);
 	}
 
 	function renderLinkedPageTools() {
@@ -380,6 +382,83 @@
 			wp.Uploader.defaults.multipart_params = wp.Uploader.defaults.multipart_params || {};
 			wp.Uploader.defaults.multipart_params.foldery_media_folder = selectedFolder;
 		}
+		syncActiveUploaders();
+	}
+
+	function syncPlupload(up) {
+		if (!up || !up.settings) {
+			return;
+		}
+		up.settings.multipart_params = up.settings.multipart_params || {};
+		up.settings.multipart_params.foldery_media_folder = selectedFolder;
+		if (typeof up.setOption === 'function') {
+			up.setOption('multipart_params', up.settings.multipart_params);
+		}
+	}
+
+	function registerUploaderInstance(instance) {
+		if (!instance || instance.folderyMediaSynced) {
+			return;
+		}
+		instance.folderyMediaSynced = true;
+		uploaderInstances.push(instance);
+
+		if (instance.uploader && typeof instance.uploader.bind === 'function') {
+			instance.uploader.bind('FilesAdded', function (up) {
+				syncPlupload(up);
+			});
+			instance.uploader.bind('BeforeUpload', function (up) {
+				syncPlupload(up);
+			});
+			syncPlupload(instance.uploader);
+		}
+		if (typeof instance.param === 'function') {
+			instance.param('foldery_media_folder', selectedFolder);
+		}
+	}
+
+	function patchWpUploader() {
+		var originalInit;
+		if (!wp || !wp.Uploader || !wp.Uploader.prototype || wp.Uploader.prototype.folderyMediaPatched) {
+			return;
+		}
+		originalInit = wp.Uploader.prototype.init;
+		wp.Uploader.prototype.init = function () {
+			registerUploaderInstance(this);
+			if (typeof originalInit === 'function') {
+				return originalInit.apply(this, arguments);
+			}
+		};
+		wp.Uploader.prototype.folderyMediaPatched = true;
+	}
+
+	function syncMediaFrameUploader(frame) {
+		if (!frame || !frame.uploader || !frame.uploader.uploader) {
+			return;
+		}
+		registerUploaderInstance(frame.uploader.uploader);
+	}
+
+	function syncActiveUploaders() {
+		uploaderInstances = uploaderInstances.filter(function (instance) {
+			return instance && instance.uploader;
+		});
+		uploaderInstances.forEach(function (instance) {
+			if (typeof instance.param === 'function') {
+				instance.param('foldery_media_folder', selectedFolder);
+			}
+			syncPlupload(instance.uploader);
+		});
+
+		if (window.uploader) {
+			syncPlupload(window.uploader);
+		}
+		if (wp && wp.media) {
+			syncMediaFrameUploader(wp.media.frame);
+			if (wp.media.frames) {
+				syncMediaFrameUploader(wp.media.frames.browse);
+			}
+		}
 	}
 
 	function canReorder() {
@@ -501,16 +580,124 @@
 	}
 
 	function enableDragOnAttachments() {
-		if (canReorder()) {
-			$('.attachments .attachment').removeAttr('draggable');
+		$('.attachments .attachment img').attr('draggable', 'false');
+		if (canReorder() || $.fn.draggable) {
+			$('.attachments .attachment, .attachments .attachment img').attr('draggable', 'false');
 			return;
 		}
 		$('.attachments .attachment').attr('draggable', 'true');
 	}
 
+	function setSortingActive(active) {
+		isSorting = !!active;
+		$('body').toggleClass('foldery-media-is-sorting', isSorting);
+		if (isSorting) {
+			$('.uploader-window').hide().css({ opacity: 0 });
+		}
+	}
+
+	function setAttachmentMovingActive(active) {
+		$('body').toggleClass('foldery-media-is-moving', !!active);
+		if (active) {
+			$('.uploader-window').hide().css({ opacity: 0 });
+		}
+	}
+
+	function moveAttachmentToFolder(attachmentId, folderId) {
+		attachmentId = parseInt(attachmentId, 10);
+		folderId = parseInt(folderId, 10);
+		if (!attachmentId || folderId === 0) {
+			return;
+		}
+		setFolder(folderId, false);
+		request('move', { to: folderId, ids: [attachmentId] }).done(refreshMedia);
+	}
+
+	function destroyAttachmentMoving() {
+		$('.attachments .attachment').each(function () {
+			var $attachment = $(this);
+			if ($attachment.data('ui-draggable')) {
+				$attachment.draggable('destroy');
+			}
+		});
+		setAttachmentMovingActive(false);
+	}
+
+	function initFolderDroppables() {
+		if (!$.fn.droppable) {
+			return;
+		}
+
+		$('.foldery-media-folder').each(function () {
+			var $folder = $(this);
+			var folderId = parseInt($folder.attr('data-folder-id'), 10);
+			if (folderId === 0) {
+				if ($folder.data('ui-droppable')) {
+					$folder.droppable('destroy');
+				}
+				return;
+			}
+			if ($folder.data('ui-droppable')) {
+				$folder.droppable('option', 'disabled', false);
+				return;
+			}
+			$folder.droppable({
+				accept: '.attachments .attachment',
+				greedy: true,
+				hoverClass: 'is-drop-target',
+				tolerance: 'pointer',
+				drop: function (event, ui) {
+					event.preventDefault();
+					moveAttachmentToFolder(ui.draggable.attr('data-id'), folderId);
+				}
+			});
+		});
+	}
+
+	function initAttachmentMoving() {
+		var $attachments = $('.attachments .attachment');
+		if (canReorder() || !$.fn.draggable) {
+			destroyAttachmentMoving();
+			enableDragOnAttachments();
+			return;
+		}
+
+		enableDragOnAttachments();
+		initFolderDroppables();
+		$attachments.each(function () {
+			var $attachment = $(this);
+			if ($attachment.data('ui-draggable')) {
+				return;
+			}
+			$attachment.draggable({
+				appendTo: 'body',
+				cancel: 'a, button, input, select, textarea, .check',
+				cursor: 'move',
+				distance: 8,
+				helper: function () {
+					return $(this).clone().addClass('foldery-media-drag-helper').css({
+						height: $(this).outerHeight(),
+						width: $(this).outerWidth()
+					});
+				},
+				revert: 'invalid',
+				zIndex: 100000,
+				start: function () {
+					draggedAttachmentId = parseInt($(this).attr('data-id'), 10) || null;
+					setAttachmentMovingActive(true);
+				},
+				stop: function () {
+					draggedAttachmentId = null;
+					setAttachmentMovingActive(false);
+				}
+			});
+		});
+	}
+
 	function initAttachmentSorting() {
 		var $attachments = $('.attachments');
 		if (!$attachments.length || !$.fn.sortable) {
+			initAttachmentMoving();
 			return;
 		}
 
@@ -518,11 +705,12 @@
 			if ($attachments.data('ui-sortable')) {
 				$attachments.sortable('destroy');
 			}
-			enableDragOnAttachments();
+			initAttachmentMoving();
 			return;
 		}
 
-		$('.attachments .attachment').removeAttr('draggable');
+		destroyAttachmentMoving();
+		$('.attachments .attachment, .attachments .attachment img').attr('draggable', 'false');
 		if ($attachments.data('ui-sortable')) {
 			$attachments.sortable('refresh');
 			return;
@@ -533,16 +721,39 @@
 			placeholder: 'foldery-media-sort-placeholder',
 			tolerance: 'pointer',
 			start: function (event, ui) {
-				isSorting = true;
+				setSortingActive(true);
 				ui.placeholder.width(ui.item.outerWidth());
 				ui.placeholder.height(ui.item.outerHeight());
 			},
 			stop: function () {
 				window.setTimeout(function () {
-					isSorting = false;
+					setSortingActive(false);
 				}, 0);
 			},
 			update: saveAttachmentOrder
+		});
+	}
+
+	function installSortingDragGuard() {
+		document.addEventListener('dragstart', function (event) {
+			if (!canReorder() || !$(event.target).closest('.attachments .attachment').length) {
+				return;
+			}
+			event.preventDefault();
+			event.stopPropagation();
+		}, true);
+
+		['dragenter', 'dragover', 'drop'].forEach(function (eventName) {
+			document.addEventListener(eventName, function (event) {
+				if (!isSorting) {
+					return;
+				}
+				event.preventDefault();
+				event.stopPropagation();
+				if (event.stopImmediatePropagation) {
+					event.stopImmediatePropagation();
+				}
+			}, true);
 		});
 	}
 
@@ -581,10 +792,12 @@
 	}
 
 	installMediaFilter();
+	patchWpUploader();
 
 	$(function () {
 		renderPanel();
 		syncUploader();
+		installSortingDragGuard();
 		setTimeout(function () {
 			enableDragOnAttachments();
 			initAttachmentSorting();
@@ -704,7 +917,12 @@
 			});
 		});
 
-		$(document).on('mouseenter', '.attachments .attachment', enableDragOnAttachments);
+		$(document).on('mouseenter', '.attachments .attachment', function () {
+			enableDragOnAttachments();
+			if (!canReorder()) {
+				initAttachmentMoving();
+			}
+		});
 
 		$(document).on('dragstart', '.attachments .attachment', function (event) {
 			if (isSorting || canReorder()) {
@@ -741,6 +959,7 @@
 		});
 
 		if (wp && wp.media && wp.media.frame) {
+			wp.media.frame.on('uploader:ready', syncUploader);
 			wp.media.frame.on('content:render:browse', function () {
 				setTimeout(function () {
 					setFolder(selectedFolder, false);

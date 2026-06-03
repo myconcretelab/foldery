@@ -329,6 +329,26 @@
 	cursor: move;
 }
 
+.foldery-media-can-reorder .attachments .attachment,
+.foldery-media-can-reorder .attachments .attachment img {
+	-webkit-user-drag: none;
+	user-select: none;
+}
+
+body.foldery-media-is-sorting .uploader-window,
+body.foldery-media-is-moving .uploader-window {
+	display: none !important;
+	opacity: 0 !important;
+	pointer-events: none !important;
+}
+
+.foldery-media-drag-helper {
+	background: #fff;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+	opacity: .9;
+	pointer-events: none;
+}
+
 .foldery-media-sort-placeholder {
 	background: #f0f6fc;
 	border: 2px dashed #2271b1;
