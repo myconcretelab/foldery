@@ -6,6 +6,7 @@
 	var draggedAttachmentId = null;
 	var isSorting = false;
 	var isFolderSorting = false;
+	var pageChooserOpen = false;
 	var collapsedFolders = loadCollapsedFolders();
 
 	function labels(key) {
@@ -63,6 +64,38 @@
 	function currentLinkedPageId() {
 		var folder = currentFolder();
 		return folder ? (parseInt(folder.linkedPageId, 10) || 0) : 0;
+	}
+
+	function pageById(pageId) {
+		var found = null;
+		pageId = parseInt(pageId, 10) || 0;
+		(config.pages || []).some(function (page) {
+			if (parseInt(page.id, 10) === pageId) {
+				found = page;
+				return true;
+			}
+			return false;
+		});
+		return found;
+	}
+
+	function currentLinkedPage() {
+		var folder = currentFolder();
+		var pageId = currentLinkedPageId();
+		var page = pageId ? pageById(pageId) : null;
+		if (page) {
+			return page;
+		}
+		if (!folder || !pageId) {
+			return null;
+		}
+		return {
+			id: pageId,
+			title: folder.linkedPageTitle || ('#' + pageId),
+			status: folder.linkedPageStatus || '',
+			editUrl: folder.linkedPageEditUrl || '',
+			viewUrl: folder.linkedPageViewUrl || ''
+		};
 	}
 
 	function pageOptions(selectedPageId) {
@@ -128,6 +161,7 @@
 				'<strong>' + escapeHtml(labels('title')) + '</strong>' +
 				'<button type="button" class="button button-small foldery-media-create">' + escapeHtml(labels('newFolder')) + '</button>' +
 			'</div>' +
+			renderLinkedPageTools() +
 			'<div class="foldery-media-tree">' +
 				'<ul class="foldery-media-system">' +
 					'<li><button type="button" class="foldery-media-folder' + allActive + '" data-folder-id="0" style="--folder-depth:0">' +
@@ -147,11 +181,6 @@
 				'<button type="button" class="button foldery-media-move">' + escapeHtml(labels('moveSelected')) + '</button>' +
 				'<button type="button" class="button foldery-media-rename">' + escapeHtml(labels('rename')) + '</button>' +
 				'<button type="button" class="button foldery-media-delete">' + escapeHtml(labels('delete')) + '</button>' +
-			'</div>' +
-			'<div class="foldery-media-page-link">' +
-				'<label for="foldery-media-linked-page">' + escapeHtml(labels('linkedPage')) + '</label>' +
-				'<select id="foldery-media-linked-page" class="foldery-media-linked-page">' + pageOptions(currentLinkedPageId()) + '</select>' +
-				'<button type="button" class="button foldery-media-save-page-link">' + escapeHtml(labels('savePageLink')) + '</button>' +
 			'</div>' +
 			'<p class="foldery-media-message" aria-live="polite"></p>' +
 		'</div>';
@@ -173,11 +202,73 @@
 		window.setTimeout(initFolderSorting, 0);
 	}
 
+	function renderLinkedPageTools() {
+		var canEditFolder = selectedFolder > 0;
+		var page = currentLinkedPage();
+		var hasPage = !!page;
+		var status = page && page.status && page.status !== 'publish' ? ' [' + page.status + ']' : '';
+		var title = hasPage ? (page.title || ('#' + page.id)) : (canEditFolder ? labels('noLinkedPage') : labels('selectFolder'));
+		var chooserClass = pageChooserOpen ? ' is-choosing' : '';
+		var html = '<div class="foldery-media-page-tools' + (hasPage ? ' has-page' : '') + chooserClass + '">' +
+			'<div class="foldery-media-page-tools__summary">' +
+				'<span class="dashicons dashicons-admin-page" aria-hidden="true"></span>' +
+				'<span class="foldery-media-page-tools__copy">' +
+					'<span class="foldery-media-page-tools__eyebrow">' + escapeHtml(hasPage ? labels('pageLinkedTo') : labels('linkedPage')) + '</span>' +
+					'<strong title="' + escapeHtml(title + status) + '">' + escapeHtml(title + status) + '</strong>' +
+				'</span>' +
+			'</div>' +
+			'<div class="foldery-media-page-tools__buttons">';
+
+		if (hasPage) {
+			if (page.editUrl) {
+				html += '<a class="foldery-media-icon-button" href="' + escapeHtml(page.editUrl) + '" target="_blank" rel="noopener" title="' + escapeHtml(labels('editPage')) + '">' +
+					'<span class="dashicons dashicons-edit-page" aria-hidden="true"></span><span class="screen-reader-text">' + escapeHtml(labels('editPage')) + '</span>' +
+				'</a>';
+			}
+			if (page.viewUrl) {
+				html += '<a class="foldery-media-icon-button" href="' + escapeHtml(page.viewUrl) + '" target="_blank" rel="noopener" title="' + escapeHtml(labels('viewPage')) + '">' +
+					'<span class="dashicons dashicons-visibility" aria-hidden="true"></span><span class="screen-reader-text">' + escapeHtml(labels('viewPage')) + '</span>' +
+				'</a>';
+			}
+			html += '<button type="button" class="foldery-media-icon-button foldery-media-page-choose" title="' + escapeHtml(labels('changePage')) + '">' +
+				'<span class="dashicons dashicons-update" aria-hidden="true"></span><span class="screen-reader-text">' + escapeHtml(labels('changePage')) + '</span>' +
+			'</button>' +
+			'<button type="button" class="foldery-media-icon-button foldery-media-page-unlink" title="' + escapeHtml(labels('unlinkPage')) + '">' +
+				'<span class="dashicons dashicons-no-alt" aria-hidden="true"></span><span class="screen-reader-text">' + escapeHtml(labels('unlinkPage')) + '</span>' +
+			'</button>';
+		} else {
+			html += '<button type="button" class="foldery-media-icon-button foldery-media-page-choose" title="' + escapeHtml(labels('choosePage')) + '"' + (canEditFolder ? '' : ' disabled') + '>' +
+				'<span class="dashicons dashicons-admin-links" aria-hidden="true"></span><span class="screen-reader-text">' + escapeHtml(labels('choosePage')) + '</span>' +
+			'</button>' +
+			'<button type="button" class="foldery-media-icon-button foldery-media-page-create" title="' + escapeHtml(labels('createPage')) + '"' + (canEditFolder ? '' : ' disabled') + '>' +
+				'<span class="dashicons dashicons-plus-alt2" aria-hidden="true"></span><span class="screen-reader-text">' + escapeHtml(labels('createPage')) + '</span>' +
+			'</button>';
+		}
+
+		html += '</div>' +
+			'<div class="foldery-media-page-tools__chooser">' +
+				'<label class="screen-reader-text" for="foldery-media-linked-page">' + escapeHtml(labels('linkedPage')) + '</label>' +
+				'<select id="foldery-media-linked-page" class="foldery-media-linked-page"' + (canEditFolder ? '' : ' disabled') + '>' + pageOptions(currentLinkedPageId()) + '</select>' +
+				'<button type="button" class="button button-small foldery-media-save-page-link"' + (canEditFolder ? '' : ' disabled') + '>' + escapeHtml(labels('savePageLink')) + '</button>' +
+				'<button type="button" class="button-link foldery-media-page-cancel">' + escapeHtml(labels('cancel')) + '</button>' +
+			'</div>' +
+		'</div>';
+
+		return html;
+	}
+
+	function refreshLinkedPageTools() {
+		var $tools = $('.foldery-media-page-tools').first();
+		if ($tools.length) {
+			$tools.replaceWith(renderLinkedPageTools());
+		}
+	}
+
 	function updateButtons() {
 		var canEditFolder = selectedFolder > 0;
 		$('.foldery-media-rename, .foldery-media-delete').prop('disabled', !canEditFolder);
 		$('.foldery-media-move').prop('disabled', selectedFolder === 0);
-		$('.foldery-media-linked-page, .foldery-media-save-page-link').prop('disabled', !canEditFolder);
+		$('.foldery-media-linked-page, .foldery-media-save-page-link, .foldery-media-page-choose, .foldery-media-page-create, .foldery-media-page-unlink').prop('disabled', !canEditFolder);
 		$('.foldery-media-linked-page').val(String(currentLinkedPageId()));
 		$('.attachments-browser').toggleClass('foldery-media-can-reorder', canReorder());
 	}
@@ -217,9 +308,14 @@
 	}
 
 	function setFolder(id, refresh) {
-		selectedFolder = parseInt(id, 10);
+		id = parseInt(id, 10);
+		if (id !== selectedFolder) {
+			pageChooserOpen = false;
+		}
+		selectedFolder = id;
 		$('.foldery-media-folder').removeClass('is-active');
 		$('.foldery-media-folder[data-folder-id="' + selectedFolder + '"]').addClass('is-active');
+		refreshLinkedPageTools();
 		updateButtons();
 		syncUploader();
 		initAttachmentSorting();
@@ -262,6 +358,7 @@
 		}, data || {})).done(function (response) {
 			if (response && response.success && response.data) {
 				config.tree = response.data.tree || config.tree;
+				config.pages = response.data.pages || config.pages;
 				selectedFolder = parseInt(response.data.selected, 10);
 				renderPanel();
 				setFolder(selectedFolder, false);
@@ -558,11 +655,52 @@
 			if (selectedFolder <= 0) {
 				return;
 			}
+			pageChooserOpen = false;
 			request('link_page', {
 				id: selectedFolder,
 				page_id: parseInt($('.foldery-media-linked-page').val(), 10) || 0
 			}).done(function () {
 				$('.foldery-media-message').text(labels('pageLinkSaved'));
+			});
+		});
+
+		$(document).on('click', '.foldery-media-page-choose', function () {
+			if (selectedFolder <= 0) {
+				return;
+			}
+			pageChooserOpen = true;
+			renderPanel();
+			$('.foldery-media-linked-page').trigger('focus');
+		});
+
+		$(document).on('click', '.foldery-media-page-cancel', function () {
+			pageChooserOpen = false;
+			renderPanel();
+		});
+
+		$(document).on('click', '.foldery-media-page-unlink', function () {
+			if (selectedFolder <= 0) {
+				return;
+			}
+			pageChooserOpen = false;
+			request('link_page', {
+				id: selectedFolder,
+				page_id: 0
+			}).done(function () {
+				$('.foldery-media-message').text(labels('pageLinkSaved'));
+			});
+		});
+
+		$(document).on('click', '.foldery-media-page-create', function () {
+			if (selectedFolder <= 0) {
+				return;
+			}
+
+			pageChooserOpen = false;
+			request('create_linked_page', {
+				id: selectedFolder
+			}).done(function () {
+				$('.foldery-media-message').text(labels('pageCreated'));
 			});
 		});
 

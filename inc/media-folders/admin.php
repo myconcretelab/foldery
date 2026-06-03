@@ -3,15 +3,32 @@ function foldery_media_plain_folder( $folder ) {
 	$linked_page_id = function_exists( 'foldery_explorer_folder_linked_page_id' ) ? foldery_explorer_folder_linked_page_id( $folder->getId() ) : 0;
 
 	return array(
-		'id'              => $folder->getId(),
-		'parent'          => $folder->getParent(),
-		'name'            => $folder->getName(),
-		'path'            => $folder->getAbsolutePath(),
-		'count'           => foldery_media_count_attachments_in_folder( $folder->getId() ),
-		'linkedPageId'    => $linked_page_id,
-		'linkedPageTitle' => $linked_page_id ? get_the_title( $linked_page_id ) : '',
-		'children'        => array_map( 'foldery_media_plain_folder', $folder->getChildren() ),
+		'id'                => $folder->getId(),
+		'parent'            => $folder->getParent(),
+		'name'              => $folder->getName(),
+		'path'              => $folder->getAbsolutePath(),
+		'count'             => foldery_media_count_attachments_in_folder( $folder->getId() ),
+		'linkedPageId'      => $linked_page_id,
+		'linkedPageTitle'   => $linked_page_id ? get_the_title( $linked_page_id ) : '',
+		'linkedPageStatus'  => $linked_page_id ? get_post_status( $linked_page_id ) : '',
+		'linkedPageEditUrl' => $linked_page_id ? get_edit_post_link( $linked_page_id, '' ) : '',
+		'linkedPageViewUrl' => $linked_page_id ? foldery_media_admin_page_view_url( $linked_page_id ) : '',
+		'children'          => array_map( 'foldery_media_plain_folder', $folder->getChildren() ),
 	);
+}
+
+function foldery_media_admin_page_view_url( $page_id ) {
+	$page_id = absint( $page_id );
+	if ( ! $page_id ) {
+		return '';
+	}
+
+	if ( 'publish' === get_post_status( $page_id ) ) {
+		return get_permalink( $page_id );
+	}
+
+	$preview_url = get_preview_post_link( $page_id );
+	return $preview_url ? $preview_url : get_permalink( $page_id );
 }
 
 function foldery_media_admin_page_data() {
@@ -35,13 +52,46 @@ function foldery_media_admin_page_data() {
 	return array_map(
 		function ( $page ) {
 			return array(
-				'id'     => (int) $page->ID,
-				'title'  => get_the_title( $page ),
-				'status' => get_post_status( $page ),
+				'id'      => (int) $page->ID,
+				'title'   => get_the_title( $page ),
+				'status'  => get_post_status( $page ),
+				'editUrl' => get_edit_post_link( $page->ID, '' ),
+				'viewUrl' => foldery_media_admin_page_view_url( $page->ID ),
 			);
 		},
 		$pages
 	);
+}
+
+function foldery_media_create_linked_page( $folder_id ) {
+	$folder_id = absint( $folder_id );
+	$folder    = foldery_media_get_folder( $folder_id );
+	if ( ! $folder_id || ! foldery_is_media_folder( $folder ) ) {
+		return array( __( 'Folder does not exist.', 'foldery' ) );
+	}
+
+	if ( ! current_user_can( 'edit_pages' ) ) {
+		return array( __( 'Insufficient permissions.', 'foldery' ) );
+	}
+
+	$page_id = wp_insert_post(
+		array(
+			'post_type'   => 'page',
+			'post_status' => 'draft',
+			'post_title'  => wp_strip_all_tags( $folder->getName() ),
+		),
+		true
+	);
+
+	if ( is_wp_error( $page_id ) ) {
+		return array( $page_id->get_error_message() );
+	}
+
+	$result = function_exists( 'foldery_explorer_link_folder_to_page' )
+		? foldery_explorer_link_folder_to_page( $folder_id, $page_id )
+		: array( __( 'Explorer is not available.', 'foldery' ) );
+
+	return true === $result ? (int) $page_id : $result;
 }
 
 function foldery_media_admin_tree_data() {
@@ -195,10 +245,20 @@ function foldery_media_admin_enqueue( $hook ) {
 				'rename'         => __( 'Rename', 'foldery' ),
 				'delete'         => __( 'Delete', 'foldery' ),
 				'moveSelected'   => __( 'Move selection here', 'foldery' ),
-				'linkedPage'     => __( 'Linked page', 'foldery' ),
-				'noLinkedPage'   => __( 'No linked page', 'foldery' ),
-				'savePageLink'   => __( 'Save page link', 'foldery' ),
-				'pageLinkSaved'  => __( 'Page link saved.', 'foldery' ),
+				'linkedPage'     => __( 'Page liée', 'foldery' ),
+				'noLinkedPage'   => __( 'Aucune page liée', 'foldery' ),
+				'selectFolder'    => __( 'Sélectionner un dossier', 'foldery' ),
+				'pageLinkedTo'    => __( 'Liée à ce dossier', 'foldery' ),
+				'choosePage'      => __( 'Choisir une page', 'foldery' ),
+				'createPage'      => __( 'Créer une page', 'foldery' ),
+				'editPage'        => __( 'Modifier', 'foldery' ),
+				'changePage'      => __( 'Changer', 'foldery' ),
+				'unlinkPage'      => __( 'Délier', 'foldery' ),
+				'viewPage'        => __( 'Voir', 'foldery' ),
+				'cancel'          => __( 'Annuler', 'foldery' ),
+				'savePageLink'   => __( 'Enregistrer', 'foldery' ),
+				'pageLinkSaved'  => __( 'Page liée enregistrée.', 'foldery' ),
+				'pageCreated'    => __( 'Page créée et liée.', 'foldery' ),
 				'folderName'     => __( 'Folder name', 'foldery' ),
 				'confirmDelete'  => __( 'Delete this folder? Files will become unorganized.', 'foldery' ),
 				'selectFiles'    => __( 'Select media first.', 'foldery' ),
@@ -278,6 +338,16 @@ function foldery_media_admin_ajax() {
 				: array( __( 'Explorer is not available.', 'foldery' ) );
 			$selected = $id;
 			break;
+		case 'create_linked_page':
+			if ( ! current_user_can( 'edit_pages' ) ) {
+				$result = array( __( 'Insufficient permissions.', 'foldery' ) );
+				break;
+			}
+
+			$id       = isset( $_POST['id'] ) ? (int) $_POST['id'] : $selected;
+			$result   = foldery_media_create_linked_page( $id );
+			$selected = $id;
+			break;
 		default:
 			wp_send_json_error( array( 'message' => __( 'Unknown action.', 'foldery' ) ), 400 );
 	}
@@ -289,6 +359,7 @@ function foldery_media_admin_ajax() {
 	wp_send_json_success(
 		array(
 			'tree'     => foldery_media_admin_tree_data(),
+			'pages'    => foldery_media_admin_page_data(),
 			'selected' => $selected,
 			'message'  => __( 'Media folders updated.', 'foldery' ),
 		)

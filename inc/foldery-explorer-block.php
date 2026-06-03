@@ -38,22 +38,6 @@ function foldery_explorer_folder_linked_page_id( $folder_id ) {
     return 0;
 }
 
-function foldery_explorer_folder_page_fallback( $folder_id ) {
-    $pages = get_posts(
-        array(
-            'post_type'      => 'page',
-            'post_status'    => 'publish',
-            'posts_per_page' => 1,
-            'meta_key'       => 'folder',
-            'meta_value'     => (string) absint( $folder_id ),
-            'orderby'        => 'menu_order',
-            'order'          => 'ASC',
-        )
-    );
-
-    return count( $pages ) ? $pages[0] : null;
-}
-
 function foldery_explorer_folder_page( $folder_id ) {
     $page_id = foldery_explorer_folder_linked_page_id( $folder_id );
     if ( $page_id ) {
@@ -63,7 +47,7 @@ function foldery_explorer_folder_page( $folder_id ) {
         }
     }
 
-    return foldery_explorer_folder_page_fallback( $folder_id );
+    return null;
 }
 
 function foldery_explorer_page_folder_id( $page_id ) {
@@ -88,11 +72,6 @@ function foldery_explorer_page_folder_id( $page_id ) {
 
     if ( $folder_id && foldery_is_media_folder( foldery_media_get_folder( $folder_id ) ) ) {
         return $folder_id;
-    }
-
-    $legacy_folder_id = absint( get_post_meta( $page_id, 'folder', true ) );
-    if ( $legacy_folder_id && foldery_is_media_folder( foldery_media_get_folder( $legacy_folder_id ) ) ) {
-        return $legacy_folder_id;
     }
 
     return 0;
