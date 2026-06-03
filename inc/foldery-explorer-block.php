@@ -154,8 +154,103 @@ function foldery_explorer_page_content( $folder_id ) {
     return '<div class="foldery-explorer-page-content">' . $html . '</div>';
 }
 
+function foldery_explorer_attachment_ids_from_folder( $folder ) {
+    if ( ! foldery_is_media_folder( $folder ) ) {
+        return array();
+    }
+
+    $ids = $folder->read();
+    if ( count( $ids ) ) {
+        return $ids;
+    }
+
+    foreach ( $folder->getChildren() as $child ) {
+        if ( $child->getCnt() ) {
+            $ids = array_merge( $ids, $child->read() );
+        }
+    }
+
+    return $ids;
+}
+
+function foldery_explorer_attachment_field( $key, $post_id = null, $format_value = true ) {
+    if ( function_exists( 'get_field' ) ) {
+        return get_field( $key, $post_id, $format_value );
+    }
+
+    return get_post_meta( $post_id ? $post_id : get_the_ID(), $key, true );
+}
+
+function foldery_explorer_frame_classes( $attachment_id ) {
+    $frame   = foldery_explorer_attachment_field( 'cadre_presentation', $attachment_id, false );
+    $classes = in_array( (string) $frame, array( '15', '25', '35' ), true ) ? 'frame' : '';
+    if ( '25' === (string) $frame ) {
+        $classes .= ' borderless';
+    }
+
+    return trim( $classes );
+}
+
+function foldery_explorer_render_framed_attachment( $attachment_id, $ratio = 0.5 ) {
+    $image = wp_get_attachment_image_src( $attachment_id, 'medium' );
+    if ( ! $image ) {
+        return '';
+    }
+
+    $link = wp_get_attachment_link( $attachment_id, 'medium' );
+    if ( function_exists( 'foldery_lightbox_activate' ) ) {
+        $link = foldery_lightbox_activate( $link );
+    }
+
+    $width    = $image[1] * $ratio;
+    $height   = $image[2] * $ratio;
+    $style_id = 'frame_' . (int) $attachment_id;
+
+    return sprintf(
+        '<figure class="%1$s" id="%2$s" style="width:%3$dpx">%4$s</figure><style>#%2$s:before{width:%5$dpx;height:%6$dpx}#%2$s:after{width:%7$dpx;height:%8$dpx}#%2$s.borderless:before{width:%3$dpx;height:%9$dpx}#%2$s.borderless:after{width:%10$dpx;height:%11$dpx}</style>',
+        esc_attr( foldery_explorer_frame_classes( $attachment_id ) ),
+        esc_attr( $style_id ),
+        (int) $width,
+        $link,
+        (int) ( $width + 40 ),
+        (int) ( $height + 40 ),
+        (int) ( $width + 60 ),
+        (int) ( $height + 60 ),
+        (int) $height,
+        (int) ( $width + 20 ),
+        (int) ( $height + 20 )
+    );
+}
+
+function foldery_explorer_render_masonry( $folder_id, $thumbsize = 'medium' ) {
+    $ids = foldery_explorer_attachment_ids_from_folder( foldery_media_get_folder( $folder_id ) );
+    if ( ! count( $ids ) ) {
+        return '';
+    }
+
+    $html = '<div class="grid foldery-masonry" data-masonry=\'{ "itemSelector": ".grid-item", "columnWidth": ".grid-item", "gutter": 20, "isFitWidth": true }\'>';
+    foreach ( $ids as $id ) {
+        $image = wp_get_attachment_image_src( $id, $thumbsize );
+        if ( ! $image ) {
+            continue;
+        }
+
+        $shape = $image[1] === $image[2] ? 'img-sq' : ( $image[1] > $image[2] ? 'img-lg' : 'img-ht' );
+        $html .= sprintf(
+            '<div class="grid-item %1$s w%2$d h%3$d">%4$s</div>',
+            esc_attr( $shape ),
+            (int) $image[1],
+            (int) $image[2],
+            wp_get_attachment_link( $id, $thumbsize )
+        );
+    }
+    $html .= '</div><div class="clear"></div>';
+
+    return function_exists( 'foldery_lightbox_activate' ) ? foldery_lightbox_activate( $html ) : $html;
+}
+
 function foldery_explorer_stack_image_id( $folder ) {
-    $ids = foldery_attachment_ids_from_folder( $folder );
+    $ids = foldery_explorer_attachment_ids_from_folder( $folder );
     return count( $ids ) ? (int) $ids[0] : 0;
 }
 
@@ -244,7 +339,7 @@ function foldery_explorer_render_folder( $folder_id, $include_page_content = tru
     if ( count( $children ) ) {
         $html .= foldery_explorer_render_stack( $children );
     } elseif ( $folder->getCnt() ) {
-        $html .= do_shortcode( '[masonry folder_id="' . (int) $folder->getId() . '"]' );
+        $html .= foldery_explorer_render_masonry( $folder->getId() );
     }
 
     $html .= '</section>';
@@ -267,13 +362,13 @@ function foldery_explorer_render_selected_images( $ids, $columns = 3 ) {
                 continue;
             }
 
-            $attachment_html = foldery_render_framed_attachment( $attachment_id );
+            $attachment_html = foldery_explorer_render_framed_attachment( $attachment_id );
             if ( '' === $attachment_html ) {
                 continue;
             }
 
             $cells .= '<td>' . $attachment_html;
-            $display_dimension = foldery_attachment_field( 'dimension', $attachment_id, true );
+            $display_dimension = foldery_explorer_attachment_field( 'dimension', $attachment_id, true );
             if ( $display_dimension ) {
                 $cells .= '<h5>' . esc_html( $display_dimension ) . '</h5>';
             }

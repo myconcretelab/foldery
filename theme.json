@@ -1,6 +1,27 @@
 {
   "$schema": "https://schemas.wp.org/wp/6.5/theme.json",
   "version": 3,
+  "customTemplates": [
+    {
+      "name": "bureau",
+      "title": "Bureau",
+      "postTypes": [
+        "page"
+      ]
+    }
+  ],
+  "templateParts": [
+    {
+      "name": "header",
+      "title": "Header",
+      "area": "header"
+    },
+    {
+      "name": "footer",
+      "title": "Footer",
+      "area": "footer"
+    }
+  ],
   "settings": {
     "appearanceTools": true,
     "layout": {

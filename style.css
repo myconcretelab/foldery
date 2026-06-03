@@ -2,25 +2,99 @@
 Theme Name: Foldery
 Theme URI: https://github.com/myconcretelab/foldery
 Author: Sebastien Jacqmin
-Description: Theme Gutenberg leger pour sebastienj.com avec shortcodes medias integres.
-Version: 2.0.0
+Description: Block theme leger pour sebastienj.com.
+Version: 3.0.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Tags: one-column, two-columns, right-sidebar, custom-header, custom-menu, editor-style, featured-images, microformats, post-formats, rtl-language-support, sticky-post, translation-ready
+Tags: one-column, two-columns, right-sidebar, custom-menu, editor-style, featured-images, translation-ready, block-theme, full-site-editing
 Text Domain: foldery
-
-This theme, like WordPress, is licensed under the GPL.
-Use it to make something cool, have fun, and share what you've learned with others.
 */
 
-/*
+body {
+  background: #f6f5ee;
+}
 
-Mode d'emploi :
+.foldery-site-header-wrap {
+  border-bottom: 1px solid rgba(17, 17, 17, 0.08);
+  background: rgba(246, 245, 238, 0.94);
+}
 
-Le contenu est edite dans Gutenberg. Les parties dynamiques du site passent
-par les shortcodes du theme :
+.foldery-site-header {
+  min-height: 92px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
 
-- [foldery_series] affiche les sous-series du dossier media ACF "folder".
-- [foldery_series folder_id="-1"] affiche les series de premier niveau.
-- [foldery_serie_detail] affiche la galerie d'une serie depuis l'URL.
-- [foldery_reproductions] affiche les reproductions disponibles.
+.foldery-brand {
+  gap: 16px;
+}
+
+.foldery-brand .wp-block-site-logo {
+  flex: 0 0 auto;
+}
+
+.foldery-site-title {
+  margin: 0;
+  font-family: "proxima_nova_ltsemibold", Arial, sans-serif;
+  font-size: 18px;
+  line-height: 1.1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.foldery-site-title a {
+  color: #111;
+}
+
+.foldery-navigation {
+  font-family: "proxima_nova_ltsemibold", Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.2;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.foldery-navigation a {
+  color: #111;
+}
+
+.foldery-navigation a:hover,
+.foldery-navigation a:focus {
+  color: #b46d70;
+}
+
+.foldery-main {
+  padding-top: clamp(36px, 6vw, 72px);
+  padding-bottom: clamp(48px, 7vw, 96px);
+}
+
+.foldery-loop-item {
+  padding-bottom: 28px;
+  border-bottom: 1px solid rgba(17, 17, 17, 0.1);
+}
+
+.foldery-loop-item + .foldery-loop-item {
+  margin-top: 28px;
+}
+
+.foldery-site-footer {
+  padding-top: 28px;
+  padding-bottom: 28px;
+  border-top: 1px solid rgba(17, 17, 17, 0.08);
+  color: #555;
+  font-size: 13px;
+}
+
+.foldery-comments {
+  margin-top: 48px;
+}
+
+@media (max-width: 720px) {
+  .foldery-site-header {
+    align-items: flex-start;
+  }
+
+  .foldery-site-title {
+    font-size: 15px;
+  }
+}
