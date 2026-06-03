@@ -46,6 +46,62 @@ body.bureau-template #wpadminbar {
   margin-bottom: 18px;
 }
 
+.bureau-header--shared {
+  display: block;
+}
+
+.bureau-header-content {
+  color: #18110d;
+}
+
+.bureau-header-content > *:first-child {
+  margin-top: 0;
+}
+
+.bureau-header-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.bureau-header-content .wp-block-columns {
+  align-items: center !important;
+  gap: clamp(18px, 4vw, 56px);
+}
+
+.bureau-header-content h1,
+.bureau-header-content h2,
+.bureau-header-content h3,
+.bureau-header-content p {
+  margin-top: 0;
+  letter-spacing: 0;
+}
+
+.bureau-header-content h1,
+.bureau-header-content h2 {
+  font-family: "proxima_nova_ltsemibold", Arial, sans-serif;
+  font-size: clamp(31px, 5vw, 62px);
+  line-height: 0.95;
+  text-transform: uppercase;
+}
+
+.bureau-header-content p {
+  color: var(--bureau-muted);
+  font-size: clamp(14px, 1.5vw, 17px);
+  line-height: 1.35;
+}
+
+.bureau-header-content img {
+  max-width: 100%;
+  height: auto;
+}
+
+.bureau-header-content .bureau-shared-header .wp-block-image {
+  margin: 0;
+}
+
+.bureau-header-content .bureau-shared-header .wp-block-image img {
+  width: min(150px, 100%);
+}
+
 .bureau-logo-paper,
 .bureau-info-paper,
 .bureau-sheet,

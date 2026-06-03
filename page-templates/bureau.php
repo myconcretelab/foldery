@@ -8,6 +8,7 @@ $bureau_background_url = foldery_make_relative_dev_url( content_url( 'uploads/IM
 $bureau_logo_url       = foldery_get_site_logo_url();
 $bureau_contact        = get_theme_mod( 'foldery_bureau_contact', get_option( 'admin_email' ) );
 $bureau_address        = get_theme_mod( 'foldery_bureau_address', '' );
+$bureau_header_block   = foldery_render_bureau_header_block();
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
@@ -21,27 +22,33 @@ $bureau_address        = get_theme_mod( 'foldery_bureau_address', '' );
 
 <div id="cms-page" class="bureau-page" style="--bureau-bg: url('<?php echo esc_url( $bureau_background_url ); ?>');">
     <div class="bureau-stage">
-        <header class="bureau-header" role="banner">
-            <div class="bureau-logo-paper" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-                <a href="<?php echo esc_url( foldery_make_relative_dev_url( home_url( '/' ) ) ); ?>">
-                    <img src="<?php echo esc_url( $bureau_logo_url ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
-                </a>
-            </div>
-
-            <div class="bureau-info-paper">
-                <p class="bureau-site-name"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></p>
-                <div class="bureau-site-meta">
-                    <?php if ( get_bloginfo( 'description' ) ) : ?>
-                        <span><?php echo esc_html( get_bloginfo( 'description' ) ); ?></span>
-                    <?php endif; ?>
-                    <?php if ( $bureau_address ) : ?>
-                        <span><?php echo esc_html( $bureau_address ); ?></span>
-                    <?php endif; ?>
-                    <?php if ( $bureau_contact ) : ?>
-                        <span><?php echo esc_html( $bureau_contact ); ?></span>
-                    <?php endif; ?>
+        <header class="bureau-header <?php echo $bureau_header_block ? 'bureau-header--shared' : 'bureau-header--fallback'; ?>" role="banner">
+            <?php if ( $bureau_header_block ) : ?>
+                <div class="bureau-header-content entry-content">
+                    <?php echo $bureau_header_block; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
                 </div>
-            </div>
+            <?php else : ?>
+                <div class="bureau-logo-paper" aria-label="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+                    <a href="<?php echo esc_url( foldery_make_relative_dev_url( home_url( '/' ) ) ); ?>">
+                        <img src="<?php echo esc_url( $bureau_logo_url ); ?>" alt="<?php echo esc_attr( get_bloginfo( 'name' ) ); ?>">
+                    </a>
+                </div>
+
+                <div class="bureau-info-paper">
+                    <p class="bureau-site-name"><?php echo esc_html( get_bloginfo( 'name' ) ); ?></p>
+                    <div class="bureau-site-meta">
+                        <?php if ( get_bloginfo( 'description' ) ) : ?>
+                            <span><?php echo esc_html( get_bloginfo( 'description' ) ); ?></span>
+                        <?php endif; ?>
+                        <?php if ( $bureau_address ) : ?>
+                            <span><?php echo esc_html( $bureau_address ); ?></span>
+                        <?php endif; ?>
+                        <?php if ( $bureau_contact ) : ?>
+                            <span><?php echo esc_html( $bureau_contact ); ?></span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         </header>
 
         <nav class="bureau-navigation main-navigation" role="navigation" aria-label="<?php esc_attr_e( 'Navigation principale', 'foldery' ); ?>">

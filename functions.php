@@ -109,6 +109,26 @@ function foldery_get_primary_menu_args( $menu_class = 'nav-menu menu-main-menu' 
     return $foldery_menu_args;
 }
 
+function foldery_get_bureau_header_block() {
+    $block = get_page_by_path( 'header-bureau', OBJECT, 'wp_block' );
+
+    if ( $block instanceof WP_Post && 'trash' !== get_post_status( $block ) ) {
+        return $block;
+    }
+
+    return null;
+}
+
+function foldery_render_bureau_header_block() {
+    $block = foldery_get_bureau_header_block();
+
+    if ( ! $block || '' === trim( $block->post_content ) ) {
+        return '';
+    }
+
+    return do_blocks( $block->post_content );
+}
+
 function foldery_render_block_list_content( $blocks ) {
     if ( empty( $blocks ) || ! function_exists( 'serialize_blocks' ) ) {
         return '';
