@@ -185,6 +185,35 @@
     }
   }
 
+  function explorerPagePanels() {
+    return document.querySelectorAll('.foldery-explorer-page-panel');
+  }
+
+  function initExplorerPagePanels() {
+    explorerPagePanels().forEach(function(panel) {
+      if (!panel.dataset.homeHtml) {
+        panel.dataset.homeHtml = panel.innerHTML;
+      }
+    });
+  }
+
+  function renderExplorerPagePanels(html) {
+    explorerPagePanels().forEach(function(panel) {
+      var content = panel.querySelector('.foldery-explorer-page-panel-content');
+      if (content) {
+        content.innerHTML = html || '';
+      } else {
+        panel.innerHTML = html || '';
+      }
+    });
+  }
+
+  function restoreExplorerPagePanels() {
+    explorerPagePanels().forEach(function(panel) {
+      panel.innerHTML = panel.dataset.homeHtml || '';
+    });
+  }
+
   function updateActiveMenuItem(folderId, ancestorIds) {
     var visibleMatch = false;
 
@@ -301,6 +330,7 @@
 
     return renderStage(explorer, homeView.html).then(function() {
       explorer._folderyCurrentView = homeView;
+      restoreExplorerPagePanels();
       updateActiveMenuItem(null);
       if (push) {
         writeExplorerState(homeView, false);
@@ -336,6 +366,7 @@
           configureBackLink(explorer, view.backTarget);
           explorer._folderyCurrentView = view;
           explorer.classList.remove('is-loading');
+          renderExplorerPagePanels(payload.pageContent || '');
           updateActiveMenuItem(folderId, payload.ancestorIds || []);
 
           if (push && targetUrl) {
@@ -450,6 +481,7 @@
   }
 
   document.addEventListener('DOMContentLoaded', function() {
+    initExplorerPagePanels();
     document.querySelectorAll('.foldery-explorer').forEach(initExplorer);
   });
 }());

@@ -647,4 +647,29 @@
       return null;
     }
   });
+
+  blocks.registerBlockType('foldery/explorer-page-content', {
+    apiVersion: 3,
+    title: __('Foldery Explorer Page Content', 'foldery'),
+    icon: 'media-document',
+    category: 'widgets',
+    edit: function() {
+      var blockProps = useBlockProps ? useBlockProps({ className: 'foldery-explorer-page-content-editor-preview' }) : { className: 'foldery-explorer-page-content-editor-preview' };
+
+      return el(
+        'div',
+        blockProps,
+        el(
+          Disabled,
+          null,
+          el(ServerSideRender, {
+            block: 'foldery/explorer-page-content'
+          })
+        )
+      );
+    },
+    save: function() {
+      return null;
+    }
+  });
 }(wp.blocks, wp.element, wp.components, wp.blockEditor, wp.i18n));

@@ -322,6 +322,36 @@ body.bureau-template #wpadminbar {
   display: none;
 }
 
+.bureau-sheet--side .foldery-explorer-page-panel {
+  min-height: 0;
+}
+
+.bureau-sheet--side .foldery-explorer-page-panel-content:empty {
+  display: none;
+}
+
+.bureau-sheet--side .foldery-explorer-page-content {
+  margin: 0;
+}
+
+.bureau-sheet--side .foldery-explorer-page-content > *:last-child {
+  margin-bottom: 0;
+}
+
+.bureau-sheet--side .foldery-explorer-page-content h1,
+.bureau-sheet--side .foldery-explorer-page-content h2,
+.bureau-sheet--side .foldery-explorer-page-content h3,
+.bureau-sheet--side .foldery-explorer-page-content h4 {
+  margin: 0 0 18px;
+  color: #211b17;
+  font-size: clamp(20px, 2vw, 27px);
+  line-height: 1.05;
+}
+
+.bureau-sheet--side .foldery-explorer-page-content p {
+  margin: 0 0 18px;
+}
+
 .bureau-board {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 370px);

@@ -115,13 +115,28 @@ function foldery_explorer_folder_url( $folder ) {
         return foldery_make_relative_dev_url( home_url( '/' ) );
     }
 
-    $page = foldery_explorer_folder_page( $folder->getId() );
-    if ( $page ) {
-        return foldery_make_relative_dev_url( get_permalink( $page ) );
-    }
-
     return foldery_make_relative_dev_url( home_url( '/explorer/' . trim( $folder->getAbsolutePath(), '/' ) . '/' ) );
 }
+
+function foldery_explorer_redirect_linked_pages() {
+    if ( is_admin() || wp_doing_ajax() || ! is_singular( 'page' ) || is_front_page() ) {
+        return;
+    }
+
+    $folder_id = foldery_explorer_page_folder_id( get_queried_object_id() );
+    if ( ! $folder_id ) {
+        return;
+    }
+
+    $folder = foldery_media_get_folder( $folder_id );
+    if ( ! foldery_is_media_folder( $folder ) ) {
+        return;
+    }
+
+    wp_safe_redirect( home_url( '/explorer/' . trim( $folder->getAbsolutePath(), '/' ) . '/' ), 302 );
+    exit;
+}
+add_action( 'template_redirect', 'foldery_explorer_redirect_linked_pages' );
 
 function foldery_explorer_clean_page_content( $content ) {
     $content = preg_replace( '/<!-- wp:foldery\/explorer\b[^>]*(?:\/-->|-->.*?<!-- \/wp:foldery\/explorer -->)/is', '', $content );
@@ -152,6 +167,13 @@ function foldery_explorer_page_content( $folder_id ) {
     wp_reset_postdata();
 
     return '<div class="foldery-explorer-page-content">' . $html . '</div>';
+}
+
+function foldery_explorer_render_page_content_block( $attributes = array() ) {
+    $folder_id = foldery_explorer_current_folder_id();
+    $content   = $folder_id ? foldery_explorer_page_content( $folder_id ) : '';
+
+    return '<div class="foldery-explorer-page-panel"><div class="foldery-explorer-page-panel-content">' . $content . '</div></div>';
 }
 
 function foldery_explorer_attachment_ids_from_folder( $folder ) {
@@ -650,6 +672,7 @@ function foldery_explorer_response_data( $folder_id, $include_page ) {
         'ancestorIds' => foldery_explorer_folder_ancestor_ids( $folder->getId() ),
         'title'       => $folder->getName(),
         'url'         => foldery_explorer_folder_url( $folder ),
+        'pageContent' => foldery_explorer_page_content( $folder->getId() ),
         'html'        => foldery_explorer_render_folder( $folder->getId(), (bool) $include_page ),
     );
 }
@@ -727,6 +750,16 @@ function foldery_explorer_register_block() {
                 'ariaLabel'    => array( 'type' => 'string', 'default' => 'Explorer' ),
                 'className'    => array( 'type' => 'string' ),
             ),
+        )
+    );
+
+    register_block_type(
+        'foldery/explorer-page-content',
+        array(
+            'api_version'     => 3,
+            'editor_script'   => 'foldery-explorer-editor',
+            'editor_style'    => 'foldery-explorer-editor-style',
+            'render_callback' => 'foldery_explorer_render_page_content_block',
         )
     );
 }
