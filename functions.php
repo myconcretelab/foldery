@@ -11,6 +11,11 @@ if ( ! isset( $content_width ) ) {
     $content_width = 1170;
 }
 
+function foldery_upload_size_limit( $size ) {
+    return min( $size, 10 * MB_IN_BYTES );
+}
+add_filter( 'upload_size_limit', 'foldery_upload_size_limit' );
+
 function foldery_register_shared_styles() {
     wp_register_style( 'bootstrap', get_template_directory_uri() . '/assets/css/bootstrap.min.css', array(), '3.3.4' );
     wp_register_style( 'font-awesome', get_template_directory_uri() . '/assets/css/font-awesome.min.css', array(), '4.7.0' );
