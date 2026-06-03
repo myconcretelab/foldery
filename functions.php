@@ -4,7 +4,7 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '2.0.12' );
+    define( 'FOLDERY_VERSION', '2.0.13' );
 }
 
 if ( ! isset( $content_width ) ) {
@@ -23,6 +23,7 @@ function foldery_register_shared_styles() {
     wp_register_style( 'foldery-static', get_template_directory_uri() . '/assets/css/static.css', array( 'foldery-style' ), FOLDERY_VERSION );
     wp_register_style( 'foldery-explorer', get_template_directory_uri() . '/assets/css/foldery-explorer.css', array( 'foldery-static' ), FOLDERY_VERSION );
     wp_register_style( 'foldery-site', get_template_directory_uri() . '/assets/css/foldery-child.css', array( 'foldery-explorer' ), FOLDERY_VERSION );
+    wp_register_style( 'foldery-bureau', get_template_directory_uri() . '/assets/css/bureau.css', array( 'foldery-site' ), FOLDERY_VERSION );
     wp_register_style( 'foldery-explorer-editor-style', get_template_directory_uri() . '/assets/css/foldery-explorer-editor.css', array(), FOLDERY_VERSION );
 }
 add_action( 'init', 'foldery_register_shared_styles', 5 );
@@ -48,6 +49,7 @@ function foldery_setup() {
             'assets/css/static.css',
             'assets/css/foldery-explorer.css',
             'assets/css/foldery-child.css',
+            'assets/css/bureau.css',
             'assets/css/foldery-explorer-editor.css',
         )
     );
@@ -68,6 +70,100 @@ function foldery_body_classes( $classes ) {
     return $classes;
 }
 add_filter( 'body_class', 'foldery_body_classes' );
+
+function foldery_get_site_logo_url() {
+    $foldery_logo_url = '';
+    $custom_logo_id   = get_theme_mod( 'custom_logo' );
+
+    if ( $custom_logo_id ) {
+        $foldery_logo_url = wp_get_attachment_image_url( $custom_logo_id, 'full' );
+    }
+
+    if ( ! $foldery_logo_url ) {
+        $legacy_options   = get_option( 'smof_data' );
+        $foldery_logo_url = $legacy_options['main_logo']['url'] ?? '';
+    }
+
+    if ( ! $foldery_logo_url ) {
+        $foldery_logo_url = content_url( 'uploads/logo-pt.png' );
+    }
+
+    return foldery_make_relative_dev_url( $foldery_logo_url );
+}
+
+function foldery_get_primary_menu_args( $menu_class = 'nav-menu menu-main-menu' ) {
+    $foldery_menu_args = array(
+        'menu_class'  => $menu_class,
+        'container'   => false,
+        'fallback_cb' => false,
+    );
+
+    $foldery_menu_locations = get_nav_menu_locations();
+
+    if ( ! empty( $foldery_menu_locations['primary'] ) ) {
+        $foldery_menu_args['theme_location'] = 'primary';
+    } else {
+        $foldery_menu_args['menu'] = 'Main menu';
+    }
+
+    return $foldery_menu_args;
+}
+
+function foldery_render_block_list_content( $blocks ) {
+    if ( empty( $blocks ) || ! function_exists( 'serialize_blocks' ) ) {
+        return '';
+    }
+
+    return apply_filters( 'the_content', serialize_blocks( $blocks ) );
+}
+
+function foldery_bureau_split_content( $content ) {
+    $fallback = array(
+        'main'    => apply_filters( 'the_content', $content ),
+        'sidebar' => '',
+    );
+
+    if ( ! function_exists( 'parse_blocks' ) || ! function_exists( 'serialize_blocks' ) ) {
+        return $fallback;
+    }
+
+    $blocks = parse_blocks( $content );
+
+    foreach ( $blocks as $index => $block ) {
+        if ( 'core/columns' !== ( $block['blockName'] ?? '' ) || empty( $block['innerBlocks'] ) ) {
+            continue;
+        }
+
+        $columns = array_values(
+            array_filter(
+                $block['innerBlocks'],
+                function ( $inner_block ) {
+                    return 'core/column' === ( $inner_block['blockName'] ?? '' );
+                }
+            )
+        );
+
+        if ( count( $columns ) < 2 ) {
+            continue;
+        }
+
+        $before_blocks  = array_slice( $blocks, 0, $index );
+        $after_blocks   = array_slice( $blocks, $index + 1 );
+        $main_blocks    = array_merge( $before_blocks, $columns[0]['innerBlocks'], $after_blocks );
+        $sidebar_blocks = array();
+
+        foreach ( array_slice( $columns, 1 ) as $sidebar_column ) {
+            $sidebar_blocks = array_merge( $sidebar_blocks, $sidebar_column['innerBlocks'] );
+        }
+
+        return array(
+            'main'    => foldery_render_block_list_content( $main_blocks ),
+            'sidebar' => foldery_render_block_list_content( $sidebar_blocks ),
+        );
+    }
+
+    return $fallback;
+}
 
 function foldery_should_use_relative_dev_urls() {
     if ( ! is_admin() ) {
@@ -211,6 +307,10 @@ function foldery_scripts_styles() {
     wp_enqueue_style( 'font-awesome' );
     wp_enqueue_style( 'foldery-site' );
 
+    if ( is_page_template( 'page-templates/bureau.php' ) ) {
+        wp_enqueue_style( 'foldery-bureau' );
+    }
+
     wp_enqueue_script( 'foldery-menu', get_template_directory_uri() . '/assets/js/menu.js', array( 'jquery' ), FOLDERY_VERSION, true );
     wp_enqueue_script( 'foldery-masonry', get_template_directory_uri() . '/js/masonry.pkgd.min.js', array(), '4.2.2', true );
 
@@ -219,6 +319,130 @@ function foldery_scripts_styles() {
     }
 }
 add_action( 'wp_enqueue_scripts', 'foldery_scripts_styles' );
+
+function foldery_customize_bureau_options( $wp_customize ) {
+    $wp_customize->add_section(
+        'foldery_bureau',
+        array(
+            'title'    => __( 'Bureau', 'foldery' ),
+            'priority' => 35,
+        )
+    );
+
+    $wp_customize->add_setting(
+        'foldery_bureau_address',
+        array(
+            'default'           => '',
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+
+    $wp_customize->add_control(
+        'foldery_bureau_address',
+        array(
+            'label'   => __( 'Adresse / atelier', 'foldery' ),
+            'section' => 'foldery_bureau',
+            'type'    => 'text',
+        )
+    );
+
+    $wp_customize->add_setting(
+        'foldery_bureau_contact',
+        array(
+            'default'           => get_option( 'admin_email' ),
+            'sanitize_callback' => 'sanitize_text_field',
+        )
+    );
+
+    $wp_customize->add_control(
+        'foldery_bureau_contact',
+        array(
+            'label'   => __( 'Contact affiche', 'foldery' ),
+            'section' => 'foldery_bureau',
+            'type'    => 'text',
+        )
+    );
+}
+add_action( 'customize_register', 'foldery_customize_bureau_options' );
+
+function foldery_register_bureau_block_styles() {
+    if ( ! function_exists( 'register_block_style' ) ) {
+        return;
+    }
+
+    register_block_style(
+        'core/group',
+        array(
+            'name'  => 'bureau-paper',
+            'label' => __( 'Papier scotche', 'foldery' ),
+        )
+    );
+
+    register_block_style(
+        'core/group',
+        array(
+            'name'  => 'bureau-note',
+            'label' => __( 'Petite note', 'foldery' ),
+        )
+    );
+
+    register_block_style(
+        'core/heading',
+        array(
+            'name'  => 'bureau-label',
+            'label' => __( 'Etiquette scotchee', 'foldery' ),
+        )
+    );
+
+    register_block_style(
+        'core/paragraph',
+        array(
+            'name'  => 'bureau-typewritten',
+            'label' => __( 'Texte de papier', 'foldery' ),
+        )
+    );
+
+    register_block_style(
+        'core/image',
+        array(
+            'name'  => 'bureau-taped',
+            'label' => __( 'Photo scotchee', 'foldery' ),
+        )
+    );
+
+    register_block_style(
+        'core/columns',
+        array(
+            'name'  => 'bureau-layout',
+            'label' => __( 'Bureau deux feuilles', 'foldery' ),
+        )
+    );
+}
+add_action( 'init', 'foldery_register_bureau_block_styles' );
+
+function foldery_register_bureau_block_pattern() {
+    if ( ! function_exists( 'register_block_pattern' ) || ! function_exists( 'register_block_pattern_category' ) ) {
+        return;
+    }
+
+    register_block_pattern_category(
+        'foldery',
+        array(
+            'label' => __( 'Foldery', 'foldery' ),
+        )
+    );
+
+    register_block_pattern(
+        'foldery/bureau-page',
+        array(
+            'title'       => __( 'Bureau - deux feuilles', 'foldery' ),
+            'description' => __( 'Structure editable pour le modele Bureau : contenu principal a gauche, contenu lateral a droite.', 'foldery' ),
+            'categories'  => array( 'foldery' ),
+            'content'     => '<!-- wp:columns {"className":"is-style-bureau-layout"} --><div class="wp-block-columns is-style-bureau-layout"><!-- wp:column {"width":"68%"} --><div class="wp-block-column" style="flex-basis:68%"><!-- wp:heading {"className":"is-style-bureau-label"} --><h2 class="wp-block-heading is-style-bureau-label">Titre principal</h2><!-- /wp:heading --><!-- wp:paragraph {"className":"is-style-bureau-typewritten"} --><p class="is-style-bureau-typewritten">Ajoutez ici le contenu principal de la page.</p><!-- /wp:paragraph --></div><!-- /wp:column --><!-- wp:column {"width":"32%"} --><div class="wp-block-column" style="flex-basis:32%"><!-- wp:heading {"level":3,"className":"is-style-bureau-label"} --><h3 class="wp-block-heading is-style-bureau-label">Note</h3><!-- /wp:heading --><!-- wp:paragraph {"className":"is-style-bureau-typewritten"} --><p class="is-style-bureau-typewritten">Ajoutez ici la colonne laterale.</p><!-- /wp:paragraph --></div><!-- /wp:column --></div><!-- /wp:columns -->',
+        )
+    );
+}
+add_action( 'init', 'foldery_register_bureau_block_pattern' );
 
 function foldery_admin_styles() {
     wp_enqueue_style( 'foldery-admin', get_template_directory_uri() . '/assets/admin/admin.css', array(), FOLDERY_VERSION );
