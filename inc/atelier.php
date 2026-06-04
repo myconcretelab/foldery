@@ -203,7 +203,7 @@ function foldery_atelier_rgba( $color, $opacity ) {
     $rgb     = foldery_atelier_hex_to_rgb( $color );
     $opacity = foldery_atelier_clamp_int( $opacity, 0, 100 ) / 100;
 
-    return sprintf( 'rgba(%1$d, %2$d, %3$d, %.2F)', $rgb[0], $rgb[1], $rgb[2], $opacity );
+    return sprintf( 'rgba(%1$d, %2$d, %3$d, %4$.2F)', $rgb[0], $rgb[1], $rgb[2], $opacity );
 }
 
 function foldery_atelier_overlay_settings( $post_id ) {
