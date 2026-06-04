@@ -626,6 +626,7 @@
       menuFolderIds: { type: 'string', default: '' },
       showSubmenus: { type: 'boolean', default: true },
       ariaLabel: { type: 'string', default: 'Menu principal' },
+      scrollToExplorer: { type: 'boolean', default: false },
       className: { type: 'string' },
       artistName: { type: 'string' },
       artistBaseline: { type: 'string' },
@@ -713,6 +714,13 @@
               checked: props.attributes.showSubmenus !== false,
               onChange: function(value) {
                 props.setAttributes({ showSubmenus: !!value });
+              }
+            }),
+            el(ToggleControl, {
+              label: __('Scroller vers Explorer au clic', 'foldery'),
+              checked: !!props.attributes.scrollToExplorer,
+              onChange: function(value) {
+                props.setAttributes({ scrollToExplorer: !!value });
               }
             }),
             el(TextControl, {

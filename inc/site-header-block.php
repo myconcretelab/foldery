@@ -46,6 +46,7 @@ function foldery_header_menu_html( $attributes ) {
                 'folderIds'    => isset( $attributes['menuFolderIds'] ) ? $attributes['menuFolderIds'] : '',
                 'showSubmenus' => ! empty( $attributes['showSubmenus'] ),
                 'ariaLabel'    => isset( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : __( 'Menu principal', 'foldery' ),
+                'scrollToExplorer' => ! empty( $attributes['scrollToExplorer'] ),
                 'className'    => 'foldery-paper-header__menu',
             )
         );
@@ -154,10 +155,11 @@ function foldery_register_site_header_block() {
             'editor_style'    => 'foldery-explorer-editor-style',
             'render_callback' => 'foldery_render_site_header_block',
             'attributes'      => array(
-                'menuFolderIds' => array( 'type' => 'string', 'default' => '' ),
-                'showSubmenus' => array( 'type' => 'boolean', 'default' => true ),
-                'ariaLabel'    => array( 'type' => 'string', 'default' => 'Menu principal' ),
-                'className'    => array( 'type' => 'string' ),
+                'menuFolderIds'     => array( 'type' => 'string', 'default' => '' ),
+                'showSubmenus'      => array( 'type' => 'boolean', 'default' => true ),
+                'ariaLabel'         => array( 'type' => 'string', 'default' => 'Menu principal' ),
+                'scrollToExplorer'  => array( 'type' => 'boolean', 'default' => false ),
+                'className'         => array( 'type' => 'string' ),
                 'artistName'     => array( 'type' => 'string' ),
                 'artistBaseline' => array( 'type' => 'string' ),
                 'phone'          => array( 'type' => 'string' ),
