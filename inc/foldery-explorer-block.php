@@ -16,6 +16,7 @@ function foldery_explorer_default_attributes() {
         'recentTitle'       => "Recemment cree a l'atelier (ou dehors !)",
         'recentImageIds'    => '',
         'includePageContent'=> true,
+        'pageContentLayout' => 'stacked',
         'animate'           => true,
     );
 }
@@ -167,6 +168,30 @@ function foldery_explorer_page_content( $folder_id ) {
     wp_reset_postdata();
 
     return '<div class="foldery-explorer-page-content">' . $html . '</div>';
+}
+
+function foldery_explorer_page_content_layout( $layout ) {
+    $layout = is_string( $layout ) ? $layout : '';
+
+    return in_array( $layout, array( 'stacked', 'split' ), true ) ? $layout : 'stacked';
+}
+
+function foldery_explorer_folder_subtitle( $folder ) {
+    if ( ! foldery_is_media_folder( $folder ) ) {
+        return '';
+    }
+
+    $page = foldery_explorer_folder_page( $folder->getId() );
+    if ( ! $page ) {
+        return '';
+    }
+
+    $subtitle = trim( wp_strip_all_tags( (string) $page->post_excerpt ) );
+    if ( '' === $subtitle && defined( 'FOLDERY_ATELIER_SUBTITLE_META' ) ) {
+        $subtitle = trim( wp_strip_all_tags( (string) get_post_meta( $page->ID, FOLDERY_ATELIER_SUBTITLE_META, true ) ) );
+    }
+
+    return apply_filters( 'foldery_explorer_folder_subtitle', $subtitle, $folder, $page );
 }
 
 function foldery_explorer_strip_matching_first_heading( $html, $title ) {
@@ -386,19 +411,47 @@ function foldery_explorer_render_parent_link( $folder ) {
     );
 }
 
-function foldery_explorer_render_folder( $folder_id, $include_page_content = true ) {
+function foldery_explorer_render_folder_page_intro( $folder, $parent_link, $page_content ) {
+    $subtitle = foldery_explorer_folder_subtitle( $folder );
+
+    return sprintf(
+        '<div class="foldery-explorer-page-intro"><div class="foldery-explorer-page-intro-meta">%1$s%2$s%3$s</div><div class="foldery-explorer-page-intro-content"><div class="foldery-explorer-page-paper" style="--foldery-page-paper-rotation:%4$sdeg">%5$s</div></div></div>',
+        foldery_explorer_render_title_row( $folder ),
+        '' !== $subtitle ? '<p class="foldery-explorer-subtitle">' . nl2br( esc_html( $subtitle ) ) . '</p>' : '',
+        $parent_link,
+        esc_attr( foldery_explorer_paper_rotation( $folder->getId(), 12 ) ),
+        foldery_explorer_strip_matching_first_heading( $page_content, $folder->getName() )
+    );
+}
+
+function foldery_explorer_render_folder( $folder_id, $include_page_content = true, $page_content_layout = 'stacked' ) {
     $folder = foldery_media_get_folder( $folder_id );
     if ( ! foldery_is_media_folder( $folder ) ) {
         return '';
     }
 
-    $children     = $folder->getChildren();
-    $page_content = $include_page_content ? foldery_explorer_page_content( $folder->getId() ) : '';
-    $parent_link  = foldery_explorer_render_parent_link( $folder );
-    $html         = '<section class="foldery-explorer-view foldery-explorer-folder' . ( $parent_link ? ' has-parent-link' : '' ) . '" data-folder-id="' . (int) $folder->getId() . '">';
-    $html        .= foldery_explorer_render_title_row( $folder, $parent_link );
+    $children            = $folder->getChildren();
+    $page_content        = $include_page_content ? foldery_explorer_page_content( $folder->getId() ) : '';
+    $page_content_layout = foldery_explorer_page_content_layout( $page_content_layout );
+    $has_split_intro     = 'split' === $page_content_layout && '' !== $page_content;
+    $parent_link         = foldery_explorer_render_parent_link( $folder );
+    $classes             = array( 'foldery-explorer-view', 'foldery-explorer-folder' );
+    if ( $parent_link ) {
+        $classes[] = 'has-parent-link';
+    }
+    if ( $has_split_intro ) {
+        $classes[] = 'has-page-intro';
+    }
 
-    if ( '' !== $page_content ) {
+    $html = '<section class="' . esc_attr( implode( ' ', $classes ) ) . '" data-folder-id="' . (int) $folder->getId() . '">';
+
+    if ( $has_split_intro ) {
+        $html .= foldery_explorer_render_folder_page_intro( $folder, $parent_link, $page_content );
+    } else {
+        $html .= foldery_explorer_render_title_row( $folder, $parent_link );
+    }
+
+    if ( '' !== $page_content && ! $has_split_intro ) {
         $html .= foldery_explorer_strip_matching_first_heading( $page_content, $folder->getName() );
     }
 
@@ -674,14 +727,16 @@ function foldery_explorer_render_block( $attributes ) {
         $linked_folder_id = foldery_explorer_page_folder_id( get_queried_object_id() );
         $folder           = $linked_folder_id ? foldery_media_get_folder( $linked_folder_id ) : null;
     }
+    $page_content_layout = foldery_explorer_page_content_layout( $attributes['pageContentLayout'] );
     $html       = foldery_is_media_folder( $folder )
-        ? foldery_explorer_render_folder( $folder->getId(), ! empty( $attributes['includePageContent'] ) )
+        ? foldery_explorer_render_folder( $folder->getId(), ! empty( $attributes['includePageContent'] ), $page_content_layout )
         : foldery_explorer_render_home( $attributes );
 
     return sprintf(
-        '<div class="foldery-explorer" data-api-url="%1$s" data-include-page="%2$d" data-animate="%3$d" data-menu-map="%4$s"><div class="foldery-explorer-stage">%5$s</div></div>',
+        '<div class="foldery-explorer" data-api-url="%1$s" data-include-page="%2$d" data-page-content-layout="%3$s" data-animate="%4$d" data-menu-map="%5$s"><div class="foldery-explorer-stage">%6$s</div></div>',
         esc_url( foldery_make_relative_dev_url( admin_url( 'admin-ajax.php?action=foldery_explorer' ) ) ),
         empty( $attributes['includePageContent'] ) ? 0 : 1,
+        esc_attr( $page_content_layout ),
         empty( $attributes['animate'] ) ? 0 : 1,
         esc_attr( wp_json_encode( foldery_explorer_menu_map() ) ),
         $html
@@ -704,7 +759,7 @@ function foldery_explorer_filter_linked_page_content( $content ) {
 }
 add_filter( 'the_content', 'foldery_explorer_filter_linked_page_content', 11 );
 
-function foldery_explorer_response_data( $folder_id, $include_page ) {
+function foldery_explorer_response_data( $folder_id, $include_page, $page_content_layout = 'stacked' ) {
     $folder = foldery_media_get_folder( $folder_id );
 
     if ( ! foldery_is_media_folder( $folder ) ) {
@@ -717,7 +772,7 @@ function foldery_explorer_response_data( $folder_id, $include_page ) {
         'title'       => $folder->getName(),
         'url'         => foldery_explorer_folder_url( $folder ),
         'pageContent' => foldery_explorer_page_content( $folder->getId() ),
-        'html'        => foldery_explorer_render_folder( $folder->getId(), (bool) $include_page ),
+        'html'        => foldery_explorer_render_folder( $folder->getId(), (bool) $include_page, $page_content_layout ),
     );
 }
 
@@ -774,6 +829,7 @@ function foldery_explorer_register_block() {
                 'recentTitle'       => array( 'type' => 'string', 'default' => "Recemment cree a l'atelier (ou dehors !)" ),
                 'recentImageIds'    => array( 'type' => 'string', 'default' => '' ),
                 'includePageContent'=> array( 'type' => 'boolean', 'default' => true ),
+                'pageContentLayout' => array( 'type' => 'string', 'default' => 'stacked' ),
                 'animate'           => array( 'type' => 'boolean', 'default' => true ),
             ),
         )
@@ -842,9 +898,10 @@ function foldery_explorer_register_routes() {
             'args'                => array(
                 'folder_id'    => array( 'sanitize_callback' => 'absint' ),
                 'include_page' => array( 'sanitize_callback' => 'absint' ),
+                'page_content_layout' => array( 'sanitize_callback' => 'sanitize_key' ),
             ),
             'callback'            => function ( WP_REST_Request $request ) {
-                $data = foldery_explorer_response_data( absint( $request->get_param( 'folder_id' ) ), $request->get_param( 'include_page' ) );
+                $data = foldery_explorer_response_data( absint( $request->get_param( 'folder_id' ) ), $request->get_param( 'include_page' ), $request->get_param( 'page_content_layout' ) );
                 if ( ! $data ) {
                     return new WP_Error( 'foldery_missing_folder', __( 'Folder not found.', 'foldery' ), array( 'status' => 404 ) );
                 }
@@ -859,7 +916,8 @@ add_action( 'rest_api_init', 'foldery_explorer_register_routes' );
 function foldery_explorer_ajax() {
     $folder_id = isset( $_GET['folder_id'] ) ? absint( $_GET['folder_id'] ) : 0;
     $include_page = isset( $_GET['include_page'] ) ? absint( $_GET['include_page'] ) : 1;
-    $data = foldery_explorer_response_data( $folder_id, $include_page );
+    $page_content_layout = isset( $_GET['page_content_layout'] ) ? sanitize_key( wp_unslash( $_GET['page_content_layout'] ) ) : 'stacked';
+    $data = foldery_explorer_response_data( $folder_id, $include_page, $page_content_layout );
 
     if ( ! $data ) {
         wp_send_json_error( array( 'message' => __( 'Folder not found.', 'foldery' ) ), 404 );

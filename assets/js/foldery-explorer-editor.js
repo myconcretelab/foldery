@@ -468,6 +468,7 @@
       recentTitle: { type: 'string', default: "Recemment cree a l'atelier (ou dehors !)" },
       recentImageIds: { type: 'string', default: '' },
       includePageContent: { type: 'boolean', default: true },
+      pageContentLayout: { type: 'string', default: 'stacked' },
       animate: { type: 'boolean', default: true }
     },
     edit: function(props) {
@@ -521,6 +522,17 @@
               checked: attrs.includePageContent,
               onChange: function(value) { setAttributes({ includePageContent: value }); }
             }),
+            attrs.includePageContent && SelectControl
+              ? el(SelectControl, {
+                  label: __('Presentation du contenu de page', 'foldery'),
+                  value: attrs.pageContentLayout || 'stacked',
+                  options: [
+                    { label: __('Au-dessus des galeries', 'foldery'), value: 'stacked' },
+                    { label: __('Deux colonnes papier', 'foldery'), value: 'split' }
+                  ],
+                  onChange: function(value) { setAttributes({ pageContentLayout: value }); }
+                })
+              : null,
             el(ToggleControl, {
               label: __('Animations desktop', 'foldery'),
               checked: attrs.animate,

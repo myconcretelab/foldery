@@ -338,6 +338,63 @@
   margin-bottom: 46px;
 }
 
+.editor-styles-wrapper .foldery-explorer-folder.has-page-intro {
+  padding-top: 0;
+}
+
+.editor-styles-wrapper .foldery-explorer-page-intro {
+  align-items: start;
+  display: grid;
+  gap: clamp(28px, 5vw, 64px);
+  grid-template-columns: minmax(220px, 1fr) minmax(0, 2fr);
+  margin: 0 0 clamp(42px, 6vw, 74px);
+}
+
+.editor-styles-wrapper .foldery-explorer-page-intro-meta {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+  padding-top: 12px;
+}
+
+.editor-styles-wrapper .foldery-explorer-page-intro .foldery-explorer-title-row,
+.editor-styles-wrapper .foldery-explorer-page-intro .foldery-explorer-heading {
+  margin: 0;
+}
+
+.editor-styles-wrapper .foldery-explorer-page-intro .foldery-explorer-back {
+  left: auto;
+  position: relative;
+  top: auto;
+}
+
+.editor-styles-wrapper .foldery-explorer-subtitle {
+  color: #5f5147;
+  font-size: clamp(17px, 1.6vw, 23px);
+  line-height: 1.35;
+  margin: 2px 0 0;
+}
+
+.editor-styles-wrapper .foldery-explorer-page-paper {
+  background-color: #fff8e6;
+  box-shadow:
+    0 18px 36px rgba(35, 22, 12, 0.18),
+    0 3px 8px rgba(35, 22, 12, 0.12);
+  box-sizing: border-box;
+  color: #211b17;
+  margin: 4px auto 0;
+  max-width: 100%;
+  padding: clamp(24px, 3.4vw, 44px);
+  position: relative;
+  transform: rotate(var(--foldery-page-paper-rotation, -0.8deg));
+}
+
+.editor-styles-wrapper .foldery-explorer-page-paper .foldery-explorer-page-content {
+  margin: 0;
+}
+
 .editor-styles-wrapper .foldery-explorer .stack-wrapper:after {
   clear: both;
   content: "";

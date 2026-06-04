@@ -361,6 +361,7 @@
     var apiUrl = new URL(explorer.dataset.apiUrl, window.location.origin);
     apiUrl.searchParams.set('folder_id', folderId);
     apiUrl.searchParams.set('include_page', explorer.dataset.includePage || '1');
+    apiUrl.searchParams.set('page_content_layout', explorer.dataset.pageContentLayout || 'stacked');
 
     explorer.classList.add('is-loading');
 
