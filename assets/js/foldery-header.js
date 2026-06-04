@@ -1,7 +1,31 @@
 (function () {
+  function numberAttribute(element, name, fallback) {
+    var value = Number(element.getAttribute(name));
+    return Number.isFinite(value) ? value : fallback;
+  }
+
+  function setHeaderReserve(header) {
+    var wasCompact = header.classList.contains('is-compact');
+
+    if (wasCompact) {
+      header.classList.remove('is-compact');
+    }
+
+    header.style.removeProperty('--foldery-paper-header-height');
+    header.style.setProperty('--foldery-paper-header-height', header.offsetHeight + 'px');
+
+    if (wasCompact) {
+      header.classList.add('is-compact');
+    }
+  }
+
   function updateHeader(header) {
-    var threshold = Number(header.getAttribute('data-compact-threshold') || 52);
-    header.classList.toggle('is-compact', window.scrollY > threshold);
+    var compactThreshold = numberAttribute(header, 'data-compact-threshold', 120);
+    var expandThreshold = numberAttribute(header, 'data-expand-threshold', 8);
+    var isCompact = header.classList.contains('is-compact');
+    var shouldCompact = isCompact ? window.scrollY > expandThreshold : window.scrollY > compactThreshold;
+
+    header.classList.toggle('is-compact', shouldCompact);
   }
 
   function init() {
@@ -23,9 +47,16 @@
       });
     }
 
-    headers.forEach(updateHeader);
+    headers.forEach(function (header) {
+      setHeaderReserve(header);
+      updateHeader(header);
+    });
+
     window.addEventListener('scroll', requestUpdate, { passive: true });
-    window.addEventListener('resize', requestUpdate);
+    window.addEventListener('resize', function () {
+      headers.forEach(setHeaderReserve);
+      requestUpdate();
+    });
   }
 
   if (document.readyState === 'loading') {
