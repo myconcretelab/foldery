@@ -4,7 +4,7 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '3.0.19' );
+    define( 'FOLDERY_VERSION', '3.0.22' );
 }
 
 if ( ! isset( $content_width ) ) {
@@ -33,6 +33,7 @@ require get_template_directory() . '/inc/lightbox/bootstrap.php';
 require get_template_directory() . '/inc/site-header-block.php';
 require get_template_directory() . '/inc/foldery-explorer-block.php';
 require get_template_directory() . '/inc/atelier.php';
+require get_template_directory() . '/inc/block-editor.php';
 
 function foldery_setup() {
     load_theme_textdomain( 'foldery', get_template_directory() . '/languages' );

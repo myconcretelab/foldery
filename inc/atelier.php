@@ -162,6 +162,8 @@ function foldery_register_atelier_hero_block() {
         'foldery/atelier-hero',
         array(
             'api_version'     => 3,
+            'editor_script'   => 'foldery-blocks-editor',
+            'editor_style'    => 'foldery-explorer-editor-style',
             'render_callback' => 'foldery_render_atelier_hero_block',
         )
     );
@@ -276,5 +278,17 @@ function foldery_atelier_admin_assets( $hook ) {
 
     wp_enqueue_media();
     wp_enqueue_script( 'foldery-atelier-admin', get_template_directory_uri() . '/assets/admin/atelier-hero.js', array( 'jquery' ), FOLDERY_VERSION, true );
+    wp_localize_script(
+        'foldery-atelier-admin',
+        'FolderyAtelierAdmin',
+        array(
+            'metaKeys' => array(
+                'foldery_atelier_hero_image_id' => FOLDERY_ATELIER_HERO_IMAGE_META,
+                'foldery_atelier_title'         => FOLDERY_ATELIER_TITLE_META,
+                'foldery_atelier_subtitle'      => FOLDERY_ATELIER_SUBTITLE_META,
+                'foldery_atelier_artwork_ids'   => FOLDERY_ATELIER_ARTWORKS_META,
+            ),
+        )
+    );
 }
 add_action( 'admin_enqueue_scripts', 'foldery_atelier_admin_assets' );

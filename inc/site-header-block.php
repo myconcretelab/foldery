@@ -3,10 +3,13 @@
  * Dynamic global header.
  */
 
-function foldery_header_social_links() {
-    $settings = function_exists( 'foldery_theme_settings' ) ? foldery_theme_settings() : array();
-    $raw      = isset( $settings['social_links'] ) ? (string) $settings['social_links'] : '';
-    $links    = array();
+function foldery_header_social_links( $raw = null ) {
+    if ( null === $raw ) {
+        $settings = function_exists( 'foldery_theme_settings' ) ? foldery_theme_settings() : array();
+        $raw      = isset( $settings['social_links'] ) ? (string) $settings['social_links'] : '';
+    }
+
+    $links = array();
 
     foreach ( preg_split( '/\r\n|\r|\n/', $raw ) as $line ) {
         $line = trim( $line );
@@ -63,6 +66,14 @@ function foldery_header_menu_html( $attributes ) {
     return '';
 }
 
+function foldery_header_attribute_or_setting( $attributes, $attribute_key, $settings, $settings_key, $fallback = '' ) {
+    if ( array_key_exists( $attribute_key, $attributes ) ) {
+        return (string) $attributes[ $attribute_key ];
+    }
+
+    return isset( $settings[ $settings_key ] ) ? (string) $settings[ $settings_key ] : $fallback;
+}
+
 function foldery_header_render_link_or_text( $label, $url, $class_name = '' ) {
     if ( '' === $label ) {
         return '';
@@ -83,12 +94,13 @@ function foldery_render_site_header_block( $attributes ) {
         $classes      .= ' ' . implode( ' ', $extra_classes );
     }
 
-    $artist_name     = $settings['artist_name'] ?? get_bloginfo( 'name' );
-    $artist_baseline = $settings['artist_baseline'] ?? get_bloginfo( 'description' );
-    $phone           = $settings['phone'] ?? '';
-    $email           = $settings['email'] ?? get_option( 'admin_email' );
-    $action_label    = $settings['header_link_label'] ?? '';
-    $action_url      = $settings['header_link_url'] ?? '';
+    $artist_name     = foldery_header_attribute_or_setting( $attributes, 'artistName', $settings, 'artist_name', get_bloginfo( 'name' ) );
+    $artist_baseline = foldery_header_attribute_or_setting( $attributes, 'artistBaseline', $settings, 'artist_baseline', get_bloginfo( 'description' ) );
+    $phone           = foldery_header_attribute_or_setting( $attributes, 'phone', $settings, 'phone' );
+    $email           = foldery_header_attribute_or_setting( $attributes, 'email', $settings, 'email', get_option( 'admin_email' ) );
+    $social_links    = foldery_header_attribute_or_setting( $attributes, 'socialLinks', $settings, 'social_links' );
+    $action_label    = foldery_header_attribute_or_setting( $attributes, 'actionLabel', $settings, 'header_link_label' );
+    $action_url      = foldery_header_attribute_or_setting( $attributes, 'actionUrl', $settings, 'header_link_url' );
     $menu            = foldery_header_menu_html( $attributes );
 
     ob_start();
@@ -104,7 +116,7 @@ function foldery_render_site_header_block( $attributes ) {
                     <?php if ( $artist_baseline ) : ?>
                         <p><?php echo esc_html( $artist_baseline ); ?></p>
                     <?php endif; ?>
-                    <?php foreach ( foldery_header_social_links() as $link ) : ?>
+                    <?php foreach ( foldery_header_social_links( $social_links ) as $link ) : ?>
                         <p><?php echo foldery_header_render_link_or_text( $link['label'], $link['url'], 'foldery-paper-header__social-link' ); ?></p>
                     <?php endforeach; ?>
                 </section>
@@ -138,12 +150,21 @@ function foldery_register_site_header_block() {
         'foldery/site-header',
         array(
             'api_version'     => 3,
+            'editor_script'   => 'foldery-blocks-editor',
+            'editor_style'    => 'foldery-explorer-editor-style',
             'render_callback' => 'foldery_render_site_header_block',
             'attributes'      => array(
                 'menuFolderIds' => array( 'type' => 'string', 'default' => '' ),
                 'showSubmenus' => array( 'type' => 'boolean', 'default' => true ),
                 'ariaLabel'    => array( 'type' => 'string', 'default' => 'Menu principal' ),
                 'className'    => array( 'type' => 'string' ),
+                'artistName'     => array( 'type' => 'string' ),
+                'artistBaseline' => array( 'type' => 'string' ),
+                'phone'          => array( 'type' => 'string' ),
+                'email'          => array( 'type' => 'string' ),
+                'socialLinks'    => array( 'type' => 'string' ),
+                'actionLabel'    => array( 'type' => 'string' ),
+                'actionUrl'      => array( 'type' => 'string' ),
             ),
         )
     );

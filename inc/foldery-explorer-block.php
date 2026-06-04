@@ -733,6 +733,7 @@ function foldery_explorer_editor_folder_tree( $folders = null ) {
                     'id'       => $folder->getId(),
                     'parent'   => $folder->getParent(),
                     'name'     => $folder->getName(),
+                    'menuTitle' => function_exists( 'foldery_explorer_folder_menu_title' ) ? foldery_explorer_folder_menu_title( $folder ) : $folder->getName(),
                     'path'     => $folder->getPath( ' / ', null ),
                     'count'    => $folder->getCnt(),
                     'children' => foldery_explorer_editor_folder_tree( $folder->getChildren() ),

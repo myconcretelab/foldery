@@ -33,6 +33,37 @@
   function clearField($field) {
     $field.find('input[type="hidden"]').val('');
     $field.find('.foldery-atelier-media-preview').empty();
+    syncMetaField($field.find('input[type="hidden"]'));
+  }
+
+  function syncMetaField($input) {
+    var adminData = window.FolderyAtelierAdmin || {};
+    var metaKeys = adminData.metaKeys || {};
+    var name = $input.attr('name');
+    var metaKey = metaKeys[name];
+    var meta = {};
+    var editorDispatch;
+
+    if (!metaKey || !window.wp || !wp.data || !wp.data.dispatch || !wp.data.select) {
+      return;
+    }
+
+    try {
+      if (!wp.data.select('core/editor') || !wp.data.dispatch('core/editor')) {
+        return;
+      }
+
+      editorDispatch = wp.data.dispatch('core/editor');
+    } catch (error) {
+      return;
+    }
+
+    if (!editorDispatch.editPost) {
+      return;
+    }
+
+    meta[metaKey] = $input.val() || '';
+    editorDispatch.editPost({ meta: meta });
   }
 
   $(document).on('click', '.foldery-atelier-choose-media', function() {
@@ -74,6 +105,7 @@
 
       $input.val(ids.join(','));
       updatePreview($field, selection);
+      syncMetaField($input);
     });
 
     frame.open();
@@ -81,5 +113,9 @@
 
   $(document).on('click', '.foldery-atelier-clear-media', function() {
     clearField($(this).closest('.foldery-atelier-media-field'));
+  });
+
+  $(document).on('input change', '#foldery-atelier-title, #foldery-atelier-subtitle', function() {
+    syncMetaField($(this));
   });
 }(jQuery));
