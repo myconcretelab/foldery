@@ -39,6 +39,10 @@
     var grids = stage.querySelectorAll('[data-masonry]');
     grids.forEach(function(grid) {
       try {
+        if (window.getComputedStyle(grid).display === 'flex') {
+          return;
+        }
+
         var options = JSON.parse(grid.getAttribute('data-masonry') || '{}');
         var masonry = new window.Masonry(grid, options);
         var images = grid.querySelectorAll('img');
@@ -254,6 +258,8 @@
 
   function ensureBackLink(explorer) {
     var view = explorer.querySelector('.foldery-explorer-folder');
+    var titleRow;
+    var heading;
     var link;
 
     if (!view) {
@@ -262,10 +268,22 @@
 
     link = view.querySelector('.foldery-explorer-back');
     if (!link) {
+      titleRow = view.querySelector('.foldery-explorer-title-row');
+      heading = view.querySelector('.foldery-explorer-heading');
+
+      if (!titleRow) {
+        titleRow = document.createElement('div');
+        titleRow.className = 'foldery-explorer-title-row';
+        if (heading) {
+          titleRow.appendChild(heading);
+        }
+        view.insertBefore(titleRow, view.firstChild);
+      }
+
       link = document.createElement('a');
       link.className = 'foldery-explorer-back foldery-explorer-link';
       link.innerHTML = '<span class="foldery-explorer-back-icon" aria-hidden="true"></span><span class="foldery-explorer-back-label"></span>';
-      view.insertBefore(link, view.firstChild);
+      titleRow.insertBefore(link, titleRow.firstChild);
     }
 
     view.classList.add('has-parent-link');

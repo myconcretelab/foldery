@@ -169,6 +169,27 @@ function foldery_explorer_page_content( $folder_id ) {
     return '<div class="foldery-explorer-page-content">' . $html . '</div>';
 }
 
+function foldery_explorer_strip_matching_first_heading( $html, $title ) {
+    if ( '' === $html || '' === $title ) {
+        return $html;
+    }
+
+    $title_slug = sanitize_title( wp_strip_all_tags( $title ) );
+    if ( '' === $title_slug ) {
+        return $html;
+    }
+
+    return preg_replace_callback(
+        '/<h([1-3])\b[^>]*>.*?<\/h\1>/is',
+        function( $matches ) use ( $title_slug ) {
+            $heading_slug = sanitize_title( wp_strip_all_tags( $matches[0] ) );
+            return $heading_slug === $title_slug ? '' : $matches[0];
+        },
+        $html,
+        1
+    );
+}
+
 function foldery_explorer_render_page_content_block( $attributes = array() ) {
     $folder_id = foldery_explorer_current_folder_id();
     $content   = $folder_id ? foldery_explorer_page_content( $folder_id ) : '';
@@ -276,13 +297,38 @@ function foldery_explorer_stack_image_id( $folder ) {
     return count( $ids ) ? (int) $ids[0] : 0;
 }
 
+function foldery_explorer_paper_rotation( $seed, $max_tenths = 26 ) {
+    $seed  = absint( $seed );
+    $range = ( $max_tenths * 2 ) + 1;
+    $value = ( ( $seed * 37 ) % $range ) - $max_tenths;
+
+    if ( abs( $value ) < 5 ) {
+        $value += $value < 0 ? -7 : 7;
+    }
+
+    return number_format( $value / 10, 1, '.', '' );
+}
+
+function foldery_explorer_render_title_row( $folder, $parent_link = '' ) {
+    if ( ! foldery_is_media_folder( $folder ) ) {
+        return '';
+    }
+
+    return sprintf(
+        '<div class="foldery-explorer-title-row">%1$s<header class="foldery-explorer-heading"><h3 class="foldery-explorer-paper foldery-explorer-title-paper" style="--foldery-paper-rotation:%2$sdeg">%3$s</h3></header></div>',
+        $parent_link,
+        esc_attr( foldery_explorer_paper_rotation( $folder->getId(), 18 ) ),
+        esc_html( $folder->getName() )
+    );
+}
+
 function foldery_explorer_render_stack( $folders ) {
     $folders = array_filter( (array) $folders, 'foldery_is_media_folder' );
     if ( ! count( $folders ) ) {
         return '';
     }
 
-    $html = '<div class="stack-wrapper foldery-series-stack foldery-explorer-stack" data-masonry=\'{ "itemSelector": ".stack-item", "columnWidth": ".stack-item", "gutter": 30 }\'>';
+    $html = '<div class="stack-wrapper foldery-series-stack foldery-explorer-stack" data-masonry=\'{ "itemSelector": ".stack-item", "columnWidth": ".stack-item", "gutter": 30, "isFitWidth": true }\'>';
     foreach ( $folders as $folder ) {
         $image_id = foldery_explorer_stack_image_id( $folder );
         if ( ! $image_id ) {
@@ -297,14 +343,15 @@ function foldery_explorer_render_stack( $folders ) {
         $width  = $image[1] / 2;
         $height = $image[2] / 2;
         $html  .= sprintf(
-            '<div class="stack-item foldery-explorer-item"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5>%3$s</h5><figure class="img-area" id="explorer-img-area-%4$d" style="width:%5$dpx;height:%6$dpx">%7$s</figure><style>#explorer-img-area-%4$d:after,#explorer-img-area-%4$d:before{width:%5$dpx;height:%6$dpx}</style></a></div>',
+            '<div class="stack-item foldery-explorer-item"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><figure class="img-area" id="explorer-img-area-%4$d" style="width:%5$dpx;height:%6$dpx">%7$s</figure><style>#explorer-img-area-%4$d:after,#explorer-img-area-%4$d:before{width:%5$dpx;height:%6$dpx}</style></a></div>',
             esc_url( foldery_explorer_folder_url( $folder ) ),
             (int) $folder->getId(),
             esc_html( $folder->getName() ),
             (int) $image_id,
             (int) $width,
             (int) $height,
-            wp_get_attachment_image( $image_id, 'medium' )
+            wp_get_attachment_image( $image_id, 'medium' ),
+            esc_attr( foldery_explorer_paper_rotation( $folder->getId() ) )
         );
     }
     $html .= '</div>';
@@ -349,13 +396,10 @@ function foldery_explorer_render_folder( $folder_id, $include_page_content = tru
     $page_content = $include_page_content ? foldery_explorer_page_content( $folder->getId() ) : '';
     $parent_link  = foldery_explorer_render_parent_link( $folder );
     $html         = '<section class="foldery-explorer-view foldery-explorer-folder' . ( $parent_link ? ' has-parent-link' : '' ) . '" data-folder-id="' . (int) $folder->getId() . '">';
+    $html        .= foldery_explorer_render_title_row( $folder, $parent_link );
 
-    $html .= $parent_link;
-
-    if ( '' === $page_content ) {
-        $html .= '<header class="foldery-explorer-heading"><h3>' . esc_html( $folder->getName() ) . '</h3></header>';
-    } else {
-        $html .= $page_content;
+    if ( '' !== $page_content ) {
+        $html .= foldery_explorer_strip_matching_first_heading( $page_content, $folder->getName() );
     }
 
     if ( count( $children ) ) {
