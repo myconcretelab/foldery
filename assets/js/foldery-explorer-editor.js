@@ -570,7 +570,8 @@
       maxDepth: { type: 'number', default: 0 },
       showSubmenus: { type: 'boolean', default: true },
       includeEmpty: { type: 'boolean', default: true },
-      ariaLabel: { type: 'string', default: 'Explorer' }
+      ariaLabel: { type: 'string', default: 'Explorer' },
+      scrollToExplorer: { type: 'boolean', default: false }
     },
     edit: function(props) {
       var attrs = props.attributes;
@@ -630,6 +631,13 @@
               checked: attrs.includeEmpty,
               onChange: function(value) {
                 setAttributes({ includeEmpty: value });
+              }
+            }),
+            el(ToggleControl, {
+              label: __('Scroller vers Explorer au clic', 'foldery'),
+              checked: attrs.scrollToExplorer,
+              onChange: function(value) {
+                setAttributes({ scrollToExplorer: value });
               }
             }),
             el(TextControl, {

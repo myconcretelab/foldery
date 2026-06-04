@@ -31,6 +31,28 @@
     return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
+  function reducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function scrollToExplorer(explorer) {
+    var rootStyle = window.getComputedStyle(document.documentElement);
+    var headerOffset = parseFloat(rootStyle.getPropertyValue('--foldery-paper-header-height')) || 0;
+    var adminBar = document.getElementById('wpadminbar');
+    var adminOffset = adminBar && window.getComputedStyle(adminBar).position === 'fixed' ? adminBar.offsetHeight : 0;
+    var top = explorer.getBoundingClientRect().top + window.pageYOffset - headerOffset - adminOffset - 18;
+
+    window.scrollTo({
+      top: Math.max(0, top),
+      behavior: reducedMotion() ? 'auto' : 'smooth'
+    });
+  }
+
+  function menuShouldScrollToExplorer(link) {
+    var menu = link.closest('.foldery-explorer-menu');
+    return !!menu && menu.dataset.scrollToExplorer === '1';
+  }
+
   function initMasonry(stage) {
     if (!window.Masonry) {
       return;
@@ -470,6 +492,7 @@
       var match;
       var folderId;
       var title;
+      var shouldScroll;
 
       if (!link || !explorer.isConnected) {
         return;
@@ -478,13 +501,18 @@
       match = link.dataset.folderId ? null : menuMap[normalizeUrl(link.href)];
       folderId = link.dataset.folderId || (match && match.folderId);
       title = link.textContent.trim() || (match && match.title);
+      shouldScroll = menuShouldScrollToExplorer(link);
 
       if (!folderId) {
         return;
       }
 
       event.preventDefault();
-      loadFolder(explorer, folderId, link.href, true, previousView, title);
+      loadFolder(explorer, folderId, link.href, true, previousView, title).then(function(view) {
+        if (view && shouldScroll) {
+          scrollToExplorer(explorer);
+        }
+      });
     });
 
     window.addEventListener('popstate', function(event) {

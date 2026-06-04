@@ -574,9 +574,10 @@ function foldery_explorer_menu_default_attributes() {
         'rootFolderId' => foldery_media_root_id(),
         'folderIds'    => '',
         'maxDepth'     => 0,
-        'showSubmenus' => true,
-        'includeEmpty' => true,
-        'ariaLabel'    => 'Explorer',
+        'showSubmenus'     => true,
+        'includeEmpty'     => true,
+        'ariaLabel'        => 'Explorer',
+        'scrollToExplorer' => false,
     );
 }
 
@@ -710,9 +711,10 @@ function foldery_explorer_render_menu_block( $attributes ) {
     }
 
     return sprintf(
-        '<nav class="%1$s" aria-label="%2$s"><ul class="foldery-explorer-menu-list">%3$s</ul></nav>',
+        '<nav class="%1$s" aria-label="%2$s" data-scroll-to-explorer="%3$d"><ul class="foldery-explorer-menu-list">%4$s</ul></nav>',
         esc_attr( trim( $classes ) ),
         esc_attr( $attributes['ariaLabel'] ),
+        empty( $attributes['scrollToExplorer'] ) ? 0 : 1,
         $items
     );
 }
@@ -846,10 +848,11 @@ function foldery_explorer_register_block() {
                 'rootFolderId' => array( 'type' => 'number', 'default' => foldery_media_root_id() ),
                 'folderIds'    => array( 'type' => 'string', 'default' => '' ),
                 'maxDepth'     => array( 'type' => 'number', 'default' => 0 ),
-                'showSubmenus' => array( 'type' => 'boolean', 'default' => true ),
-                'includeEmpty' => array( 'type' => 'boolean', 'default' => true ),
-                'ariaLabel'    => array( 'type' => 'string', 'default' => 'Explorer' ),
-                'className'    => array( 'type' => 'string' ),
+                'showSubmenus'     => array( 'type' => 'boolean', 'default' => true ),
+                'includeEmpty'     => array( 'type' => 'boolean', 'default' => true ),
+                'ariaLabel'        => array( 'type' => 'string', 'default' => 'Explorer' ),
+                'scrollToExplorer' => array( 'type' => 'boolean', 'default' => false ),
+                'className'        => array( 'type' => 'string' ),
             ),
         )
     );
