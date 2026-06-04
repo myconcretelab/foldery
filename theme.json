@@ -15,6 +15,13 @@
       "postTypes": [
         "page"
       ]
+    },
+    {
+      "name": "atelier-large",
+      "title": "Atelier large",
+      "postTypes": [
+        "page"
+      ]
     }
   ],
   "templateParts": [

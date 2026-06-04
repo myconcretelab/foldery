@@ -4,7 +4,7 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '3.0.31' );
+    define( 'FOLDERY_VERSION', '3.0.32' );
 }
 
 if ( ! isset( $content_width ) ) {
@@ -311,10 +311,23 @@ function foldery_register_bureau_block_styles() {
 }
 add_action( 'init', 'foldery_register_bureau_block_styles' );
 
-function foldery_register_bureau_block_pattern() {
+function foldery_get_pattern_file_content( $file ) {
+    $path = get_template_directory() . '/patterns/' . ltrim( $file, '/' );
+    if ( ! is_readable( $path ) ) {
+        return '';
+    }
+
+    ob_start();
+    include $path;
+    return trim( ob_get_clean() );
+}
+
+function foldery_register_block_patterns() {
     if ( ! function_exists( 'register_block_pattern' ) || ! function_exists( 'register_block_pattern_category' ) ) {
         return;
     }
+
+    $registry = WP_Block_Patterns_Registry::get_instance();
 
     register_block_pattern_category(
         'foldery',
@@ -323,17 +336,51 @@ function foldery_register_bureau_block_pattern() {
         )
     );
 
-    register_block_pattern(
-        'foldery/bureau-page',
-        array(
-            'title'       => __( 'Bureau - deux feuilles', 'foldery' ),
-            'description' => __( 'Structure editable pour le modele Bureau : contenu principal a gauche, contenu lateral a droite.', 'foldery' ),
-            'categories'  => array( 'foldery' ),
-            'content'     => '<!-- wp:columns {"className":"is-style-bureau-layout"} --><div class="wp-block-columns is-style-bureau-layout"><!-- wp:column {"width":"68%"} --><div class="wp-block-column" style="flex-basis:68%"><!-- wp:heading {"className":"is-style-bureau-label"} --><h2 class="wp-block-heading is-style-bureau-label">Titre principal</h2><!-- /wp:heading --><!-- wp:paragraph {"className":"is-style-bureau-typewritten"} --><p class="is-style-bureau-typewritten">Ajoutez ici le contenu principal de la page.</p><!-- /wp:paragraph --></div><!-- /wp:column --><!-- wp:column {"width":"32%"} --><div class="wp-block-column" style="flex-basis:32%"><!-- wp:heading {"level":3,"className":"is-style-bureau-label"} --><h3 class="wp-block-heading is-style-bureau-label">Note</h3><!-- /wp:heading --><!-- wp:paragraph {"className":"is-style-bureau-typewritten"} --><p class="is-style-bureau-typewritten">Ajoutez ici la colonne laterale.</p><!-- /wp:paragraph --></div><!-- /wp:column --></div><!-- /wp:columns -->',
-        )
+    if ( ! $registry->is_registered( 'foldery/bureau-page' ) ) {
+        register_block_pattern(
+            'foldery/bureau-page',
+            array(
+                'title'       => __( 'Bureau - deux feuilles', 'foldery' ),
+                'description' => __( 'Structure editable pour le modele Bureau : contenu principal a gauche, contenu lateral a droite.', 'foldery' ),
+                'categories'  => array( 'foldery' ),
+                'content'     => '<!-- wp:columns {"className":"is-style-bureau-layout"} --><div class="wp-block-columns is-style-bureau-layout"><!-- wp:column {"width":"68%"} --><div class="wp-block-column" style="flex-basis:68%"><!-- wp:heading {"className":"is-style-bureau-label"} --><h2 class="wp-block-heading is-style-bureau-label">Titre principal</h2><!-- /wp:heading --><!-- wp:paragraph {"className":"is-style-bureau-typewritten"} --><p class="is-style-bureau-typewritten">Ajoutez ici le contenu principal de la page.</p><!-- /wp:paragraph --></div><!-- /wp:column --><!-- wp:column {"width":"32%"} --><div class="wp-block-column" style="flex-basis:32%"><!-- wp:heading {"level":3,"className":"is-style-bureau-label"} --><h3 class="wp-block-heading is-style-bureau-label">Note</h3><!-- /wp:heading --><!-- wp:paragraph {"className":"is-style-bureau-typewritten"} --><p class="is-style-bureau-typewritten">Ajoutez ici la colonne laterale.</p><!-- /wp:paragraph --></div><!-- /wp:column --></div><!-- /wp:columns -->',
+            )
+        );
+    }
+
+    $atelier_patterns = array(
+        'foldery/atelier-main-sheet'    => array(
+            'title' => __( 'Atelier - feuille principale', 'foldery' ),
+            'file'  => 'atelier-main-sheet.php',
+        ),
+        'foldery/atelier-sidebar-sheet' => array(
+            'title' => __( 'Atelier - feuille laterale', 'foldery' ),
+            'file'  => 'atelier-sidebar-sheet.php',
+        ),
     );
+
+    foreach ( $atelier_patterns as $slug => $pattern ) {
+        if ( $registry->is_registered( $slug ) ) {
+            continue;
+        }
+
+        $content = foldery_get_pattern_file_content( $pattern['file'] );
+        if ( '' === $content ) {
+            continue;
+        }
+
+        register_block_pattern(
+            $slug,
+            array(
+                'title'      => $pattern['title'],
+                'categories' => array( 'foldery' ),
+                'content'    => $content,
+                'inserter'   => false,
+            )
+        );
+    }
 }
-add_action( 'init', 'foldery_register_bureau_block_pattern' );
+add_action( 'init', 'foldery_register_block_patterns', 5 );
 
 function foldery_admin_styles() {
     wp_enqueue_style( 'foldery-admin', get_template_directory_uri() . '/assets/admin/admin.css', array(), FOLDERY_VERSION );

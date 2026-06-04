@@ -1093,6 +1093,11 @@ body.admin-bar .atelier-global-header {
   margin: 0 auto;
 }
 
+.atelier-board--large {
+  grid-template-columns: minmax(0, 1fr);
+  width: min(var(--foldery-wide-width, 1280px), calc(100vw - 38px));
+}
+
 .atelier-sheet--main {
   min-height: 0;
 }
