@@ -859,6 +859,7 @@ body.atelier-template #wpadminbar {
 .atelier-page {
   --atelier-paper: url("../images/paper-bg.jpg");
   --atelier-ink: #211b17;
+  --atelier-hero-end-overlay: 58px;
   position: relative;
   min-height: 100vh;
   overflow-x: clip;
@@ -873,6 +874,16 @@ body.atelier-template #wpadminbar {
   z-index: 90;
   width: 100vw;
   margin: 0;
+  pointer-events: none;
+}
+
+.atelier-global-header a,
+.atelier-global-header button,
+.atelier-global-header input,
+.atelier-global-header select,
+.atelier-global-header textarea,
+.atelier-global-header [tabindex] {
+  pointer-events: auto;
 }
 
 body.admin-bar .atelier-global-header {
@@ -880,14 +891,13 @@ body.admin-bar .atelier-global-header {
 }
 
 .atelier-hero {
-  --atelier-hero-end-overlay: 90px;
   --atelier-artwork-size: clamp(160px, min(16vw, 25svh), 285px);
   --atelier-artwork-image-max: clamp(205px, min(21vw, 33svh), 370px);
   position: relative;
   isolation: isolate;
   box-sizing: border-box;
-  height: calc(100svh + var(--atelier-hero-end-overlay));
-  min-height: 620px;
+  height: calc(82svh + var(--atelier-hero-end-overlay));
+  min-height: 520px;
   margin-top: 0;
   padding: 0;
   background-image: var(--atelier-hero-image);
@@ -1079,8 +1089,8 @@ body.admin-bar .atelier-global-header {
 .atelier-paper-zone {
   position: relative;
   z-index: 4;
-  margin-top: -1px;
-  padding: clamp(46px, 7vw, 86px) 0 clamp(64px, 8vw, 110px);
+  margin-top: calc(0px - var(--atelier-hero-end-overlay, 58px));
+  padding: clamp(18px, 2.8vw, 34px) 0 clamp(64px, 8vw, 110px);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0)),
     var(--atelier-paper),
@@ -1116,8 +1126,8 @@ body.admin-bar .atelier-global-header {
   .atelier-hero {
     --atelier-artwork-size: clamp(112px, min(34vw, 24svh), 190px);
     --atelier-artwork-image-max: clamp(145px, min(43vw, 31svh), 247px);
-    height: calc(100svh + var(--atelier-hero-end-overlay));
-    min-height: 650px;
+    height: calc(88svh + var(--atelier-hero-end-overlay));
+    min-height: 620px;
   }
 
   .atelier-hero__copy {
@@ -1191,6 +1201,7 @@ body.admin-bar .atelier-global-header {
   }
 
   .atelier-paper-zone {
-    padding-top: 34px;
+    margin-top: calc(0px - var(--atelier-hero-end-overlay, 58px));
+    padding-top: 22px;
   }
 }
