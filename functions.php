@@ -4,11 +4,11 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '3.0.5' );
+    define( 'FOLDERY_VERSION', '3.0.6' );
 }
 
 if ( ! isset( $content_width ) ) {
-    $content_width = 1170;
+    $content_width = 1024;
 }
 
 function foldery_upload_size_limit( $size ) {
@@ -28,7 +28,9 @@ function foldery_register_shared_styles() {
 add_action( 'init', 'foldery_register_shared_styles', 5 );
 
 require get_template_directory() . '/inc/media-folders/bootstrap.php';
+require get_template_directory() . '/inc/theme-settings.php';
 require get_template_directory() . '/inc/lightbox/bootstrap.php';
+require get_template_directory() . '/inc/site-header-block.php';
 require get_template_directory() . '/inc/foldery-explorer-block.php';
 
 function foldery_setup() {
@@ -224,6 +226,7 @@ function foldery_scripts_styles() {
     foldery_register_shared_styles();
 
     wp_enqueue_style( 'foldery-site' );
+    wp_enqueue_script( 'foldery-header', get_template_directory_uri() . '/assets/js/foldery-header.js', array(), FOLDERY_VERSION, true );
 
     if ( foldery_is_bureau_template() ) {
         wp_enqueue_style( 'foldery-bureau' );

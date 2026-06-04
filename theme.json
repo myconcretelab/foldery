@@ -25,8 +25,8 @@
   "settings": {
     "appearanceTools": true,
     "layout": {
-      "contentSize": "1170px",
-      "wideSize": "1400px"
+      "contentSize": "1024px",
+      "wideSize": "1280px"
     },
     "color": {
       "palette": [

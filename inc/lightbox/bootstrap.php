@@ -4,7 +4,7 @@
  */
 
 function foldery_lightbox_options() {
-    return array(
+    $defaults = array(
         'enabled' => true,
         'groupLinks' => true,
         'groupByPost' => true,
@@ -25,6 +25,20 @@ function foldery_lightbox_options() {
             'slideshowStop' => __( 'Stop slideshow', 'foldery' ),
             'groupStatus' => __( 'Image %current% of %total%', 'foldery' ),
         ),
+    );
+
+    if ( ! function_exists( 'foldery_theme_settings' ) ) {
+        return $defaults;
+    }
+
+    $settings = foldery_theme_settings();
+    if ( empty( $settings['lightbox'] ) || ! is_array( $settings['lightbox'] ) ) {
+        return $defaults;
+    }
+
+    return array_replace(
+        $defaults,
+        array_intersect_key( $settings['lightbox'], $defaults )
     );
 }
 

@@ -1,0 +1,151 @@
+<?php
+/**
+ * Dynamic global header.
+ */
+
+function foldery_header_social_links() {
+    $settings = function_exists( 'foldery_theme_settings' ) ? foldery_theme_settings() : array();
+    $raw      = isset( $settings['social_links'] ) ? (string) $settings['social_links'] : '';
+    $links    = array();
+
+    foreach ( preg_split( '/\r\n|\r|\n/', $raw ) as $line ) {
+        $line = trim( $line );
+        if ( '' === $line ) {
+            continue;
+        }
+
+        $parts   = array_map( 'trim', explode( '|', $line, 2 ) );
+        $links[] = array(
+            'label' => $parts[0],
+            'url'   => isset( $parts[1] ) ? $parts[1] : '',
+        );
+    }
+
+    return $links;
+}
+
+function foldery_header_logo_html() {
+    $custom_logo_id = absint( get_theme_mod( 'custom_logo' ) );
+    $image          = $custom_logo_id ? wp_get_attachment_image( $custom_logo_id, 'medium', false, array( 'class' => 'foldery-paper-header__logo-image' ) ) : '';
+
+    if ( '' === $image ) {
+        $fallback = get_template_directory_uri() . '/assets/images/logo.png';
+        $image    = '<img class="foldery-paper-header__logo-image" src="' . esc_url( $fallback ) . '" alt="' . esc_attr( get_bloginfo( 'name' ) ) . '">';
+    }
+
+    return '<a class="foldery-paper-header__logo" href="' . esc_url( home_url( '/' ) ) . '" aria-label="' . esc_attr( get_bloginfo( 'name' ) ) . '">' . $image . '</a>';
+}
+
+function foldery_header_menu_html( $attributes ) {
+    if ( function_exists( 'foldery_explorer_render_menu_block' ) ) {
+        return foldery_explorer_render_menu_block(
+            array(
+                'folderIds'    => isset( $attributes['menuFolderIds'] ) ? $attributes['menuFolderIds'] : '',
+                'showSubmenus' => ! empty( $attributes['showSubmenus'] ),
+                'ariaLabel'    => isset( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : __( 'Menu principal', 'foldery' ),
+                'className'    => 'foldery-paper-header__menu',
+            )
+        );
+    }
+
+    if ( has_nav_menu( 'primary' ) ) {
+        return wp_nav_menu(
+            array(
+                'theme_location' => 'primary',
+                'container'      => 'nav',
+                'container_class'=> 'foldery-paper-header__menu',
+                'echo'           => false,
+                'fallback_cb'    => false,
+            )
+        );
+    }
+
+    return '';
+}
+
+function foldery_header_render_link_or_text( $label, $url, $class_name = '' ) {
+    if ( '' === $label ) {
+        return '';
+    }
+
+    if ( '' !== $url ) {
+        return '<a class="' . esc_attr( $class_name ) . '" href="' . esc_url( $url ) . '">' . esc_html( $label ) . '</a>';
+    }
+
+    return '<span class="' . esc_attr( $class_name ) . '">' . esc_html( $label ) . '</span>';
+}
+
+function foldery_render_site_header_block( $attributes ) {
+    $settings = function_exists( 'foldery_theme_settings' ) ? foldery_theme_settings() : array();
+    $classes  = 'foldery-paper-header';
+    if ( ! empty( $attributes['className'] ) ) {
+        $extra_classes = array_filter( array_map( 'sanitize_html_class', preg_split( '/\s+/', $attributes['className'] ) ) );
+        $classes      .= ' ' . implode( ' ', $extra_classes );
+    }
+
+    $artist_name     = $settings['artist_name'] ?? get_bloginfo( 'name' );
+    $artist_baseline = $settings['artist_baseline'] ?? get_bloginfo( 'description' );
+    $phone           = $settings['phone'] ?? '';
+    $email           = $settings['email'] ?? get_option( 'admin_email' );
+    $action_label    = $settings['header_link_label'] ?? '';
+    $action_url      = $settings['header_link_url'] ?? '';
+    $menu            = foldery_header_menu_html( $attributes );
+
+    ob_start();
+    ?>
+    <header class="<?php echo esc_attr( $classes ); ?>" data-foldery-paper-header>
+        <div class="foldery-paper-header__paper">
+            <?php echo foldery_header_logo_html(); ?>
+            <div class="foldery-paper-header__content">
+                <section class="foldery-paper-header__column foldery-paper-header__column--artist" aria-label="<?php esc_attr_e( 'Artiste', 'foldery' ); ?>">
+                    <?php if ( $artist_name ) : ?>
+                        <h2><?php echo esc_html( $artist_name ); ?></h2>
+                    <?php endif; ?>
+                    <?php if ( $artist_baseline ) : ?>
+                        <p><?php echo esc_html( $artist_baseline ); ?></p>
+                    <?php endif; ?>
+                    <?php foreach ( foldery_header_social_links() as $link ) : ?>
+                        <p><?php echo foldery_header_render_link_or_text( $link['label'], $link['url'], 'foldery-paper-header__social-link' ); ?></p>
+                    <?php endforeach; ?>
+                </section>
+
+                <section class="foldery-paper-header__column foldery-paper-header__column--contact" aria-label="<?php esc_attr_e( 'Contact', 'foldery' ); ?>">
+                    <h2><?php esc_html_e( 'CONTACT', 'foldery' ); ?></h2>
+                    <?php if ( $phone ) : ?>
+                        <p><a href="<?php echo esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ); ?>"><?php echo esc_html( $phone ); ?></a></p>
+                    <?php endif; ?>
+                    <?php if ( $email ) : ?>
+                        <p><a href="<?php echo esc_url( 'mailto:' . $email ); ?>"><?php echo esc_html( $email ); ?></a></p>
+                    <?php endif; ?>
+                </section>
+
+                <section class="foldery-paper-header__column foldery-paper-header__column--action" aria-label="<?php esc_attr_e( 'Lien principal', 'foldery' ); ?>">
+                    <?php if ( $action_label ) : ?>
+                        <?php echo foldery_header_render_link_or_text( $action_label, $action_url, 'foldery-paper-header__action-link' ); ?>
+                    <?php endif; ?>
+                </section>
+            </div>
+        </div>
+        <?php echo $menu; ?>
+    </header>
+    <?php
+
+    return ob_get_clean();
+}
+
+function foldery_register_site_header_block() {
+    register_block_type(
+        'foldery/site-header',
+        array(
+            'api_version'     => 3,
+            'render_callback' => 'foldery_render_site_header_block',
+            'attributes'      => array(
+                'menuFolderIds' => array( 'type' => 'string', 'default' => '' ),
+                'showSubmenus' => array( 'type' => 'boolean', 'default' => true ),
+                'ariaLabel'    => array( 'type' => 'string', 'default' => 'Menu principal' ),
+                'className'    => array( 'type' => 'string' ),
+            ),
+        )
+    );
+}
+add_action( 'init', 'foldery_register_site_header_block' );
