@@ -19,12 +19,27 @@ if ( ! defined( 'FOLDERY_ATELIER_ARTWORKS_META' ) ) {
     define( 'FOLDERY_ATELIER_ARTWORKS_META', '_foldery_atelier_artwork_ids' );
 }
 
+if ( ! defined( 'FOLDERY_ATELIER_OVERLAY_COLOR_META' ) ) {
+    define( 'FOLDERY_ATELIER_OVERLAY_COLOR_META', '_foldery_atelier_overlay_color' );
+}
+
+if ( ! defined( 'FOLDERY_ATELIER_OVERLAY_OPACITY_META' ) ) {
+    define( 'FOLDERY_ATELIER_OVERLAY_OPACITY_META', '_foldery_atelier_overlay_opacity' );
+}
+
+if ( ! defined( 'FOLDERY_ATELIER_VIGNETTE_META' ) ) {
+    define( 'FOLDERY_ATELIER_VIGNETTE_META', '_foldery_atelier_vignette' );
+}
+
 function foldery_atelier_meta_keys() {
     return array(
         FOLDERY_ATELIER_HERO_IMAGE_META,
         FOLDERY_ATELIER_TITLE_META,
         FOLDERY_ATELIER_SUBTITLE_META,
         FOLDERY_ATELIER_ARTWORKS_META,
+        FOLDERY_ATELIER_OVERLAY_COLOR_META,
+        FOLDERY_ATELIER_OVERLAY_OPACITY_META,
+        FOLDERY_ATELIER_VIGNETTE_META,
     );
 }
 
@@ -47,6 +62,25 @@ function foldery_atelier_parse_ids( $ids ) {
 
 function foldery_atelier_clamp_int( $value, $min, $max ) {
     return min( $max, max( $min, absint( $value ) ) );
+}
+
+function foldery_atelier_default_overlay_settings() {
+    return array(
+        'color'    => '#15100c',
+        'opacity'  => 34,
+        'vignette' => 46,
+    );
+}
+
+function foldery_atelier_sanitize_overlay_color( $value ) {
+    $defaults = foldery_atelier_default_overlay_settings();
+    $color = sanitize_hex_color( $value );
+
+    return $color ? $color : $defaults['color'];
+}
+
+function foldery_atelier_sanitize_percent_meta( $value ) {
+    return (string) foldery_atelier_clamp_int( $value, 0, 100 );
 }
 
 function foldery_atelier_default_artwork( $attachment_id ) {
@@ -122,6 +156,10 @@ function foldery_atelier_register_meta() {
             $sanitize_callback = 'foldery_atelier_sanitize_ids_meta';
         } elseif ( FOLDERY_ATELIER_ARTWORKS_META === $key ) {
             $sanitize_callback = 'foldery_atelier_sanitize_artworks_meta';
+        } elseif ( FOLDERY_ATELIER_OVERLAY_COLOR_META === $key ) {
+            $sanitize_callback = 'foldery_atelier_sanitize_overlay_color';
+        } elseif ( in_array( $key, array( FOLDERY_ATELIER_OVERLAY_OPACITY_META, FOLDERY_ATELIER_VIGNETTE_META ), true ) ) {
+            $sanitize_callback = 'foldery_atelier_sanitize_percent_meta';
         }
 
         register_post_meta(
@@ -149,6 +187,45 @@ function foldery_atelier_sanitize_artworks_meta( $value ) {
     $artworks = foldery_atelier_parse_artworks( $value );
 
     return $artworks ? wp_json_encode( $artworks ) : '';
+}
+
+function foldery_atelier_hex_to_rgb( $color ) {
+    $color = ltrim( foldery_atelier_sanitize_overlay_color( $color ), '#' );
+
+    return array(
+        hexdec( substr( $color, 0, 2 ) ),
+        hexdec( substr( $color, 2, 2 ) ),
+        hexdec( substr( $color, 4, 2 ) ),
+    );
+}
+
+function foldery_atelier_rgba( $color, $opacity ) {
+    $rgb     = foldery_atelier_hex_to_rgb( $color );
+    $opacity = foldery_atelier_clamp_int( $opacity, 0, 100 ) / 100;
+
+    return sprintf( 'rgba(%1$d, %2$d, %3$d, %.2F)', $rgb[0], $rgb[1], $rgb[2], $opacity );
+}
+
+function foldery_atelier_overlay_settings( $post_id ) {
+    $defaults = foldery_atelier_default_overlay_settings();
+    $color    = foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_OVERLAY_COLOR_META );
+    $opacity  = foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_OVERLAY_OPACITY_META );
+    $vignette = foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_VIGNETTE_META );
+
+    return array(
+        'color'    => '' !== $color ? foldery_atelier_sanitize_overlay_color( $color ) : $defaults['color'],
+        'opacity'  => '' !== $opacity ? foldery_atelier_clamp_int( $opacity, 0, 100 ) : $defaults['opacity'],
+        'vignette' => '' !== $vignette ? foldery_atelier_clamp_int( $vignette, 0, 100 ) : $defaults['vignette'],
+    );
+}
+
+function foldery_atelier_hero_style( $hero_url, $overlay ) {
+    return sprintf(
+        '--atelier-hero-image: url("%1$s"); --atelier-hero-overlay: %2$s; --atelier-hero-vignette: %3$s;',
+        esc_url( $hero_url ),
+        foldery_atelier_rgba( $overlay['color'], $overlay['opacity'] ),
+        foldery_atelier_rgba( $overlay['color'], $overlay['vignette'] )
+    );
 }
 
 function foldery_atelier_tape_style( $attachment_id, $index, $tape_index, $count ) {
@@ -266,10 +343,11 @@ function foldery_render_atelier_hero_block() {
     $title    = trim( (string) foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_TITLE_META ) );
     $subtitle = trim( (string) foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_SUBTITLE_META ) );
     $artworks = foldery_atelier_parse_artworks( foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_ARTWORKS_META ) );
+    $overlay  = foldery_atelier_overlay_settings( $post_id );
 
     ob_start();
     ?>
-    <section class="atelier-hero" style="<?php echo esc_attr( '--atelier-hero-image: url("' . esc_url( $hero_url ) . '");' ); ?>" aria-label="<?php esc_attr_e( 'Atelier', 'foldery' ); ?>">
+    <section class="atelier-hero" style="<?php echo esc_attr( foldery_atelier_hero_style( $hero_url, $overlay ) ); ?>" aria-label="<?php esc_attr_e( 'Atelier', 'foldery' ); ?>">
         <div class="atelier-hero__shade"></div>
         <div class="atelier-hero__inner">
             <div class="atelier-hero__copy">
@@ -379,6 +457,7 @@ function foldery_atelier_render_meta_box( $post ) {
     $title         = (string) foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_TITLE_META );
     $subtitle      = (string) foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_SUBTITLE_META );
     $artworks      = foldery_atelier_parse_artworks( foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_ARTWORKS_META ) );
+    $overlay       = foldery_atelier_overlay_settings( $post->ID );
 
     wp_nonce_field( 'foldery_atelier_save_meta', 'foldery_atelier_nonce' );
     ?>
@@ -391,6 +470,22 @@ function foldery_atelier_render_meta_box( $post ) {
             <label for="foldery-atelier-subtitle"><strong><?php esc_html_e( 'Sous-titre', 'foldery' ); ?></strong></label>
             <textarea id="foldery-atelier-subtitle" name="foldery_atelier_subtitle" rows="3" class="widefat"><?php echo esc_textarea( $subtitle ); ?></textarea>
         </p>
+
+        <div class="foldery-atelier-overlay-controls">
+            <strong><?php esc_html_e( 'Lisibilite du heros', 'foldery' ); ?></strong>
+            <label class="foldery-atelier-control-row" for="foldery-atelier-overlay-color">
+                <span><?php esc_html_e( 'Couleur', 'foldery' ); ?></span>
+                <input type="color" id="foldery-atelier-overlay-color" name="foldery_atelier_overlay_color" value="<?php echo esc_attr( $overlay['color'] ); ?>">
+            </label>
+            <label class="foldery-atelier-control-row">
+                <span><?php esc_html_e( 'Opacite', 'foldery' ); ?> <output><?php echo esc_html( $overlay['opacity'] ); ?>%</output></span>
+                <input type="range" class="foldery-atelier-percent-field" name="foldery_atelier_overlay_opacity" min="0" max="100" step="1" value="<?php echo esc_attr( $overlay['opacity'] ); ?>">
+            </label>
+            <label class="foldery-atelier-control-row">
+                <span><?php esc_html_e( 'Vignettage', 'foldery' ); ?> <output><?php echo esc_html( $overlay['vignette'] ); ?>%</output></span>
+                <input type="range" class="foldery-atelier-percent-field" name="foldery_atelier_vignette" min="0" max="100" step="1" value="<?php echo esc_attr( $overlay['vignette'] ); ?>">
+            </label>
+        </div>
 
         <div class="foldery-atelier-media-field" data-foldery-media-field="single">
             <strong><?php esc_html_e( 'Image du bureau', 'foldery' ); ?></strong>
@@ -441,6 +536,17 @@ function foldery_atelier_save_meta( $post_id ) {
     $subtitle = isset( $_POST['foldery_atelier_subtitle'] ) ? sanitize_textarea_field( wp_unslash( $_POST['foldery_atelier_subtitle'] ) ) : '';
     update_post_meta( $post_id, FOLDERY_ATELIER_SUBTITLE_META, $subtitle );
 
+    $overlay_defaults = foldery_atelier_default_overlay_settings();
+
+    $overlay_color = isset( $_POST['foldery_atelier_overlay_color'] ) ? foldery_atelier_sanitize_overlay_color( wp_unslash( $_POST['foldery_atelier_overlay_color'] ) ) : $overlay_defaults['color'];
+    update_post_meta( $post_id, FOLDERY_ATELIER_OVERLAY_COLOR_META, $overlay_color );
+
+    $overlay_opacity = isset( $_POST['foldery_atelier_overlay_opacity'] ) ? foldery_atelier_sanitize_percent_meta( wp_unslash( $_POST['foldery_atelier_overlay_opacity'] ) ) : (string) $overlay_defaults['opacity'];
+    update_post_meta( $post_id, FOLDERY_ATELIER_OVERLAY_OPACITY_META, $overlay_opacity );
+
+    $vignette = isset( $_POST['foldery_atelier_vignette'] ) ? foldery_atelier_sanitize_percent_meta( wp_unslash( $_POST['foldery_atelier_vignette'] ) ) : (string) $overlay_defaults['vignette'];
+    update_post_meta( $post_id, FOLDERY_ATELIER_VIGNETTE_META, $vignette );
+
     $hero_image_id = isset( $_POST['foldery_atelier_hero_image_id'] ) ? absint( $_POST['foldery_atelier_hero_image_id'] ) : 0;
     update_post_meta( $post_id, FOLDERY_ATELIER_HERO_IMAGE_META, $hero_image_id ? (string) $hero_image_id : '' );
 
@@ -470,6 +576,9 @@ function foldery_atelier_admin_assets( $hook ) {
                 'foldery_atelier_title'         => FOLDERY_ATELIER_TITLE_META,
                 'foldery_atelier_subtitle'      => FOLDERY_ATELIER_SUBTITLE_META,
                 'foldery_atelier_artwork_ids'   => FOLDERY_ATELIER_ARTWORKS_META,
+                'foldery_atelier_overlay_color' => FOLDERY_ATELIER_OVERLAY_COLOR_META,
+                'foldery_atelier_overlay_opacity' => FOLDERY_ATELIER_OVERLAY_OPACITY_META,
+                'foldery_atelier_vignette'      => FOLDERY_ATELIER_VIGNETTE_META,
             ),
         )
     );

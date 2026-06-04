@@ -108,6 +108,28 @@
     return JSON.stringify((items || []).map(normalizeArtworkItem).filter(Boolean));
   }
 
+  function clampPercent(value, fallback) {
+    value = parseInt(value, 10);
+    if (isNaN(value)) {
+      value = fallback;
+    }
+
+    return Math.min(100, Math.max(0, value));
+  }
+
+  function sanitizeHexColor(value, fallback) {
+    value = String(value || '').trim();
+
+    return /^#[0-9a-f]{6}$/i.test(value) ? value : fallback;
+  }
+
+  function hexToRgba(value, opacity) {
+    value = sanitizeHexColor(value, '#15100c').replace('#', '');
+    opacity = clampPercent(opacity, 34) / 100;
+
+    return 'rgba(' + parseInt(value.substr(0, 2), 16) + ', ' + parseInt(value.substr(2, 2), 16) + ', ' + parseInt(value.substr(4, 2), 16) + ', ' + opacity.toFixed(2) + ')';
+  }
+
   function flattenFolders(folders, output) {
     output = output || [];
 
@@ -534,12 +556,19 @@
     var title = String(meta[atelierMetaKeys.title] || '').trim();
     var subtitle = String(meta[atelierMetaKeys.subtitle] || '').trim();
     var artworks = props.atelier.artworkItems.slice(0, 6);
+    var overlayColor = sanitizeHexColor(meta[atelierMetaKeys.overlayColor], '#15100c');
+    var overlayOpacity = clampPercent(meta[atelierMetaKeys.overlayOpacity], 34);
+    var vignette = clampPercent(meta[atelierMetaKeys.vignette], 46);
 
     return el(
       'section',
       {
         className: 'atelier-hero',
-        style: { '--atelier-hero-image': 'url("' + heroUrl + '")' },
+        style: {
+          '--atelier-hero-image': 'url("' + heroUrl + '")',
+          '--atelier-hero-overlay': hexToRgba(overlayColor, overlayOpacity),
+          '--atelier-hero-vignette': hexToRgba(overlayColor, vignette)
+        },
         'aria-label': __('Atelier', 'foldery')
       },
       el('div', { className: 'atelier-hero__shade' }),

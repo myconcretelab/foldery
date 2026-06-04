@@ -344,7 +344,13 @@
     syncArtworkField($field);
   });
 
-  $(document).on('input change', '#foldery-atelier-title, #foldery-atelier-subtitle', function() {
+  $(document).on('input change', '.foldery-atelier-percent-field', function() {
+    var value = clamp($(this).val(), 0, 100);
+    $(this).val(value).closest('label').find('output').text(value + '%');
+    syncMetaField($(this));
+  });
+
+  $(document).on('input change', '#foldery-atelier-title, #foldery-atelier-subtitle, #foldery-atelier-overlay-color', function() {
     syncMetaField($(this));
   });
 

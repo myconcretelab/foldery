@@ -47,6 +47,51 @@
 	margin: 8px 0 0;
 }
 
+.foldery-atelier-overlay-controls {
+	display: grid;
+	gap: 8px;
+	margin: 16px 0 0;
+	padding: 10px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+}
+
+.foldery-atelier-overlay-controls strong {
+	margin: 0;
+}
+
+.foldery-atelier-control-row {
+	display: grid;
+	grid-template-columns: 82px minmax(0, 1fr);
+	gap: 8px;
+	align-items: center;
+	margin: 0;
+	color: #50575e;
+	font-size: 12px;
+}
+
+.foldery-atelier-control-row span {
+	display: flex;
+	justify-content: space-between;
+	gap: 4px;
+}
+
+.foldery-atelier-control-row output {
+	color: #1d2327;
+	font-variant-numeric: tabular-nums;
+}
+
+.foldery-atelier-control-row input[type="range"] {
+	width: 100%;
+	margin: 0;
+}
+
+.foldery-atelier-control-row input[type="color"] {
+	width: 52px;
+	height: 28px;
+	padding: 0 2px;
+}
+
 .foldery-atelier-artwork-list {
 	display: grid;
 	gap: 8px;
