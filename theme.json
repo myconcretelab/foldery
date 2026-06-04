@@ -8,6 +8,13 @@
       "postTypes": [
         "page"
       ]
+    },
+    {
+      "name": "atelier",
+      "title": "Atelier",
+      "postTypes": [
+        "page"
+      ]
     }
   ],
   "templateParts": [

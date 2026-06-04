@@ -4,7 +4,7 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '3.0.18' );
+    define( 'FOLDERY_VERSION', '3.0.19' );
 }
 
 if ( ! isset( $content_width ) ) {
@@ -32,6 +32,7 @@ require get_template_directory() . '/inc/theme-settings.php';
 require get_template_directory() . '/inc/lightbox/bootstrap.php';
 require get_template_directory() . '/inc/site-header-block.php';
 require get_template_directory() . '/inc/foldery-explorer-block.php';
+require get_template_directory() . '/inc/atelier.php';
 
 function foldery_setup() {
     load_theme_textdomain( 'foldery', get_template_directory() . '/languages' );
@@ -72,6 +73,10 @@ function foldery_body_classes( $classes ) {
         $classes[] = 'bureau-template';
     }
 
+    if ( foldery_is_atelier_template() ) {
+        $classes[] = 'atelier-template';
+    }
+
     return $classes;
 }
 add_filter( 'body_class', 'foldery_body_classes' );
@@ -84,6 +89,16 @@ function foldery_is_bureau_template() {
     $template_slug = (string) get_page_template_slug( get_queried_object_id() );
 
     return false !== strpos( $template_slug, 'bureau' );
+}
+
+function foldery_is_atelier_template() {
+    if ( ! is_singular( 'page' ) ) {
+        return false;
+    }
+
+    $template_slug = (string) get_page_template_slug( get_queried_object_id() );
+
+    return false !== strpos( $template_slug, 'atelier' );
 }
 
 function foldery_should_use_relative_dev_urls() {
@@ -228,7 +243,7 @@ function foldery_scripts_styles() {
     wp_enqueue_style( 'foldery-site' );
     wp_enqueue_script( 'foldery-header', get_template_directory_uri() . '/assets/js/foldery-header.js', array(), FOLDERY_VERSION, true );
 
-    if ( foldery_is_bureau_template() ) {
+    if ( foldery_is_bureau_template() || foldery_is_atelier_template() ) {
         wp_enqueue_style( 'foldery-bureau' );
     }
 

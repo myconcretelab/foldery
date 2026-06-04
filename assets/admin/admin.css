@@ -5,3 +5,44 @@
 	font-size: 30px;
 	color: red;
 }
+
+.foldery-atelier-fields p {
+	margin: 0 0 14px;
+}
+
+.foldery-atelier-fields label,
+.foldery-atelier-media-field strong {
+	display: block;
+	margin-bottom: 6px;
+}
+
+.foldery-atelier-media-field {
+	margin-top: 16px;
+}
+
+.foldery-atelier-media-preview {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 8px;
+	min-height: 44px;
+	padding: 8px;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+}
+
+.foldery-atelier-media-preview--grid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.foldery-atelier-media-preview img {
+	display: block;
+	width: 100%;
+	height: auto;
+}
+
+.foldery-atelier-media-actions {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin: 8px 0 0;
+}

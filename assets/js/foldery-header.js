@@ -11,8 +11,14 @@
       header.classList.remove('is-compact');
     }
 
+    var headerHeight = header.offsetHeight;
+    var headerTop = Math.max(0, header.getBoundingClientRect().top);
+    var headerReserve = headerTop + headerHeight;
+
     header.style.removeProperty('--foldery-paper-header-height');
-    header.style.setProperty('--foldery-paper-header-height', header.offsetHeight + 'px');
+    header.style.setProperty('--foldery-paper-header-height', headerHeight + 'px');
+    document.documentElement.style.setProperty('--foldery-paper-header-height', headerHeight + 'px');
+    document.documentElement.style.setProperty('--foldery-paper-header-reserve', headerReserve + 'px');
 
     if (wasCompact) {
       header.classList.add('is-compact');
