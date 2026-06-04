@@ -51,6 +51,63 @@
     }).filter(Boolean).join(',');
   }
 
+  function normalizeArtworkItem(item) {
+    var id;
+
+    if (typeof item === 'number' || typeof item === 'string') {
+      id = parseInt(item, 10);
+      return id ? { id: id, scale: 100, tapes: 1 } : null;
+    }
+
+    if (!item || typeof item !== 'object') {
+      return null;
+    }
+
+    id = parseInt(item.id, 10);
+    if (!id) {
+      return null;
+    }
+
+    return {
+      id: id,
+      scale: Math.min(145, Math.max(55, parseInt(item.scale || 100, 10))),
+      tapes: Math.min(5, Math.max(0, parseInt(item.tapes === 0 ? 0 : item.tapes || 1, 10)))
+    };
+  }
+
+  function parseArtworkItems(value) {
+    var raw;
+    var seen = {};
+
+    value = String(value || '').trim();
+    if (!value) {
+      return [];
+    }
+
+    if (value.charAt(0) === '[') {
+      try {
+        raw = JSON.parse(value);
+      } catch (error) {
+        raw = [];
+      }
+    } else {
+      raw = value.split(',');
+    }
+
+    return (raw || []).map(normalizeArtworkItem).filter(function(item) {
+      if (!item || seen[item.id]) {
+        return false;
+      }
+
+      seen[item.id] = true;
+      return true;
+    });
+  }
+
+  function stringifyArtworkItems(items) {
+    return JSON.stringify((items || []).map(normalizeArtworkItem).filter(Boolean));
+  }
+
   function flattenFolders(folders, output) {
     output = output || [];
 
@@ -157,6 +214,56 @@
     }
 
     input.value = value || '';
+  }
+
+  function editorTapeStyle(id, index, tapeIndex, count) {
+    var positions = [
+      { left: '18%', top: '-14px', rotate: -8, axis: 'x' },
+      { left: '50%', top: '-14px', rotate: 3, axis: 'x' },
+      { left: '82%', top: '-14px', rotate: 8, axis: 'x' },
+      { right: '-34px', top: '22%', rotate: 84, axis: 'y' },
+      { right: '-34px', top: '50%', rotate: 92, axis: 'y' },
+      { right: '-34px', top: '78%', rotate: 99, axis: 'y' },
+      { left: '82%', bottom: '-14px', rotate: -6, axis: 'x' },
+      { left: '50%', bottom: '-14px', rotate: 3, axis: 'x' },
+      { left: '18%', bottom: '-14px', rotate: 7, axis: 'x' },
+      { left: '-34px', top: '78%', rotate: -96, axis: 'y' },
+      { left: '-34px', top: '50%', rotate: -88, axis: 'y' },
+      { left: '-34px', top: '22%', rotate: -82, axis: 'y' }
+    ];
+    var seed = Math.abs((id * 1103515245 + index * 12345) | 0);
+    var jitterSeed = Math.abs((id * 1103515245 + index * 12345 + tapeIndex * 2654435761) | 0);
+    var step = positions.length / Math.max(1, count);
+    var position = positions[(seed % positions.length + Math.round(tapeIndex * step)) % positions.length];
+    var style = {};
+    var jitter = -4 + jitterSeed % 9;
+    var axis = position.axis === 'x' ? 'translateX(-50%)' : 'translateY(-50%)';
+
+    Object.keys(position).forEach(function(key) {
+      if (key !== 'rotate' && key !== 'axis') {
+        style[key] = position[key];
+      }
+    });
+
+    style.transform = axis + ' rotate(' + (position.rotate + jitter) + 'deg)';
+    return style;
+  }
+
+  function renderEditorTapes(artwork, index) {
+    var tapes = [];
+    var count = Math.min(5, Math.max(0, parseInt(artwork.tapes || 0, 10)));
+    var tapeIndex;
+
+    for (tapeIndex = 0; tapeIndex < count; tapeIndex++) {
+      tapes.push(el('span', {
+        key: 'tape-' + tapeIndex,
+        className: 'atelier-hero-artwork__tape',
+        style: editorTapeStyle(artwork.id, index, tapeIndex, count),
+        'aria-hidden': true
+      }));
+    }
+
+    return tapes;
   }
 
   function folderMapById(folders) {
@@ -273,7 +380,10 @@
       var meta = coreEditor.getEditedPostAttribute('meta') || {};
       var title = coreEditor.getEditedPostAttribute('title');
       var heroImageId = parseInt(meta[atelierMetaKeys.heroImage] || 0, 10);
-      var artworkIds = parseIds(meta[atelierMetaKeys.artworks]);
+      var artworkItems = parseArtworkItems(meta[atelierMetaKeys.artworks]);
+      var artworkIds = artworkItems.map(function(item) {
+        return item.id;
+      });
       var mediaIds = [heroImageId].concat(artworkIds);
       var mediaById = {};
 
@@ -287,6 +397,7 @@
         meta: meta,
         postTitle: postTitleText(title),
         heroImageId: heroImageId,
+        artworkItems: artworkItems,
         artworkIds: artworkIds,
         mediaById: mediaById
       };
@@ -304,6 +415,7 @@
       meta: editor.meta,
       postTitle: editor.postTitle,
       heroImageId: editor.heroImageId,
+      artworkItems: editor.artworkItems,
       artworkIds: editor.artworkIds,
       mediaById: editor.mediaById,
       setMetaValue: setMetaValue
@@ -394,10 +506,16 @@
           hasValue: !!props.atelier.artworkIds.length,
           onSelect: function(media) {
             var selection = Array.isArray(media) ? media : [media];
+            var existingById = props.atelier.artworkItems.reduce(function(map, item) {
+              map[item.id] = item;
+              return map;
+            }, {});
+
             props.atelier.setMetaValue(
               atelierMetaKeys.artworks,
-              stringifyIds(selection.map(function(item) {
-                return item && item.id;
+              stringifyArtworkItems(selection.map(function(item) {
+                var id = item && item.id;
+                return existingById[id] || { id: id, scale: 100, tapes: 1 };
               }))
             );
           },
@@ -413,9 +531,9 @@
     var meta = props.atelier.meta;
     var heroMedia = props.atelier.mediaById[props.atelier.heroImageId];
     var heroUrl = mediaImageUrl(heroMedia, 'full') || editorData.fallbackHeroImageUrl || '';
-    var title = String(meta[atelierMetaKeys.title] || '').trim() || props.atelier.postTitle;
+    var title = String(meta[atelierMetaKeys.title] || '').trim();
     var subtitle = String(meta[atelierMetaKeys.subtitle] || '').trim();
-    var artworks = props.atelier.artworkIds.slice(0, 6);
+    var artworks = props.atelier.artworkItems.slice(0, 6);
 
     return el(
       'section',
@@ -438,10 +556,11 @@
           ? el(
               'div',
               { className: 'atelier-hero__artworks' },
-              artworks.map(function(id, index) {
-                var media = props.atelier.mediaById[id];
+              artworks.map(function(artwork, index) {
+                var media = props.atelier.mediaById[artwork.id];
                 var imageUrl = mediaImageUrl(media, 'medium_large');
                 var fullUrl = mediaImageUrl(media, 'full') || imageUrl;
+                var style = { '--atelier-artwork-scale': String((artwork.scale || 100) / 100) };
 
                 if (!imageUrl) {
                   return null;
@@ -449,7 +568,8 @@
 
                 return el(
                   'figure',
-                  { key: id + '-' + index, className: 'atelier-hero-artwork atelier-hero-artwork--' + (index + 1) },
+                  { key: artwork.id + '-' + index, className: 'atelier-hero-artwork atelier-hero-artwork--' + (index + 1), style: style },
+                  renderEditorTapes(artwork, index),
                   el(
                     'a',
                     {

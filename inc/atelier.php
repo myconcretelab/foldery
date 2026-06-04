@@ -32,10 +32,75 @@ function foldery_atelier_parse_ids( $ids ) {
     if ( is_array( $ids ) ) {
         $raw = $ids;
     } else {
-        $raw = explode( ',', (string) $ids );
+        $value   = trim( (string) $ids );
+        $decoded = '[' === substr( $value, 0, 1 ) ? json_decode( $value, true ) : null;
+        $raw     = is_array( $decoded ) ? array_map(
+            function( $item ) {
+                return is_array( $item ) && isset( $item['id'] ) ? $item['id'] : $item;
+            },
+            $decoded
+        ) : explode( ',', $value );
     }
 
     return array_values( array_unique( array_filter( array_map( 'absint', $raw ) ) ) );
+}
+
+function foldery_atelier_clamp_int( $value, $min, $max ) {
+    return min( $max, max( $min, absint( $value ) ) );
+}
+
+function foldery_atelier_default_artwork( $attachment_id ) {
+    return array(
+        'id'    => absint( $attachment_id ),
+        'scale' => 100,
+        'tapes' => 1,
+    );
+}
+
+function foldery_atelier_normalize_artwork( $artwork ) {
+    if ( is_numeric( $artwork ) ) {
+        return foldery_atelier_default_artwork( $artwork );
+    }
+
+    if ( ! is_array( $artwork ) ) {
+        return null;
+    }
+
+    $attachment_id = isset( $artwork['id'] ) ? absint( $artwork['id'] ) : 0;
+    if ( ! $attachment_id ) {
+        return null;
+    }
+
+    return array(
+        'id'    => $attachment_id,
+        'scale' => isset( $artwork['scale'] ) ? foldery_atelier_clamp_int( $artwork['scale'], 55, 145 ) : 100,
+        'tapes' => isset( $artwork['tapes'] ) ? foldery_atelier_clamp_int( $artwork['tapes'], 0, 5 ) : 1,
+    );
+}
+
+function foldery_atelier_parse_artworks( $value ) {
+    if ( is_array( $value ) ) {
+        $raw = $value;
+    } else {
+        $value   = trim( (string) $value );
+        $decoded = '[' === substr( $value, 0, 1 ) ? json_decode( $value, true ) : null;
+        $raw     = is_array( $decoded ) ? $decoded : foldery_atelier_parse_ids( $value );
+    }
+
+    $artworks = array();
+    $seen     = array();
+
+    foreach ( $raw as $item ) {
+        $artwork = foldery_atelier_normalize_artwork( $item );
+        if ( ! $artwork || isset( $seen[ $artwork['id'] ] ) ) {
+            continue;
+        }
+
+        $seen[ $artwork['id'] ] = true;
+        $artworks[]             = $artwork;
+    }
+
+    return $artworks;
 }
 
 function foldery_atelier_current_page_id() {
@@ -52,6 +117,13 @@ function foldery_atelier_get_meta( $post_id, $key ) {
 
 function foldery_atelier_register_meta() {
     foreach ( foldery_atelier_meta_keys() as $key ) {
+        $sanitize_callback = 'sanitize_text_field';
+        if ( FOLDERY_ATELIER_HERO_IMAGE_META === $key ) {
+            $sanitize_callback = 'foldery_atelier_sanitize_ids_meta';
+        } elseif ( FOLDERY_ATELIER_ARTWORKS_META === $key ) {
+            $sanitize_callback = 'foldery_atelier_sanitize_artworks_meta';
+        }
+
         register_post_meta(
             'page',
             $key,
@@ -61,9 +133,7 @@ function foldery_atelier_register_meta() {
                 'auth_callback'     => function() {
                     return current_user_can( 'edit_pages' );
                 },
-                'sanitize_callback' => in_array( $key, array( FOLDERY_ATELIER_HERO_IMAGE_META, FOLDERY_ATELIER_ARTWORKS_META ), true )
-                    ? 'foldery_atelier_sanitize_ids_meta'
-                    : 'sanitize_text_field',
+                'sanitize_callback' => $sanitize_callback,
                 'type'              => 'string',
             )
         );
@@ -75,7 +145,70 @@ function foldery_atelier_sanitize_ids_meta( $value ) {
     return implode( ',', foldery_atelier_parse_ids( $value ) );
 }
 
-function foldery_atelier_render_linked_image( $attachment_id, $index ) {
+function foldery_atelier_sanitize_artworks_meta( $value ) {
+    $artworks = foldery_atelier_parse_artworks( $value );
+
+    return $artworks ? wp_json_encode( $artworks ) : '';
+}
+
+function foldery_atelier_tape_style( $attachment_id, $index, $tape_index, $count ) {
+    $positions = array(
+        array( 'left' => 18, 'top' => -14, 'rotate' => -8, 'axis' => 'x' ),
+        array( 'left' => 50, 'top' => -14, 'rotate' => 3, 'axis' => 'x' ),
+        array( 'left' => 82, 'top' => -14, 'rotate' => 8, 'axis' => 'x' ),
+        array( 'right' => -34, 'top' => 22, 'rotate' => 84, 'axis' => 'y' ),
+        array( 'right' => -34, 'top' => 50, 'rotate' => 92, 'axis' => 'y' ),
+        array( 'right' => -34, 'top' => 78, 'rotate' => 99, 'axis' => 'y' ),
+        array( 'left' => 82, 'bottom' => -14, 'rotate' => -6, 'axis' => 'x' ),
+        array( 'left' => 50, 'bottom' => -14, 'rotate' => 3, 'axis' => 'x' ),
+        array( 'left' => 18, 'bottom' => -14, 'rotate' => 7, 'axis' => 'x' ),
+        array( 'left' => -34, 'top' => 78, 'rotate' => -96, 'axis' => 'y' ),
+        array( 'left' => -34, 'top' => 50, 'rotate' => -88, 'axis' => 'y' ),
+        array( 'left' => -34, 'top' => 22, 'rotate' => -82, 'axis' => 'y' ),
+    );
+    $seed      = absint( sprintf( '%u', crc32( $attachment_id . ':' . $index ) ) );
+    $count     = max( 1, foldery_atelier_clamp_int( $count, 1, 5 ) );
+    $step      = count( $positions ) / $count;
+    $position  = $positions[ ( (int) floor( $seed % count( $positions ) ) + (int) round( $tape_index * $step ) ) % count( $positions ) ];
+    $jitter    = -4 + ( ( absint( sprintf( '%u', crc32( $attachment_id . ':' . $index . ':' . $tape_index ) ) ) % 9 ) );
+    $rotation  = $position['rotate'] + $jitter;
+    $transform = 'x' === $position['axis'] ? 'translateX(-50%)' : 'translateY(-50%)';
+    $style     = '';
+
+    foreach ( array( 'left', 'right', 'top', 'bottom' ) as $key ) {
+        if ( isset( $position[ $key ] ) ) {
+            $unit   = in_array( $key, array( 'left', 'top' ), true ) && $position[ $key ] >= 0 ? '%' : 'px';
+            $style .= $key . ':' . (int) $position[ $key ] . $unit . ';';
+        }
+    }
+
+    return $style . sprintf( 'transform:%1$s rotate(%2$ddeg);', $transform, $rotation );
+}
+
+function foldery_atelier_render_tapes( $attachment_id, $index, $count ) {
+    $count = foldery_atelier_clamp_int( $count, 0, 5 );
+    if ( ! $count ) {
+        return '';
+    }
+
+    $html = '';
+    for ( $tape_index = 0; $tape_index < $count; $tape_index++ ) {
+        $html .= sprintf(
+            '<span class="atelier-hero-artwork__tape" style="%s" aria-hidden="true"></span>',
+            esc_attr( foldery_atelier_tape_style( $attachment_id, $index, $tape_index, $count ) )
+        );
+    }
+
+    return $html;
+}
+
+function foldery_atelier_render_linked_image( $artwork, $index ) {
+    $artwork       = foldery_atelier_normalize_artwork( $artwork );
+    $attachment_id = $artwork ? absint( $artwork['id'] ) : 0;
+    if ( ! $attachment_id ) {
+        return '';
+    }
+
     $image = wp_get_attachment_image(
         $attachment_id,
         'medium_large',
@@ -90,15 +223,26 @@ function foldery_atelier_render_linked_image( $attachment_id, $index ) {
         return '';
     }
 
-    $full = wp_get_attachment_image_url( $attachment_id, 'full' );
+    $scale = foldery_atelier_clamp_int( $artwork['scale'], 55, 145 ) / 100;
+    $style = '--atelier-artwork-scale: ' . number_format( $scale, 2, '.', '' ) . ';';
+    $tapes = foldery_atelier_render_tapes( $attachment_id, $index, $artwork['tapes'] );
+    $full  = wp_get_attachment_image_url( $attachment_id, 'full' );
     if ( ! $full ) {
-        return '<figure class="atelier-hero-artwork atelier-hero-artwork--' . (int) ( $index + 1 ) . '">' . $image . '</figure>';
+        return sprintf(
+            '<figure class="atelier-hero-artwork atelier-hero-artwork--%1$d" style="%2$s">%3$s%4$s</figure>',
+            (int) ( $index + 1 ),
+            esc_attr( $style ),
+            $tapes,
+            $image
+        );
     }
 
     $title = get_the_title( $attachment_id );
     $html  = sprintf(
-        '<figure class="atelier-hero-artwork atelier-hero-artwork--%1$d"><a href="%2$s" title="%3$s">%4$s</a></figure>',
+        '<figure class="atelier-hero-artwork atelier-hero-artwork--%1$d" style="%2$s">%3$s<a href="%4$s" title="%5$s">%6$s</a></figure>',
         (int) ( $index + 1 ),
+        esc_attr( $style ),
+        $tapes,
         esc_url( $full ),
         esc_attr( $title ),
         $image
@@ -121,11 +265,7 @@ function foldery_render_atelier_hero_block() {
 
     $title    = trim( (string) foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_TITLE_META ) );
     $subtitle = trim( (string) foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_SUBTITLE_META ) );
-    $artworks = foldery_atelier_parse_ids( foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_ARTWORKS_META ) );
-
-    if ( '' === $title ) {
-        $title = get_the_title( $post_id );
-    }
+    $artworks = foldery_atelier_parse_artworks( foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_ARTWORKS_META ) );
 
     ob_start();
     ?>
@@ -144,8 +284,8 @@ function foldery_render_atelier_hero_block() {
             <?php if ( ! empty( $artworks ) ) : ?>
                 <div class="atelier-hero__artworks" data-foldery-lightbox-gallery>
                     <?php
-                    foreach ( array_slice( $artworks, 0, 6 ) as $index => $artwork_id ) {
-                        echo foldery_atelier_render_linked_image( $artwork_id, $index );
+                    foreach ( array_slice( $artworks, 0, 6 ) as $index => $artwork ) {
+                        echo foldery_atelier_render_linked_image( $artwork, $index );
                     }
                     ?>
                 </div>
@@ -191,11 +331,54 @@ function foldery_atelier_media_preview( $attachment_id, $size = 'thumbnail' ) {
     return wp_get_attachment_image( $attachment_id, $size );
 }
 
+function foldery_atelier_render_artwork_control( $artwork ) {
+    $artwork = foldery_atelier_normalize_artwork( $artwork );
+    if ( ! $artwork ) {
+        return '';
+    }
+
+    $attachment_id = absint( $artwork['id'] );
+    $title         = get_the_title( $attachment_id );
+    $title         = $title ? $title : sprintf( __( 'Image #%d', 'foldery' ), $attachment_id );
+
+    ob_start();
+    ?>
+    <details class="foldery-atelier-artwork-item" data-artwork-id="<?php echo esc_attr( $attachment_id ); ?>">
+        <summary class="foldery-atelier-artwork-summary">
+            <span class="foldery-atelier-artwork-tools">
+                <span class="foldery-atelier-artwork-handle" aria-label="<?php esc_attr_e( 'Reordonner', 'foldery' ); ?>">
+                    <span class="dashicons dashicons-menu" aria-hidden="true"></span>
+                </span>
+                <button type="button" class="button-link foldery-atelier-artwork-remove" aria-label="<?php esc_attr_e( 'Retirer cette image', 'foldery' ); ?>">
+                    <span class="dashicons dashicons-trash" aria-hidden="true"></span>
+                </button>
+            </span>
+            <span class="foldery-atelier-artwork-thumb">
+                <?php echo foldery_atelier_media_preview( $attachment_id ); ?>
+            </span>
+            <span class="foldery-atelier-artwork-title"><?php echo esc_html( $title ); ?></span>
+        </summary>
+        <div class="foldery-atelier-artwork-main">
+            <label class="foldery-atelier-artwork-range">
+                <span><?php esc_html_e( 'Proportion', 'foldery' ); ?> <output><?php echo esc_html( $artwork['scale'] ); ?>%</output></span>
+                <input type="range" class="foldery-atelier-artwork-scale" min="55" max="145" step="5" value="<?php echo esc_attr( $artwork['scale'] ); ?>">
+            </label>
+            <label class="foldery-atelier-artwork-range">
+                <span><?php esc_html_e( 'Scotch', 'foldery' ); ?> <output><?php echo esc_html( $artwork['tapes'] ); ?></output></span>
+                <input type="range" class="foldery-atelier-artwork-tapes" min="0" max="5" step="1" value="<?php echo esc_attr( $artwork['tapes'] ); ?>">
+            </label>
+        </div>
+    </details>
+    <?php
+
+    return ob_get_clean();
+}
+
 function foldery_atelier_render_meta_box( $post ) {
     $hero_image_id = absint( foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_HERO_IMAGE_META ) );
     $title         = (string) foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_TITLE_META );
     $subtitle      = (string) foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_SUBTITLE_META );
-    $artwork_ids   = foldery_atelier_parse_ids( foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_ARTWORKS_META ) );
+    $artworks      = foldery_atelier_parse_artworks( foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_ARTWORKS_META ) );
 
     wp_nonce_field( 'foldery_atelier_save_meta', 'foldery_atelier_nonce' );
     ?>
@@ -223,10 +406,10 @@ function foldery_atelier_render_meta_box( $post ) {
 
         <div class="foldery-atelier-media-field" data-foldery-media-field="multiple">
             <strong><?php esc_html_e( "Oeuvres posees sur l'image", 'foldery' ); ?></strong>
-            <input type="hidden" name="foldery_atelier_artwork_ids" value="<?php echo esc_attr( implode( ',', $artwork_ids ) ); ?>">
-            <div class="foldery-atelier-media-preview foldery-atelier-media-preview--grid">
-                <?php foreach ( $artwork_ids as $artwork_id ) : ?>
-                    <?php echo foldery_atelier_media_preview( $artwork_id ); ?>
+            <input type="hidden" name="foldery_atelier_artwork_ids" value="<?php echo esc_attr( foldery_atelier_sanitize_artworks_meta( $artworks ) ); ?>">
+            <div class="foldery-atelier-artwork-list" data-foldery-atelier-artworks>
+                <?php foreach ( $artworks as $artwork ) : ?>
+                    <?php echo foldery_atelier_render_artwork_control( $artwork ); ?>
                 <?php endforeach; ?>
             </div>
             <p class="foldery-atelier-media-actions">
@@ -261,8 +444,8 @@ function foldery_atelier_save_meta( $post_id ) {
     $hero_image_id = isset( $_POST['foldery_atelier_hero_image_id'] ) ? absint( $_POST['foldery_atelier_hero_image_id'] ) : 0;
     update_post_meta( $post_id, FOLDERY_ATELIER_HERO_IMAGE_META, $hero_image_id ? (string) $hero_image_id : '' );
 
-    $artwork_ids = isset( $_POST['foldery_atelier_artwork_ids'] ) ? foldery_atelier_sanitize_ids_meta( wp_unslash( $_POST['foldery_atelier_artwork_ids'] ) ) : '';
-    update_post_meta( $post_id, FOLDERY_ATELIER_ARTWORKS_META, $artwork_ids );
+    $artworks = isset( $_POST['foldery_atelier_artwork_ids'] ) ? foldery_atelier_sanitize_artworks_meta( wp_unslash( $_POST['foldery_atelier_artwork_ids'] ) ) : '';
+    update_post_meta( $post_id, FOLDERY_ATELIER_ARTWORKS_META, $artworks );
 }
 add_action( 'save_post_page', 'foldery_atelier_save_meta' );
 
@@ -277,7 +460,7 @@ function foldery_atelier_admin_assets( $hook ) {
     }
 
     wp_enqueue_media();
-    wp_enqueue_script( 'foldery-atelier-admin', get_template_directory_uri() . '/assets/admin/atelier-hero.js', array( 'jquery' ), FOLDERY_VERSION, true );
+    wp_enqueue_script( 'foldery-atelier-admin', get_template_directory_uri() . '/assets/admin/atelier-hero.js', array( 'jquery', 'jquery-ui-sortable' ), FOLDERY_VERSION, true );
     wp_localize_script(
         'foldery-atelier-admin',
         'FolderyAtelierAdmin',
