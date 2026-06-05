@@ -174,7 +174,23 @@
     return clean ? 'tel:' + clean : '';
   }
 
-  function linkOrText(label, url, className) {
+  function lineBreakChildren(lines) {
+    var children = [];
+
+    lines.filter(Boolean).forEach(function(line, index) {
+      if (index) {
+        children.push(el('br', { key: 'br-' + index }));
+      }
+
+      children.push(line);
+    });
+
+    return children;
+  }
+
+  function linkOrText(label, url, className, key) {
+    var props = { className: className };
+
     label = String(label || '');
     url = String(url || '');
 
@@ -182,11 +198,18 @@
       return null;
     }
 
-    if (url) {
-      return el('a', { className: className, href: url, onClick: preventDefault }, label);
+    if (key) {
+      props.key = key;
     }
 
-    return el('span', { className: className }, label);
+    if (url) {
+      props.href = url;
+      props.onClick = preventDefault;
+
+      return el('a', props, label);
+    }
+
+    return el('span', props, label);
   }
 
   function preventDefault(event) {
@@ -366,17 +389,32 @@
             'section',
             { className: 'foldery-paper-header__column foldery-paper-header__column--artist', 'aria-label': __('Artiste', 'foldery') },
             artistName ? el('h2', null, artistName) : null,
-            artistBaseline ? el('p', null, artistBaseline) : null,
-            socialLinks.map(function(link, index) {
-              return el('p', { key: index }, linkOrText(link.label, link.url, 'foldery-paper-header__social-link'));
-            })
+            artistBaseline || socialLinks.length
+              ? el(
+                  'p',
+                  null,
+                  lineBreakChildren(
+                    [artistBaseline].concat(socialLinks.map(function(link, index) {
+                      return linkOrText(link.label, link.url, 'foldery-paper-header__social-link', 'social-' + index);
+                    }))
+                  )
+                )
+              : null
           ),
           el(
             'section',
             { className: 'foldery-paper-header__column foldery-paper-header__column--contact', 'aria-label': __('Contact', 'foldery') },
             el('h2', null, __('CONTACT', 'foldery')),
-            phone ? el('p', null, el('a', { href: phoneHref(phone), onClick: preventDefault }, phone)) : null,
-            email ? el('p', null, el('a', { href: 'mailto:' + email, onClick: preventDefault }, email)) : null
+            phone || email
+              ? el(
+                  'p',
+                  null,
+                  lineBreakChildren([
+                    phone ? el('a', { key: 'phone', href: phoneHref(phone), onClick: preventDefault }, phone) : null,
+                    email ? el('a', { key: 'email', href: 'mailto:' + email, onClick: preventDefault }, email) : null
+                  ])
+                )
+              : null
           ),
           el(
             'section',

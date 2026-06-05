@@ -40,7 +40,7 @@ body.admin-bar .foldery-paper-header {
 .foldery-paper-header__paper {
   position: relative;
   overflow: visible;
-  min-height: 142px;
+  min-height: 112px;
   background-color: var(--foldery-paper);
   background-image: none;
   box-shadow: none;
@@ -69,7 +69,7 @@ body.admin-bar .foldery-paper-header {
 .foldery-paper-header__logo {
   position: absolute;
   left: max(34px, calc((100vw - var(--foldery-content-width)) / 2 + 18px));
-  top: 35px;
+  top: 15px;
   z-index: 3;
   display: block;
   width: clamp(118px, 12vw, 168px);
@@ -90,7 +90,7 @@ body.admin-bar .foldery-paper-header {
   width: min(var(--foldery-content-width), calc(100vw - 32px));
   max-height: 240px;
   margin: 0 auto;
-  padding: 35px 18px 20px;
+  padding: 15px 18px;
   transition: opacity 190ms ease, transform 220ms ease, max-height 220ms ease, padding 220ms ease;
 }
 
@@ -108,7 +108,7 @@ body.admin-bar .foldery-paper-header {
 .foldery-paper-header__column h2 {
   color: #272727;
   font-family: "proxima_nova_ltsemibold", Arial, sans-serif;
-  font-size: 24px;
+  font-size: 18px;
   line-height: 1.05;
   text-transform: uppercase;
 }
@@ -117,7 +117,7 @@ body.admin-bar .foldery-paper-header {
 .foldery-paper-header__column a,
 .foldery-paper-header__column span {
   color: var(--foldery-paper-muted);
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1.35;
   text-decoration: none;
 }
@@ -389,13 +389,13 @@ body.admin-bar .foldery-paper-header {
   }
 
   .foldery-paper-header__column h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
 
   .foldery-paper-header__column p,
   .foldery-paper-header__column a,
   .foldery-paper-header__column span {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .foldery-paper-header__column--action {

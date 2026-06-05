@@ -87,6 +87,16 @@ function foldery_header_render_link_or_text( $label, $url, $class_name = '' ) {
     return '<span class="' . esc_attr( $class_name ) . '">' . esc_html( $label ) . '</span>';
 }
 
+function foldery_header_render_paragraph_lines( $lines ) {
+    $lines = array_values( array_filter( $lines ) );
+
+    if ( empty( $lines ) ) {
+        return '';
+    }
+
+    return '<p>' . implode( '<br>', $lines ) . '</p>';
+}
+
 function foldery_render_site_header_block( $attributes ) {
     $settings = function_exists( 'foldery_theme_settings' ) ? foldery_theme_settings() : array();
     $classes  = 'foldery-paper-header';
@@ -114,22 +124,28 @@ function foldery_render_site_header_block( $attributes ) {
                     <?php if ( $artist_name ) : ?>
                         <h2><?php echo esc_html( $artist_name ); ?></h2>
                     <?php endif; ?>
-                    <?php if ( $artist_baseline ) : ?>
-                        <p><?php echo esc_html( $artist_baseline ); ?></p>
-                    <?php endif; ?>
-                    <?php foreach ( foldery_header_social_links( $social_links ) as $link ) : ?>
-                        <p><?php echo foldery_header_render_link_or_text( $link['label'], $link['url'], 'foldery-paper-header__social-link' ); ?></p>
-                    <?php endforeach; ?>
+                    <?php
+                    $artist_lines = array();
+                    if ( $artist_baseline ) {
+                        $artist_lines[] = esc_html( $artist_baseline );
+                    }
+                    foreach ( foldery_header_social_links( $social_links ) as $link ) {
+                        $artist_lines[] = foldery_header_render_link_or_text( $link['label'], $link['url'], 'foldery-paper-header__social-link' );
+                    }
+                    echo foldery_header_render_paragraph_lines( $artist_lines );
+                    ?>
                 </section>
 
                 <section class="foldery-paper-header__column foldery-paper-header__column--contact" aria-label="<?php esc_attr_e( 'Contact', 'foldery' ); ?>">
                     <h2><?php esc_html_e( 'CONTACT', 'foldery' ); ?></h2>
-                    <?php if ( $phone ) : ?>
-                        <p><a href="<?php echo esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ); ?>"><?php echo esc_html( $phone ); ?></a></p>
-                    <?php endif; ?>
-                    <?php if ( $email ) : ?>
-                        <p><a href="<?php echo esc_url( 'mailto:' . $email ); ?>"><?php echo esc_html( $email ); ?></a></p>
-                    <?php endif; ?>
+                    <?php
+                    echo foldery_header_render_paragraph_lines(
+                        array(
+                            $phone ? '<a href="' . esc_url( 'tel:' . preg_replace( '/[^0-9+]/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>' : '',
+                            $email ? '<a href="' . esc_url( 'mailto:' . $email ) . '">' . esc_html( $email ) . '</a>' : '',
+                        )
+                    );
+                    ?>
                 </section>
 
                 <section class="foldery-paper-header__column foldery-paper-header__column--action" aria-label="<?php esc_attr_e( 'Lien principal', 'foldery' ); ?>">
