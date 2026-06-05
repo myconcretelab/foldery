@@ -12,6 +12,8 @@ Text Domain: foldery
 
 body {
   background: #f6f5ee;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 :root {

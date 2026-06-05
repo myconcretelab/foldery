@@ -62,10 +62,36 @@
       ]
     },
     "typography": {
-      "fluid": false
+      "fluid": false,
+      "fontSizes": [
+        {
+          "slug": "small",
+          "name": "Small",
+          "size": "12px"
+        },
+        {
+          "slug": "normal",
+          "name": "Normal",
+          "size": "14px"
+        },
+        {
+          "slug": "medium",
+          "name": "Medium",
+          "size": "16px"
+        },
+        {
+          "slug": "large",
+          "name": "Large",
+          "size": "20px"
+        }
+      ]
     }
   },
   "styles": {
+    "typography": {
+      "fontSize": "14px",
+      "lineHeight": "1.5"
+    },
     "spacing": {
       "blockGap": "1.5rem"
     }

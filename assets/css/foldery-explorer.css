@@ -131,7 +131,36 @@
 }
 
 .foldery-explorer-page-content {
+  box-sizing: border-box;
   margin-bottom: 46px;
+}
+
+.foldery-explorer-page-content .wp-block-heading {
+  margin: 0 0 24px;
+}
+
+.foldery-explorer-page-content .wp-block-columns {
+  align-items: normal !important;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap !important;
+  gap: 24px clamp(32px, 5vw, 64px);
+  margin: 0 0 1.5rem;
+}
+
+.foldery-explorer-page-content .wp-block-column {
+  flex-grow: 1;
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.foldery-explorer-page-content .wp-block-column > *:first-child {
+  margin-top: 0;
+}
+
+.foldery-explorer-page-content .wp-block-column > *:last-child {
+  margin-bottom: 0;
 }
 
 .foldery-explorer-page-content > *:last-child {
@@ -163,14 +192,6 @@
 
 .foldery-explorer-page-intro .foldery-explorer-title-paper {
   max-width: 100%;
-}
-
-.foldery-explorer-subtitle {
-  color: #5f5147;
-  font-family: "proxima_nova_ltlight", Arial, sans-serif;
-  font-size: clamp(17px, 1.6vw, 23px);
-  line-height: 1.35;
-  margin: 2px 0 0;
 }
 
 .foldery-explorer-page-intro > .foldery-explorer-page-intro-meta > .foldery-explorer-back {
@@ -439,10 +460,6 @@
     margin-bottom: 0;
   }
 
-  .foldery-explorer-subtitle {
-    font-size: 17px;
-  }
-
   .foldery-explorer-page-paper {
     margin-left: auto;
     margin-right: auto;
@@ -464,5 +481,22 @@
     font-size: 22px;
     min-height: 38px;
     padding: 8px 14px 7px;
+  }
+
+}
+
+@media screen and (min-width: 782px) {
+  .foldery-explorer-page-content .wp-block-columns {
+    flex-wrap: nowrap !important;
+  }
+
+  .foldery-explorer-page-content .wp-block-columns:not(.is-not-stacked-on-mobile) > .wp-block-column {
+    flex-basis: 0;
+  }
+}
+
+@media screen and (max-width: 781px) {
+  .foldery-explorer-page-content .wp-block-columns:not(.is-not-stacked-on-mobile) > .wp-block-column {
+    flex-basis: 100% !important;
   }
 }

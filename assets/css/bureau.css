@@ -164,8 +164,7 @@ body.bureau-template #wpadminbar {
 
 .bureau-header-content h1,
 .bureau-header-content h2,
-.bureau-header-content h3,
-.bureau-header-content p {
+.bureau-header-content h3 {
   margin-top: 0;
   letter-spacing: 0;
 }
@@ -176,12 +175,6 @@ body.bureau-template #wpadminbar {
   font-size: clamp(31px, 5vw, 62px);
   line-height: 0.95;
   text-transform: uppercase;
-}
-
-.bureau-header-content p {
-  color: var(--bureau-muted);
-  font-size: clamp(14px, 1.5vw, 17px);
-  line-height: 1.35;
 }
 
 .bureau-header-content img {
@@ -288,8 +281,6 @@ body.bureau-template #wpadminbar {
   gap: 8px 18px;
   margin-top: 12px;
   color: var(--bureau-muted);
-  font-size: clamp(14px, 1.5vw, 17px);
-  line-height: 1.35;
 }
 
 .bureau-site-meta span {
@@ -432,20 +423,6 @@ body.bureau-template #wpadminbar {
   margin-bottom: 0;
 }
 
-.bureau-sheet--side .foldery-explorer-page-content h1,
-.bureau-sheet--side .foldery-explorer-page-content h2,
-.bureau-sheet--side .foldery-explorer-page-content h3,
-.bureau-sheet--side .foldery-explorer-page-content h4 {
-  margin: 0 0 18px;
-  color: #211b17;
-  font-size: clamp(20px, 2vw, 27px);
-  line-height: 1.05;
-}
-
-.bureau-sheet--side .foldery-explorer-page-content p {
-  margin: 0 0 18px;
-}
-
 .bureau-board {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(280px, 370px);
@@ -555,12 +532,8 @@ body.bureau-template #wpadminbar {
   letter-spacing: 0;
 }
 
-.bureau-sheet p,
-.bureau-sheet li,
 .is-style-bureau-typewritten {
   color: #2d2721;
-  font-size: clamp(16px, 1.55vw, 19px);
-  line-height: 1.68;
   letter-spacing: 0;
 }
 
@@ -990,8 +963,6 @@ body.admin-bar .atelier-global-header {
     linear-gradient(90deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0)),
     rgba(255, 252, 218, 0.76);
   box-shadow: 0 2px 7px rgba(34, 22, 13, 0.24);
-  font-size: clamp(14px, 1.5vw, 18px);
-  line-height: 1.24;
   letter-spacing: 0;
   text-shadow: none;
   transform: rotate(-2deg);
@@ -1193,7 +1164,6 @@ body.admin-bar .atelier-global-header {
   .atelier-hero__copy p {
     max-width: min(330px, 100%);
     padding: 7px 12px 6px;
-    font-size: 14px;
   }
 
   .atelier-hero__artworks {

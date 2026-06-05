@@ -167,7 +167,7 @@ function foldery_explorer_page_content( $folder_id ) {
     $foldery_explorer_rendering_page_content = false;
     wp_reset_postdata();
 
-    return '<div class="foldery-explorer-page-content">' . $html . '</div>';
+    return '<div class="foldery-explorer-page-content wp-block-post-content">' . $html . '</div>';
 }
 
 function foldery_explorer_page_content_layout( $layout ) {
