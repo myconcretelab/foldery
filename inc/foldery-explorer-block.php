@@ -11,7 +11,7 @@ function foldery_explorer_default_attributes() {
     return array(
         'showHomeSelection' => true,
         'homeFolderIds'     => '45,49,56,38,2,12,1',
-        'homeTitle'         => 'Series en cours...',
+        'homeTitle'         => "Explorer l'atelier",
         'showRecent'        => true,
         'recentTitle'       => "Recemment cree a l'atelier (ou dehors !)",
         'recentImageIds'    => '',
@@ -322,6 +322,16 @@ function foldery_explorer_stack_image_id( $folder ) {
     return count( $ids ) ? (int) $ids[0] : 0;
 }
 
+function foldery_explorer_attachment_description( $attachment_id ) {
+    $attachment = get_post( $attachment_id );
+
+    if ( $attachment instanceof WP_Post ) {
+        return trim( wp_strip_all_tags( $attachment->post_content ) );
+    }
+
+    return '';
+}
+
 function foldery_explorer_paper_rotation( $seed, $max_tenths = 26 ) {
     $seed  = absint( $seed );
     $range = ( $max_tenths * 2 ) + 1;
@@ -347,36 +357,83 @@ function foldery_explorer_render_title_row( $folder, $parent_link = '' ) {
     );
 }
 
-function foldery_explorer_render_stack( $folders ) {
+function foldery_explorer_render_stack( $folders, $variant = '' ) {
     $folders = array_filter( (array) $folders, 'foldery_is_media_folder' );
     if ( ! count( $folders ) ) {
         return '';
     }
 
-    $html = '<div class="stack-wrapper foldery-series-stack foldery-explorer-stack" data-masonry=\'{ "itemSelector": ".stack-item", "columnWidth": ".stack-item", "gutter": 30, "isFitWidth": true }\'>';
+    $classes = array( 'stack-wrapper', 'foldery-series-stack', 'foldery-explorer-stack' );
+    if ( '' !== $variant ) {
+        $classes[] = 'foldery-explorer-stack--' . sanitize_html_class( $variant );
+    }
+
+    $masonry = '' === $variant ? ' data-masonry=\'{ "itemSelector": ".stack-item", "columnWidth": ".stack-item", "gutter": 30, "isFitWidth": true }\'' : '';
+    $html    = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '"' . $masonry . '>';
+    $index   = 0;
     foreach ( $folders as $folder ) {
-        $image_id = foldery_explorer_stack_image_id( $folder );
+        $folder_ids = foldery_explorer_attachment_ids_from_folder( $folder );
+        $image_id   = count( $folder_ids ) ? (int) $folder_ids[0] : 0;
         if ( ! $image_id ) {
             continue;
         }
 
-        $image = wp_get_attachment_image_src( $image_id, 'medium' );
+        $thumb_size = 'home' === $variant ? 'large' : 'medium';
+        $image      = wp_get_attachment_image_src( $image_id, $thumb_size );
         if ( ! $image ) {
             continue;
         }
 
         $width  = $image[1] / 2;
         $height = $image[2] / 2;
+        $index++;
+
+        if ( 'home' === $variant ) {
+            $note_text = foldery_explorer_attachment_description( $image_id );
+            $note      = '' !== $note_text ? '<p class="foldery-explorer-feature-note">' . esc_html( wp_trim_words( $note_text, 18, '...' ) ) . '</p>' : '';
+            $trail     = '';
+            foreach ( array_slice( $folder_ids, 1, 3 ) as $trail_index => $trail_id ) {
+                if ( 'attachment' !== get_post_type( $trail_id ) ) {
+                    continue;
+                }
+
+                $trail .= sprintf(
+                    '<figure class="foldery-explorer-flow-thumb foldery-explorer-flow-thumb--%1$d">%2$s</figure>',
+                    (int) $trail_index + 1,
+                    wp_get_attachment_image( $trail_id, 'medium' )
+                );
+            }
+
+            $html .= sprintf(
+                '<div class="stack-item foldery-explorer-item foldery-explorer-item--%9$d"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><div class="foldery-explorer-flow" style="--foldery-flow-aspect:%10$s"><figure class="img-area foldery-explorer-flow-main">%7$s</figure>%11$s%12$s</div></a></div>',
+                esc_url( foldery_explorer_folder_url( $folder ) ),
+                (int) $folder->getId(),
+                esc_html( $folder->getName() ),
+                (int) $image_id,
+                (int) $width,
+                (int) $height,
+                wp_get_attachment_image( $image_id, $thumb_size ),
+                esc_attr( foldery_explorer_paper_rotation( $folder->getId() ) ),
+                (int) $index,
+                esc_attr( number_format( $image[1] / max( 1, $image[2] ), 4, '.', '' ) ),
+                $trail,
+                $note
+            );
+            continue;
+        }
+
         $html  .= sprintf(
-            '<div class="stack-item foldery-explorer-item"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><figure class="img-area" id="explorer-img-area-%4$d" style="width:%5$dpx;height:%6$dpx">%7$s</figure><style>#explorer-img-area-%4$d:after,#explorer-img-area-%4$d:before{width:%5$dpx;height:%6$dpx}</style></a></div>',
+            '<div class="stack-item foldery-explorer-item foldery-explorer-item--%9$d"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><figure class="img-area" id="explorer-img-area-%4$d" style="width:%5$dpx;height:%6$dpx;--foldery-stack-aspect:%10$s">%7$s</figure><style>#explorer-img-area-%4$d:after,#explorer-img-area-%4$d:before{width:%5$dpx;height:%6$dpx}</style></a></div>',
             esc_url( foldery_explorer_folder_url( $folder ) ),
             (int) $folder->getId(),
             esc_html( $folder->getName() ),
             (int) $image_id,
             (int) $width,
             (int) $height,
-            wp_get_attachment_image( $image_id, 'medium' ),
-            esc_attr( foldery_explorer_paper_rotation( $folder->getId() ) )
+            wp_get_attachment_image( $image_id, $thumb_size ),
+            esc_attr( foldery_explorer_paper_rotation( $folder->getId() ) ),
+            (int) $index,
+            esc_attr( number_format( $image[1] / max( 1, $image[2] ), 4, '.', '' ) )
         );
     }
     $html .= '</div>';
@@ -518,8 +575,13 @@ function foldery_explorer_render_home( $attributes ) {
         }
 
         if ( count( $folders ) ) {
-            $html .= '<h3 class="wp-block-heading">' . esc_html( $attributes['homeTitle'] ) . '</h3>';
-            $html .= foldery_explorer_render_stack( $folders );
+            $home_title = trim( (string) $attributes['homeTitle'] );
+            if ( in_array( strtolower( $home_title ), array( 'series en cours...', 'series en cours' ), true ) ) {
+                $home_title = "Explorer l'atelier";
+            }
+
+            $html .= '<h3 class="wp-block-heading foldery-explorer-home-title">' . esc_html( $home_title ) . '</h3>';
+            $html .= foldery_explorer_render_stack( $folders, 'home' );
         }
     }
 
@@ -826,7 +888,7 @@ function foldery_explorer_register_block() {
             'attributes'      => array(
                 'showHomeSelection' => array( 'type' => 'boolean', 'default' => true ),
                 'homeFolderIds'     => array( 'type' => 'string', 'default' => '45,49,56,38,2,12,1' ),
-                'homeTitle'         => array( 'type' => 'string', 'default' => 'Series en cours...' ),
+                'homeTitle'         => array( 'type' => 'string', 'default' => "Explorer l'atelier" ),
                 'showRecent'        => array( 'type' => 'boolean', 'default' => true ),
                 'recentTitle'       => array( 'type' => 'string', 'default' => "Recemment cree a l'atelier (ou dehors !)" ),
                 'recentImageIds'    => array( 'type' => 'string', 'default' => '' ),

@@ -838,7 +838,7 @@ body.atelier-template #wpadminbar {
 .atelier-page {
   --atelier-paper: url("../images/paper-bg.jpg");
   --atelier-ink: #211b17;
-  --atelier-hero-end-overlay: 58px;
+  --atelier-hero-end-overlay: clamp(96px, 9vw, 138px);
   position: relative;
   min-height: 100vh;
   overflow-x: clip;
@@ -891,6 +891,30 @@ body.admin-bar .atelier-global-header {
   padding: 0;
   background: #15100c;
   overflow: hidden;
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--atelier-hero-end-overlay) + 6px),
+    97% calc(100% - var(--atelier-hero-end-overlay) - 3px),
+    93% calc(100% - var(--atelier-hero-end-overlay) + 11px),
+    88% calc(100% - var(--atelier-hero-end-overlay) + 1px),
+    84% calc(100% - var(--atelier-hero-end-overlay) + 9px),
+    78% calc(100% - var(--atelier-hero-end-overlay) - 2px),
+    73% calc(100% - var(--atelier-hero-end-overlay) + 12px),
+    68% calc(100% - var(--atelier-hero-end-overlay) + 3px),
+    62% calc(100% - var(--atelier-hero-end-overlay) + 15px),
+    56% calc(100% - var(--atelier-hero-end-overlay) + 5px),
+    51% calc(100% - var(--atelier-hero-end-overlay) + 13px),
+    46% calc(100% - var(--atelier-hero-end-overlay) + 0px),
+    41% calc(100% - var(--atelier-hero-end-overlay) + 10px),
+    35% calc(100% - var(--atelier-hero-end-overlay) + 3px),
+    29% calc(100% - var(--atelier-hero-end-overlay) + 14px),
+    24% calc(100% - var(--atelier-hero-end-overlay) + 2px),
+    18% calc(100% - var(--atelier-hero-end-overlay) + 11px),
+    12% calc(100% - var(--atelier-hero-end-overlay) - 1px),
+    7% calc(100% - var(--atelier-hero-end-overlay) + 9px),
+    0 calc(100% - var(--atelier-hero-end-overlay) + 4px)
+  );
 }
 
 .atelier-hero:before {
@@ -913,13 +937,10 @@ body.admin-bar .atelier-global-header {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: -1px;
+  bottom: var(--atelier-hero-end-overlay);
   z-index: 4;
-  height: var(--atelier-hero-end-overlay);
-  background:
-    linear-gradient(180deg, rgba(245, 243, 237, 0), #f5f3ed 78%),
-    var(--atelier-paper);
-  background-size: auto, 620px auto;
+  height: 32px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0), rgba(18, 11, 7, 0.2));
   pointer-events: none;
   transform: translate3d(0, var(--atelier-hero-paper-y), 0);
   will-change: transform;
@@ -1103,12 +1124,31 @@ body.admin-bar .atelier-global-header {
   position: relative;
   z-index: 4;
   margin-top: calc(0px - var(--atelier-hero-end-overlay, 58px));
-  padding: clamp(18px, 2.8vw, 34px) 0 clamp(64px, 8vw, 110px);
+  padding: clamp(24px, 4vw, 58px) 0 clamp(64px, 8vw, 110px);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0)),
+    radial-gradient(ellipse at 24% 0%, rgba(122, 86, 54, 0.12), rgba(122, 86, 54, 0) 44%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0)),
     var(--atelier-paper),
     #f5f3ed;
-  background-size: auto, 620px auto, auto;
+  background-size: auto, auto, 620px auto, auto;
+}
+
+.atelier-paper-zone:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  z-index: 0;
+  width: min(1120px, calc(100vw - 32px));
+  height: 1px;
+  background: linear-gradient(90deg, rgba(89, 58, 36, 0), rgba(89, 58, 36, 0.28), rgba(89, 58, 36, 0));
+  transform: translateX(-50%) rotate(-0.5deg);
+  pointer-events: none;
+}
+
+.atelier-paper-zone > * {
+  position: relative;
+  z-index: 1;
 }
 
 .atelier-board {
@@ -1127,6 +1167,505 @@ body.admin-bar .atelier-global-header {
 
 .atelier-sheet--side {
   margin-top: clamp(24px, 7vh, 90px);
+}
+
+.atelier-page .foldery-explorer-home {
+  margin-top: calc(-1 * clamp(32px, 5.4vw, 78px));
+}
+
+.atelier-page .foldery-explorer-home-title {
+  display: inline-flex;
+  align-items: center;
+  min-height: 52px;
+  margin: 0 0 clamp(16px, 2.3vw, 30px);
+  padding: 9px 20px 8px;
+  position: relative;
+  color: #211b17;
+  background:
+    linear-gradient(105deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0) 58%),
+    #fffaf0;
+  box-shadow:
+    0 16px 30px rgba(35, 22, 12, 0.16),
+    0 3px 8px rgba(35, 22, 12, 0.12);
+  font-size: clamp(24px, 3vw, 42px);
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  transform: rotate(-1deg);
+  transform-origin: 48% 50%;
+}
+
+.atelier-page .foldery-explorer-home-title:before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -13px;
+  width: min(116px, 42%);
+  height: 23px;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0)),
+    rgba(255, 252, 218, 0.72);
+  box-shadow: 0 1px 4px rgba(34, 22, 13, 0.2);
+  transform: translateX(-50%) rotate(1.8deg);
+}
+
+.atelier-page .foldery-explorer-stack--home {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(22px, 3vw, 44px) clamp(18px, 2.6vw, 38px);
+  width: 100% !important;
+  height: auto !important;
+  margin: 0 auto clamp(18px, 4vw, 46px);
+  padding: clamp(8px, 1.2vw, 16px) 0 0;
+}
+
+.atelier-page .foldery-explorer-stack--home:before,
+.atelier-page .foldery-explorer-stack--home:after {
+  display: none;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  float: none;
+  width: auto;
+  max-width: none;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  grid-column: span 3;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 {
+  grid-column: span 4;
+  margin-top: clamp(-22px, -1.6vw, -12px);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 {
+  grid-column: span 3;
+  margin-top: clamp(30px, 5vw, 70px);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 {
+  grid-column: span 3;
+  margin-top: clamp(2px, 1.8vw, 26px);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 {
+  grid-column: span 2;
+  margin-top: clamp(58px, 7vw, 104px);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item:nth-child(n+5) {
+  grid-column: span 3;
+}
+
+.atelier-page .foldery-explorer-stack--home .stack-link {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  width: 100%;
+  border-bottom: 0;
+  color: inherit;
+}
+
+.atelier-page .foldery-explorer-stack--home .stack-link:hover,
+.atelier-page .foldery-explorer-stack--home .stack-link:focus {
+  border-bottom: 0;
+}
+
+.atelier-page .foldery-explorer-stack--home .stack-link h5 {
+  z-index: 4;
+  margin: 0;
+  padding: 7px 13px 6px;
+  background: #f8efd9;
+  box-shadow: 0 5px 10px rgba(34, 22, 13, 0.16);
+  color: #211b17;
+  font-size: clamp(11px, 1vw, 13px);
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.atelier-page .foldery-explorer-stack--home .img-area {
+  width: min(100%, 270px) !important;
+  height: auto !important;
+  aspect-ratio: var(--foldery-stack-aspect, 1);
+  margin: 0 auto;
+  padding: 10px;
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .img-area {
+  width: min(100%, 390px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 .img-area {
+  width: min(100%, 300px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .img-area {
+  width: min(100%, 340px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 .img-area {
+  width: min(100%, 255px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .img-area:before,
+.atelier-page .foldery-explorer-stack--home .img-area:after {
+  width: calc(100% - 20px) !important;
+  height: calc(100% - 20px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .img-area img {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.atelier-page .foldery-explorer-stack--home .stack-link:hover .img-area,
+.atelier-page .foldery-explorer-stack--home .stack-link:focus .img-area {
+  filter: saturate(1.04);
+  transform: translateY(-4px) rotate(-0.6deg);
+}
+
+.atelier-page .foldery-explorer-stack--home {
+  display: block;
+  min-height: clamp(560px, 43vw, 690px);
+  position: relative;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item {
+  position: absolute !important;
+  grid-column: auto;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 {
+  left: clamp(2px, 3vw, 46px) !important;
+  top: clamp(-12px, -0.7vw, -4px) !important;
+  z-index: 4;
+  width: min(55vw, 650px);
+  transform: rotate(-1.4deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 {
+  left: clamp(390px, 43vw, 610px) !important;
+  top: clamp(210px, 16vw, 270px) !important;
+  z-index: 5;
+  width: min(24vw, 270px);
+  transform: rotate(3.2deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 {
+  right: clamp(118px, 11vw, 190px) !important;
+  top: clamp(42px, 4vw, 78px) !important;
+  z-index: 3;
+  width: min(27vw, 330px);
+  transform: rotate(-2.5deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 {
+  right: clamp(4px, 2vw, 34px) !important;
+  top: clamp(280px, 23vw, 370px) !important;
+  z-index: 6;
+  width: min(18vw, 210px);
+  transform: rotate(4.2deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item:nth-child(n+5) {
+  position: relative !important;
+  display: inline-block;
+  width: min(22vw, 260px);
+  margin: clamp(420px, 32vw, 520px) clamp(16px, 2vw, 34px) 0 0;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .stack-link {
+  position: relative;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .img-area {
+  width: min(100%, 620px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 .img-area {
+  width: min(100%, 235px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .img-area {
+  width: min(100%, 305px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 .img-area {
+  width: min(100%, 180px) !important;
+}
+
+.atelier-page .foldery-explorer-feature-note {
+  position: absolute;
+  right: clamp(-22px, -1.4vw, -8px);
+  bottom: clamp(12px, 3vw, 34px);
+  z-index: 7;
+  max-width: min(320px, 76%);
+  margin: 0;
+  padding: 8px 14px 7px;
+  color: #3a3028;
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0)),
+    rgba(255, 252, 218, 0.82);
+  box-shadow: 0 3px 8px rgba(34, 22, 13, 0.22);
+  font-size: clamp(13px, 1.2vw, 17px);
+  line-height: 1.18;
+  text-align: left;
+  transform: rotate(-2.4deg);
+}
+
+.atelier-page .foldery-explorer-stack--home {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(56px, 6vw, 92px) clamp(28px, 4vw, 60px);
+  min-height: 0;
+  position: relative;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item,
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item:nth-child(n+5) {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  top: auto !important;
+  display: block;
+  width: auto;
+  margin: 0;
+  grid-column: span 4;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 {
+  grid-column: span 5;
+  z-index: 4;
+  transform: rotate(-1.2deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 {
+  grid-column: span 4;
+  z-index: 5;
+  margin-top: clamp(70px, 6vw, 112px);
+  transform: rotate(2.1deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 {
+  grid-column: span 3;
+  z-index: 3;
+  margin-top: clamp(18px, 2vw, 36px);
+  transform: rotate(-2.3deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 {
+  grid-column: 7 / span 4;
+  z-index: 6;
+  margin-top: clamp(-28px, -1.5vw, -12px);
+  transform: rotate(2.9deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .stack-link {
+  display: block;
+  position: relative;
+}
+
+.atelier-page .foldery-explorer-flow {
+  position: relative;
+  box-sizing: border-box;
+  min-height: clamp(240px, 28vw, 430px);
+  padding: 0 clamp(40px, 6vw, 88px) clamp(44px, 5vw, 82px) 0;
+}
+
+.atelier-page .foldery-explorer-flow-main.img-area {
+  width: min(100%, 440px) !important;
+  height: auto !important;
+  aspect-ratio: var(--foldery-flow-aspect, 1.25);
+  margin: 0;
+  padding: 10px;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .foldery-explorer-flow-main.img-area {
+  width: min(100%, 560px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .foldery-explorer-flow-main.img-area {
+  width: min(100%, 330px) !important;
+}
+
+.atelier-page .foldery-explorer-flow-main.img-area:before,
+.atelier-page .foldery-explorer-flow-main.img-area:after {
+  width: calc(100% - 20px) !important;
+  height: calc(100% - 20px) !important;
+}
+
+.atelier-page .foldery-explorer-flow-main.img-area img,
+.atelier-page .foldery-explorer-flow-thumb img {
+  display: block;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #fff;
+}
+
+.atelier-page .foldery-explorer-flow-thumb {
+  position: absolute;
+  z-index: 5;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 8px;
+  background: #fff;
+  box-shadow:
+    0 12px 22px rgba(34, 22, 13, 0.22),
+    0 2px 5px rgba(34, 22, 13, 0.16);
+}
+
+.atelier-page .foldery-explorer-flow-thumb--1 {
+  right: clamp(8px, 2vw, 30px);
+  top: 22%;
+  width: min(39%, 190px);
+  transform: rotate(5deg);
+}
+
+.atelier-page .foldery-explorer-flow-thumb--2 {
+  right: 0;
+  top: 50%;
+  width: min(34%, 160px);
+  transform: rotate(-4deg);
+}
+
+.atelier-page .foldery-explorer-flow-thumb--3 {
+  right: clamp(42px, 6vw, 92px);
+  top: 70%;
+  width: min(31%, 145px);
+  transform: rotate(3deg);
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-paper {
+  z-index: 8;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-feature-note {
+  left: clamp(16px, 3vw, 34px);
+  right: auto;
+  bottom: clamp(10px, 2vw, 24px);
+  z-index: 9;
+  max-width: min(330px, 72%);
+}
+
+@media (max-width: 760px) {
+  .atelier-page .foldery-explorer-home {
+    margin-top: calc(-1 * clamp(20px, 7vw, 42px));
+  }
+
+  .atelier-page .foldery-explorer-home-title {
+    max-width: calc(100vw - 42px);
+    min-height: 48px;
+    padding: 8px 16px 7px;
+    font-size: clamp(23px, 7vw, 30px);
+    line-height: 1.04;
+  }
+
+  .atelier-page .foldery-explorer-stack--home {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 34px 22px;
+    min-height: 0;
+    padding-top: 6px;
+  }
+
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item,
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item:nth-child(n+5) {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    grid-column: span 3;
+    width: auto;
+    transform: none;
+    margin-top: 0;
+  }
+
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 {
+    grid-column: span 6;
+  }
+
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2,
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 {
+    margin-top: 18px;
+  }
+
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 {
+    grid-column: 4 / span 3;
+    margin-top: -10px;
+  }
+
+  .atelier-page .foldery-explorer-stack--home .img-area,
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 .img-area,
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .img-area,
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 .img-area {
+    width: min(100%, 178px) !important;
+  }
+
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .img-area {
+    width: min(100%, 330px) !important;
+  }
+
+  .atelier-page .foldery-explorer-flow {
+    min-height: 0;
+    padding: 0 54px 54px 0;
+  }
+
+  .atelier-page .foldery-explorer-flow-main.img-area,
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .foldery-explorer-flow-main.img-area,
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .foldery-explorer-flow-main.img-area {
+    width: min(100%, 280px) !important;
+  }
+
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .foldery-explorer-flow-main.img-area {
+    width: min(100%, 330px) !important;
+  }
+
+  .atelier-page .foldery-explorer-flow-thumb {
+    padding: 6px;
+  }
+
+  .atelier-page .foldery-explorer-flow-thumb--1 {
+    right: 12px;
+    top: 48%;
+    width: min(34%, 104px);
+  }
+
+  .atelier-page .foldery-explorer-flow-thumb--2 {
+    right: 0;
+    top: 66%;
+    width: min(30%, 92px);
+  }
+
+  .atelier-page .foldery-explorer-flow-thumb--3 {
+    right: 42px;
+    top: 82%;
+    width: min(28%, 84px);
+  }
+
+  .atelier-page .foldery-explorer-feature-note {
+    position: relative;
+    right: auto;
+    left: auto;
+    bottom: auto;
+    max-width: 92%;
+    margin: -10px 0 0;
+    font-size: 13px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

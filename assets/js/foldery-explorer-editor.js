@@ -175,7 +175,7 @@
     attributes: {
       showHomeSelection: { type: 'boolean', default: true },
       homeFolderIds: { type: 'string', default: '45,49,56,38,2,12,1' },
-      homeTitle: { type: 'string', default: 'Series en cours...' },
+      homeTitle: { type: 'string', default: "Explorer l'atelier" },
       showRecent: { type: 'boolean', default: true },
       recentTitle: { type: 'string', default: "Recemment cree a l'atelier (ou dehors !)" },
       recentImageIds: { type: 'string', default: '' },
