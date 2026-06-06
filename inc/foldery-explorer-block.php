@@ -405,7 +405,7 @@ function foldery_explorer_render_stack( $folders, $variant = '' ) {
             }
 
             $html .= sprintf(
-                '<div class="stack-item foldery-explorer-item foldery-explorer-item--%9$d"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><div class="foldery-explorer-flow" style="--foldery-flow-aspect:%10$s"><figure class="img-area foldery-explorer-flow-main">%7$s</figure>%11$s%12$s</div></a></div>',
+                '<div class="stack-item foldery-explorer-item foldery-explorer-item--%9$d"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><div class="foldery-explorer-flow" style="--foldery-flow-aspect:%10$s"><figure class="img-area foldery-explorer-flow-main">%7$s%12$s</figure>%11$s</div></a></div>',
                 esc_url( foldery_explorer_folder_url( $folder ) ),
                 (int) $folder->getId(),
                 esc_html( $folder->getName() ),
