@@ -11,6 +11,18 @@ function foldery_register_blocks_editor_assets() {
     }
 
     wp_register_script(
+        'foldery-folder-picker',
+        get_template_directory_uri() . '/assets/js/foldery-folder-picker.js',
+        array(
+            'wp-components',
+            'wp-element',
+            'wp-i18n',
+        ),
+        FOLDERY_VERSION,
+        true
+    );
+
+    wp_register_script(
         'foldery-blocks-editor',
         get_template_directory_uri() . '/assets/js/foldery-blocks-editor.js',
         array(

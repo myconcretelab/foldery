@@ -810,7 +810,7 @@ function foldery_explorer_register_block() {
     wp_register_script(
         'foldery-explorer-editor',
         get_template_directory_uri() . '/assets/js/foldery-explorer-editor.js',
-        array( 'wp-blocks', 'wp-element', 'wp-components', 'wp-block-editor', 'wp-i18n', 'wp-server-side-render' ),
+        array( 'foldery-folder-picker', 'wp-blocks', 'wp-element', 'wp-components', 'wp-block-editor', 'wp-i18n', 'wp-server-side-render' ),
         FOLDERY_VERSION,
         true
     );

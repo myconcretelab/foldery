@@ -41,9 +41,15 @@ function foldery_header_logo_html() {
 
 function foldery_header_menu_html( $attributes ) {
     if ( function_exists( 'foldery_explorer_render_menu_block' ) ) {
+        $settings   = function_exists( 'foldery_theme_settings' ) ? foldery_theme_settings() : array();
+        $folder_ids = isset( $attributes['menuFolderIds'] ) ? trim( (string) $attributes['menuFolderIds'] ) : '';
+        if ( '' === $folder_ids && ! empty( $settings['header_menu_folder_ids'] ) ) {
+            $folder_ids = (string) $settings['header_menu_folder_ids'];
+        }
+
         return foldery_explorer_render_menu_block(
             array(
-                'folderIds'    => isset( $attributes['menuFolderIds'] ) ? $attributes['menuFolderIds'] : '',
+                'folderIds'    => $folder_ids,
                 'showSubmenus' => ! empty( $attributes['showSubmenus'] ),
                 'ariaLabel'    => isset( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : __( 'Menu principal', 'foldery' ),
                 'scrollToExplorer' => ! empty( $attributes['scrollToExplorer'] ),

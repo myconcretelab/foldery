@@ -2,7 +2,6 @@
   'use strict';
 
   var el = element.createElement;
-  var useState = element.useState;
   var InspectorControls = blockEditor.InspectorControls;
   var useBlockProps = blockEditor.useBlockProps;
   var MediaUpload = blockEditor.MediaUpload;
@@ -12,13 +11,11 @@
   var ToggleControl = components.ToggleControl;
   var Disabled = components.Disabled;
   var Button = components.Button;
-  var CheckboxControl = components.CheckboxControl;
-  var Modal = components.Modal;
-  var SearchControl = components.SearchControl;
   var SelectControl = components.SelectControl;
   var ServerSideRender = wp.serverSideRender;
   var __ = i18n.__;
   var editorData = window.FolderyExplorerEditor || {};
+  var FolderPicker = window.FolderyFolderPicker && window.FolderyFolderPicker.FolderPicker;
 
   function parseIds(value) {
     var seen = {};
@@ -47,291 +44,6 @@
     });
 
     return output;
-  }
-
-  function folderMatches(folder, query) {
-    var normalized = query.trim().toLowerCase();
-
-    if (!normalized) {
-      return true;
-    }
-
-    if (
-      String(folder.name || '').toLowerCase().indexOf(normalized) !== -1 ||
-      String(folder.path || '').toLowerCase().indexOf(normalized) !== -1 ||
-      String(folder.id).indexOf(normalized) !== -1
-    ) {
-      return true;
-    }
-
-    return (folder.children || []).some(function(child) {
-      return folderMatches(child, query);
-    });
-  }
-
-  function selectedSummary(ids, folderById) {
-    if (!ids.length) {
-      return __('Aucun dossier selectionne', 'foldery');
-    }
-
-    return ids.length === 1
-      ? __('1 dossier selectionne', 'foldery')
-      : ids.length + ' ' + __('dossiers selectionnes', 'foldery');
-  }
-
-  function FolderTreeNode(props) {
-    var folder = props.folder;
-    var selectedIds = props.selectedIds;
-    var selectedLookup = props.selectedLookup;
-    var expanded = props.expanded;
-    var toggleExpanded = props.toggleExpanded;
-    var toggleFolder = props.toggleFolder;
-    var query = props.query;
-    var level = props.level || 0;
-    var children = folder.children || [];
-    var hasChildren = children.length > 0;
-    var isExpanded = !!expanded[folder.id] || !!query.trim();
-    var isSelected = !!selectedLookup[folder.id];
-    var visibleChildren = children.filter(function(child) {
-      return folderMatches(child, query);
-    });
-
-    if (!folderMatches(folder, query)) {
-      return null;
-    }
-
-    return el(
-      'li',
-      { className: 'foldery-folder-picker-node' },
-      el(
-        'div',
-        {
-          className: 'foldery-folder-picker-row' + (isSelected ? ' is-selected' : ''),
-          style: { paddingLeft: (level * 18 + 8) + 'px' }
-        },
-        el(
-          Button,
-          {
-            className: 'foldery-folder-picker-expand',
-            icon: hasChildren ? (isExpanded ? 'arrow-down-alt2' : 'arrow-right-alt2') : 'minus',
-            label: hasChildren ? __('Afficher les sous-dossiers', 'foldery') : __('Aucun sous-dossier', 'foldery'),
-            disabled: !hasChildren,
-            onClick: function() {
-              toggleExpanded(folder.id);
-            }
-          }
-        ),
-        el(CheckboxControl, {
-          label: el(
-            'span',
-            { className: 'foldery-folder-picker-label' },
-            el('span', { className: 'foldery-folder-picker-name' }, folder.name),
-            el('span', { className: 'foldery-folder-picker-meta' }, '#' + folder.id + (folder.count ? ' - ' + folder.count : ''))
-          ),
-          checked: isSelected,
-          onChange: function(checked) {
-            toggleFolder(folder.id, checked);
-          }
-        })
-      ),
-      hasChildren && isExpanded && visibleChildren.length
-        ? el(
-            'ul',
-            { className: 'foldery-folder-picker-children' },
-            visibleChildren.map(function(child) {
-              return el(FolderTreeNode, {
-                key: child.id,
-                folder: child,
-                selectedIds: selectedIds,
-                selectedLookup: selectedLookup,
-                expanded: expanded,
-                toggleExpanded: toggleExpanded,
-                toggleFolder: toggleFolder,
-                query: query,
-                level: level + 1
-              });
-            })
-          )
-        : null
-    );
-  }
-
-  function FolderPicker(props) {
-    var ids = parseIds(props.value);
-    var folders = editorData.folders || [];
-    var flatFolders = flattenFolders(folders);
-    var folderById = flatFolders.reduce(function(map, folder) {
-      map[folder.id] = folder;
-      return map;
-    }, {});
-    var selectedLookup = ids.reduce(function(map, id) {
-      map[id] = true;
-      return map;
-    }, {});
-    var modalState = useState(false);
-    var isOpen = modalState[0];
-    var setOpen = modalState[1];
-    var searchState = useState('');
-    var query = searchState[0];
-    var setQuery = searchState[1];
-    var expandedState = useState(function() {
-      return folders.reduce(function(map, folder) {
-        map[folder.id] = true;
-        return map;
-      }, {});
-    });
-    var expanded = expandedState[0];
-    var setExpanded = expandedState[1];
-
-    function setIds(nextIds) {
-      props.onChange(nextIds.join(','));
-    }
-
-    function toggleFolder(id, checked) {
-      if (checked) {
-        setIds(ids.indexOf(id) === -1 ? ids.concat([id]) : ids);
-        return;
-      }
-
-      setIds(ids.filter(function(selectedId) {
-        return selectedId !== id;
-      }));
-    }
-
-    function toggleExpanded(id) {
-      var nextExpanded = {};
-
-      Object.keys(expanded).forEach(function(key) {
-        nextExpanded[key] = expanded[key];
-      });
-      nextExpanded[id] = !nextExpanded[id];
-      setExpanded(nextExpanded);
-    }
-
-    function clearSelected() {
-      setIds([]);
-    }
-
-    return el(
-      'div',
-      { className: 'foldery-folder-picker' },
-      el(
-        'div',
-        { className: 'foldery-folder-picker-summary' },
-        el('strong', null, __('Dossiers de la selection', 'foldery')),
-        el('span', null, selectedSummary(ids, folderById))
-      ),
-      ids.length
-        ? el(
-            'div',
-            { className: 'foldery-folder-picker-chips' },
-            ids.map(function(id) {
-              var folder = folderById[id];
-
-              return el(
-                'button',
-                {
-                  key: id,
-                  type: 'button',
-                  className: 'foldery-folder-picker-chip',
-                  onClick: function() {
-                    toggleFolder(id, false);
-                  }
-                },
-                folder ? folder.name : '#' + id,
-                el('span', { 'aria-hidden': true }, 'x')
-              );
-            })
-          )
-        : null,
-      el(
-        'div',
-        { className: 'foldery-folder-picker-actions' },
-        el(Button, {
-          variant: 'primary',
-          onClick: function() {
-            setOpen(true);
-          }
-        }, __('Choisir les dossiers', 'foldery')),
-        ids.length
-          ? el(Button, {
-              variant: 'tertiary',
-              onClick: clearSelected
-            }, __('Vider', 'foldery'))
-          : null
-      ),
-      isOpen
-        ? el(
-            Modal,
-            {
-              title: __('Selection des dossiers', 'foldery'),
-              className: 'foldery-folder-picker-modal',
-              onRequestClose: function() {
-                setOpen(false);
-              }
-            },
-            el(
-              'div',
-              { className: 'foldery-folder-picker-modal-header' },
-              SearchControl
-                ? el(SearchControl, {
-                    label: __('Rechercher un dossier', 'foldery'),
-                    placeholder: __('Rechercher par nom ou ID', 'foldery'),
-                    value: query,
-                    onChange: setQuery
-                  })
-                : el(TextControl, {
-                    label: __('Rechercher un dossier', 'foldery'),
-                    value: query,
-                    onChange: setQuery
-                  }),
-              el('span', null, selectedSummary(ids, folderById))
-            ),
-            folders.length
-              ? el(
-                  'div',
-                  { className: 'foldery-folder-picker-tree-wrap' },
-                  el(
-                    'ul',
-                    { className: 'foldery-folder-picker-tree' },
-                    folders
-                      .filter(function(folder) {
-                        return folderMatches(folder, query);
-                      })
-                      .map(function(folder) {
-                        return el(FolderTreeNode, {
-                          key: folder.id,
-                          folder: folder,
-                          selectedIds: ids,
-                          selectedLookup: selectedLookup,
-                          expanded: expanded,
-                          toggleExpanded: toggleExpanded,
-                          toggleFolder: toggleFolder,
-                          query: query
-                        });
-                      })
-                  )
-                )
-              : el('p', { className: 'foldery-folder-picker-empty' }, __('Aucun dossier disponible.', 'foldery')),
-            el(
-              'div',
-              { className: 'foldery-folder-picker-modal-footer' },
-              el(TextControl, {
-                label: __('IDs selectionnes', 'foldery'),
-                help: __('Option technique: vous pouvez aussi coller une liste separee par des virgules.', 'foldery'),
-                value: props.value,
-                onChange: props.onChange
-              }),
-              el(Button, {
-                variant: 'primary',
-                onClick: function() {
-                  setOpen(false);
-                }
-              }, __('Terminer', 'foldery'))
-            )
-          )
-        : null
-    );
   }
 
   function selectedImageSummary(ids) {
@@ -496,6 +208,7 @@
               onChange: function(value) { setAttributes({ homeTitle: value }); }
             }),
             el(FolderPicker, {
+              folders: editorData.folders || [],
               value: attrs.homeFolderIds,
               onChange: function(value) { setAttributes({ homeFolderIds: value }); }
             }),
@@ -605,6 +318,7 @@
                   }
                 }),
             el(FolderPicker, {
+              folders: editorData.folders || [],
               value: attrs.folderIds || '',
               onChange: function(value) {
                 setAttributes({ folderIds: value });

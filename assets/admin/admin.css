@@ -6,6 +6,14 @@
 	color: red;
 }
 
+.foldery-folder-picker-input--enhanced {
+	display: none;
+}
+
+.foldery-theme-folder-picker {
+	max-width: 540px;
+}
+
 .foldery-atelier-fields p {
 	margin: 0 0 14px;
 }

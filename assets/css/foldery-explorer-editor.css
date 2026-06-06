@@ -563,14 +563,14 @@
   border: 1px solid #b8d6fb;
   border-radius: 3px;
   color: #1e1e1e;
-  cursor: pointer;
+  cursor: grab;
   display: inline-flex;
   font-size: 12px;
-  gap: 6px;
+  gap: 3px;
   line-height: 1.2;
   max-width: 100%;
   min-height: 26px;
-  padding: 4px 7px;
+  padding: 3px 4px 3px 7px;
 }
 
 .foldery-image-picker-chip {
@@ -593,15 +593,55 @@
   border-color: #72aee6;
 }
 
+.foldery-folder-picker-chip.is-dragging {
+  opacity: 0.55;
+}
+
+.foldery-folder-picker-chip.is-drop-before {
+  box-shadow: -3px 0 0 #2271b1;
+}
+
+.foldery-folder-picker-chip.is-drop-after {
+  box-shadow: 3px 0 0 #2271b1;
+}
+
 .foldery-image-picker-chip:hover {
   background: #f0f6fc;
   border-color: #72aee6;
 }
 
-.foldery-folder-picker-chip span {
+.foldery-folder-picker-chip-handle {
   color: #646970;
-  font-size: 16px;
-  line-height: 1;
+  flex: 0 0 auto;
+  font-size: 15px;
+  height: 15px;
+  line-height: 15px;
+  width: 15px;
+}
+
+.foldery-folder-picker-chip-label {
+  margin-right: 3px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.foldery-folder-picker-chip-action.components-button {
+  align-items: center;
+  color: #646970;
+  height: 22px;
+  justify-content: center;
+  min-width: 22px;
+  padding: 0;
+}
+
+.foldery-folder-picker-chip-action.components-button:hover:not(:disabled) {
+  color: #1d2327;
+}
+
+.foldery-folder-picker-chip-remove.components-button:hover:not(:disabled) {
+  color: #b32d2e;
 }
 
 .foldery-image-picker-chip span {

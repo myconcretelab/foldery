@@ -16,6 +16,7 @@ function foldery_theme_settings_defaults() {
         'social_links'      => "Instagram : sebastienjacqmin|https://www.instagram.com/sebastienjacqmin/",
         'header_link_label' => 'Mes reproductions...',
         'header_link_url'   => '',
+        'header_menu_folder_ids' => '26,28,29',
         'lightbox'          => array(
             'enabled'            => 1,
             'groupLinks'         => 1,
@@ -45,6 +46,22 @@ function foldery_theme_sanitize_bool( $value ) {
     return empty( $value ) ? 0 : 1;
 }
 
+function foldery_theme_sanitize_id_list( $value ) {
+    if ( is_array( $value ) ) {
+        $value = '';
+    }
+
+    $ids = array();
+    foreach ( explode( ',', (string) wp_unslash( $value ) ) as $id ) {
+        $id = absint( $id );
+        if ( $id && ! in_array( $id, $ids, true ) ) {
+            $ids[] = $id;
+        }
+    }
+
+    return implode( ',', $ids );
+}
+
 function foldery_theme_sanitize_settings( $input ) {
     $input    = is_array( $input ) ? $input : array();
     $defaults = foldery_theme_settings_defaults();
@@ -67,6 +84,9 @@ function foldery_theme_sanitize_settings( $input ) {
     }
     if ( isset( $input['header_link_url'] ) ) {
         $settings['header_link_url'] = esc_url_raw( wp_unslash( $input['header_link_url'] ) );
+    }
+    if ( isset( $input['header_menu_folder_ids'] ) ) {
+        $settings['header_menu_folder_ids'] = foldery_theme_sanitize_id_list( $input['header_menu_folder_ids'] );
     }
 
     if ( isset( $input['lightbox'] ) && is_array( $input['lightbox'] ) ) {
@@ -145,6 +165,59 @@ function foldery_theme_render_checkbox_field( $settings, $key, $label ) {
     );
 }
 
+function foldery_theme_render_header_menu_folder_field( $settings ) {
+    ?>
+    <tr>
+        <th scope="row"><label for="foldery-header-menu-folder-ids"><?php esc_html_e( 'Dossiers du menu du header', 'foldery' ); ?></label></th>
+        <td>
+            <input
+                class="regular-text code foldery-folder-picker-input"
+                type="text"
+                id="foldery-header-menu-folder-ids"
+                name="<?php echo esc_attr( foldery_theme_setting_name( 'header_menu_folder_ids' ) ); ?>"
+                value="<?php echo esc_attr( $settings['header_menu_folder_ids'] ?? '' ); ?>"
+            >
+            <div
+                id="foldery-header-menu-folder-picker"
+                class="foldery-theme-folder-picker"
+                data-input-id="foldery-header-menu-folder-ids"
+            ></div>
+            <p class="description"><?php esc_html_e( 'Ces IDs alimentent le menu global sans personnaliser les templates WordPress en base.', 'foldery' ); ?></p>
+        </td>
+    </tr>
+    <?php
+}
+
+function foldery_theme_settings_admin_assets( $hook ) {
+    if ( 'appearance_page_foldery-theme-settings' !== $hook ) {
+        return;
+    }
+
+    if ( function_exists( 'foldery_register_shared_styles' ) ) {
+        foldery_register_shared_styles();
+    }
+
+    $script = get_template_directory() . '/assets/admin/theme-settings.js';
+    wp_enqueue_style( 'foldery-explorer-editor-style' );
+    wp_enqueue_script(
+        'foldery-theme-settings',
+        get_template_directory_uri() . '/assets/admin/theme-settings.js',
+        array( 'foldery-folder-picker', 'wp-element', 'wp-components', 'wp-i18n' ),
+        file_exists( $script ) ? filemtime( $script ) : FOLDERY_VERSION,
+        true
+    );
+    wp_localize_script(
+        'foldery-theme-settings',
+        'FolderyThemeSettings',
+        array(
+            'folders' => function_exists( 'foldery_explorer_editor_folder_tree' ) && function_exists( 'foldery_media_active' ) && foldery_media_active()
+                ? foldery_explorer_editor_folder_tree()
+                : array(),
+        )
+    );
+}
+add_action( 'admin_enqueue_scripts', 'foldery_theme_settings_admin_assets' );
+
 function foldery_theme_render_settings_page() {
     if ( ! current_user_can( 'manage_options' ) ) {
         return;
@@ -173,6 +246,7 @@ function foldery_theme_render_settings_page() {
                     foldery_theme_render_text_field( $settings, 'email', __( 'Email', 'foldery' ), 'email' );
                     foldery_theme_render_text_field( $settings, 'header_link_label', __( 'Libelle du lien principal', 'foldery' ) );
                     foldery_theme_render_text_field( $settings, 'header_link_url', __( 'URL du lien principal', 'foldery' ), 'url' );
+                    foldery_theme_render_header_menu_folder_field( $settings );
                     ?>
                     <tr>
                         <th scope="row"><label for="foldery-social-links"><?php esc_html_e( 'Reseaux sociaux', 'foldery' ); ?></label></th>

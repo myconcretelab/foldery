@@ -4,7 +4,7 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '3.0.34' );
+    define( 'FOLDERY_VERSION', '3.0.39' );
 }
 
 if ( ! isset( $content_width ) ) {
@@ -246,6 +246,10 @@ function foldery_scripts_styles() {
 
     if ( foldery_is_bureau_template() || foldery_is_atelier_template() ) {
         wp_enqueue_style( 'foldery-bureau' );
+    }
+
+    if ( foldery_is_atelier_template() ) {
+        wp_enqueue_script( 'foldery-atelier-hero', get_template_directory_uri() . '/assets/js/foldery-atelier-hero.js', array(), FOLDERY_VERSION, true );
     }
 
     wp_enqueue_script( 'foldery-masonry', get_template_directory_uri() . '/js/masonry.pkgd.min.js', array(), '4.2.2', true );

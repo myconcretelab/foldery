@@ -1,4 +1,11 @@
 (function () {
+  function markSafari() {
+    var ua = window.navigator.userAgent;
+    var isSafari = /Safari/.test(ua) && !/(Chrome|Chromium|CriOS|Edg|OPR|Firefox|FxiOS)/.test(ua);
+
+    document.documentElement.classList.toggle('foldery-is-safari', isSafari);
+  }
+
   function numberAttribute(element, name, fallback) {
     var value = Number(element.getAttribute(name));
     return Number.isFinite(value) ? value : fallback;
@@ -64,6 +71,8 @@
       requestUpdate();
     });
   }
+
+  markSafari();
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

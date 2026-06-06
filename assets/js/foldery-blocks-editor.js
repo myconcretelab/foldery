@@ -344,7 +344,8 @@
     var attributes = props.attributes;
     var folders = siteHeaderData.folders || [];
     var folderById = folderMapById(folders);
-    var selectedFolders = parseIds(attributes.menuFolderIds).map(function(id) {
+    var menuFolderIds = attributes.menuFolderIds || (siteHeaderData.settings && siteHeaderData.settings.header_menu_folder_ids) || '';
+    var selectedFolders = parseIds(menuFolderIds).map(function(id) {
       return folderById[id];
     }).filter(Boolean);
     var menuFolders = selectedFolders.length ? selectedFolders : folders;
@@ -740,13 +741,7 @@
           el(
             PanelBody,
             { title: __('Menu', 'foldery'), initialOpen: false },
-            el(TextControl, {
-              label: __('Dossiers du menu', 'foldery'),
-              value: props.attributes.menuFolderIds || '',
-              onChange: function(value) {
-                props.setAttributes({ menuFolderIds: value });
-              }
-            }),
+            el('p', { className: 'components-base-control__help' }, __('Les dossiers du menu se reglent dans Apparence > Reglages Foldery.', 'foldery')),
             el(ToggleControl, {
               label: __('Afficher les sous-menus', 'foldery'),
               checked: props.attributes.showSubmenus !== false,
