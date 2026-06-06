@@ -1429,7 +1429,7 @@ body.admin-bar .atelier-global-header {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: start;
-  gap: clamp(56px, 6vw, 92px) clamp(28px, 4vw, 60px);
+  gap: clamp(46px, 5vw, 78px) clamp(28px, 4vw, 56px);
   min-height: 0;
   position: relative;
 }
@@ -1447,7 +1447,7 @@ body.admin-bar .atelier-global-header {
 }
 
 .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 {
-  grid-column: span 5;
+  grid-column: span 4;
   z-index: 4;
   transform: rotate(-1.2deg);
 }
@@ -1460,14 +1460,14 @@ body.admin-bar .atelier-global-header {
 }
 
 .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 {
-  grid-column: span 3;
+  grid-column: span 4;
   z-index: 3;
   margin-top: clamp(18px, 2vw, 36px);
   transform: rotate(-2.3deg);
 }
 
 .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 {
-  grid-column: 7 / span 4;
+  grid-column: 5 / span 4;
   z-index: 6;
   margin-top: clamp(-28px, -1.5vw, -12px);
   transform: rotate(2.9deg);
@@ -1482,7 +1482,7 @@ body.admin-bar .atelier-global-header {
   position: relative;
   box-sizing: border-box;
   min-height: clamp(240px, 28vw, 430px);
-  padding: clamp(22px, 2.4vw, 36px) clamp(34px, 4vw, 58px) clamp(46px, 5vw, 74px);
+  padding: clamp(22px, 2.4vw, 36px) clamp(38px, 4.4vw, 64px) clamp(58px, 6vw, 92px) clamp(22px, 2.6vw, 38px);
 }
 
 .atelier-page .foldery-explorer-flow-main.img-area {
@@ -1496,11 +1496,19 @@ body.admin-bar .atelier-global-header {
 }
 
 .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .foldery-explorer-flow-main.img-area {
-  width: min(100%, 560px) !important;
+  width: min(100%, 480px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 .foldery-explorer-flow-main.img-area {
+  width: min(100%, 430px) !important;
 }
 
 .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .foldery-explorer-flow-main.img-area {
-  width: min(100%, 330px) !important;
+  width: min(100%, 410px) !important;
+}
+
+.atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 .foldery-explorer-flow-main.img-area {
+  width: min(100%, 390px) !important;
 }
 
 .atelier-page .foldery-explorer-flow-main.img-area:before,
@@ -1532,26 +1540,28 @@ body.admin-bar .atelier-global-header {
 }
 
 .atelier-page .foldery-explorer-flow-thumb--1 {
-  left: clamp(-14px, -1vw, -5px);
-  right: auto;
+  left: auto;
+  right: clamp(76px, 6vw, 118px);
   top: auto;
-  bottom: clamp(2px, 1.8vw, 22px);
-  width: min(35%, 170px);
+  bottom: clamp(0px, 0.8vw, 12px);
+  width: min(32%, 150px);
   transform: rotate(-7deg);
 }
 
 .atelier-page .foldery-explorer-flow-thumb--2 {
-  right: clamp(-14px, -1vw, -5px);
-  top: 48%;
-  width: min(32%, 150px);
-  transform: rotate(5deg);
+  right: clamp(-20px, -1.2vw, -8px);
+  top: auto;
+  bottom: clamp(44px, 4vw, 72px);
+  width: min(30%, 138px);
+  transform: rotate(6deg);
 }
 
 .atelier-page .foldery-explorer-flow-thumb--3 {
-  right: clamp(0px, 1.3vw, 18px);
-  top: clamp(-16px, -1vw, -6px);
-  width: min(34%, 160px);
-  transform: rotate(8deg);
+  right: clamp(12px, 1.7vw, 28px);
+  top: auto;
+  bottom: clamp(-30px, -1.7vw, -14px);
+  width: min(31%, 146px);
+  transform: rotate(9deg);
 }
 
 .atelier-page .foldery-explorer-stack--home .foldery-explorer-paper {
@@ -1642,6 +1652,11 @@ body.admin-bar .atelier-global-header {
 
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .foldery-explorer-flow-main.img-area {
     width: min(100%, 330px) !important;
+  }
+
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 .foldery-explorer-flow-main.img-area,
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 .foldery-explorer-flow-main.img-area {
+    width: min(100%, 250px) !important;
   }
 
   .atelier-page .foldery-explorer-flow-thumb {
