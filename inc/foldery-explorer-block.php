@@ -332,6 +332,26 @@ function foldery_explorer_attachment_description( $attachment_id ) {
     return '';
 }
 
+function foldery_explorer_image_orientation_class( $width, $height ) {
+    $width  = max( 1, (int) $width );
+    $height = max( 1, (int) $height );
+    $ratio  = $width / $height;
+
+    if ( $ratio >= 1.65 ) {
+        return 'is-panorama';
+    }
+
+    if ( $ratio >= 1.12 ) {
+        return 'is-landscape';
+    }
+
+    if ( $ratio <= 0.82 ) {
+        return 'is-portrait';
+    }
+
+    return 'is-balanced';
+}
+
 function foldery_explorer_paper_rotation( $seed, $max_tenths = 26 ) {
     $seed  = absint( $seed );
     $range = ( $max_tenths * 2 ) + 1;
@@ -368,8 +388,18 @@ function foldery_explorer_render_stack( $folders, $variant = '' ) {
         $classes[] = 'foldery-explorer-stack--' . sanitize_html_class( $variant );
     }
 
-    $masonry = '' === $variant ? ' data-masonry=\'{ "itemSelector": ".stack-item", "columnWidth": ".stack-item", "gutter": 30, "isFitWidth": true }\'' : '';
+    $masonry = '';
+    if ( '' === $variant ) {
+        $masonry = ' data-masonry=\'{ "itemSelector": ".stack-item", "columnWidth": ".stack-item", "gutter": 30, "isFitWidth": true }\'';
+    } elseif ( 'category' === $variant ) {
+        $masonry = ' data-masonry=\'{ "itemSelector": ".stack-item", "columnWidth": ".foldery-explorer-grid-sizer", "gutter": ".foldery-explorer-gutter-sizer", "percentPosition": true }\'';
+    }
+
     $html    = '<div class="' . esc_attr( implode( ' ', $classes ) ) . '"' . $masonry . '>';
+    if ( 'category' === $variant ) {
+        $html .= '<div class="foldery-explorer-grid-sizer" aria-hidden="true"></div><div class="foldery-explorer-gutter-sizer" aria-hidden="true"></div>';
+    }
+
     $index   = 0;
     foreach ( $folders as $folder ) {
         $folder_ids = foldery_explorer_attachment_ids_from_folder( $folder );
@@ -387,6 +417,7 @@ function foldery_explorer_render_stack( $folders, $variant = '' ) {
         $width  = $image[1] / 2;
         $height = $image[2] / 2;
         $index++;
+        $orientation_class = foldery_explorer_image_orientation_class( $image[1], $image[2] );
 
         if ( 'home' === $variant ) {
             $note_text = foldery_explorer_attachment_description( $image_id );
@@ -405,7 +436,7 @@ function foldery_explorer_render_stack( $folders, $variant = '' ) {
             }
 
             $html .= sprintf(
-                '<div class="stack-item foldery-explorer-item foldery-explorer-item--%9$d"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><div class="foldery-explorer-flow" style="--foldery-flow-aspect:%10$s"><figure class="img-area foldery-explorer-flow-main">%7$s%12$s</figure>%11$s</div></a></div>',
+                '<div class="stack-item foldery-explorer-item foldery-explorer-item--%9$d %13$s"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><div class="foldery-explorer-flow" style="--foldery-flow-aspect:%10$s"><figure class="img-area foldery-explorer-flow-main">%7$s%12$s</figure>%11$s</div></a></div>',
                 esc_url( foldery_explorer_folder_url( $folder ) ),
                 (int) $folder->getId(),
                 esc_html( $folder->getName() ),
@@ -417,13 +448,14 @@ function foldery_explorer_render_stack( $folders, $variant = '' ) {
                 (int) $index,
                 esc_attr( number_format( $image[1] / max( 1, $image[2] ), 4, '.', '' ) ),
                 $trail,
-                $note
+                $note,
+                esc_attr( $orientation_class )
             );
             continue;
         }
 
         $html  .= sprintf(
-            '<div class="stack-item foldery-explorer-item foldery-explorer-item--%9$d"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><figure class="img-area" id="explorer-img-area-%4$d" style="width:%5$dpx;height:%6$dpx;--foldery-stack-aspect:%10$s">%7$s</figure><style>#explorer-img-area-%4$d:after,#explorer-img-area-%4$d:before{width:%5$dpx;height:%6$dpx}</style></a></div>',
+            '<div class="stack-item foldery-explorer-item foldery-explorer-item--%9$d %11$s"><a href="%1$s" class="stack-link foldery-explorer-link" data-folder-id="%2$d"><h5 class="foldery-explorer-paper" style="--foldery-paper-rotation:%8$sdeg">%3$s</h5><figure class="img-area" id="explorer-img-area-%4$d" style="width:%5$dpx;height:%6$dpx;--foldery-stack-aspect:%10$s">%7$s</figure><style>#explorer-img-area-%4$d:after,#explorer-img-area-%4$d:before{width:%5$dpx;height:%6$dpx}</style></a></div>',
             esc_url( foldery_explorer_folder_url( $folder ) ),
             (int) $folder->getId(),
             esc_html( $folder->getName() ),
@@ -433,7 +465,8 @@ function foldery_explorer_render_stack( $folders, $variant = '' ) {
             wp_get_attachment_image( $image_id, $thumb_size ),
             esc_attr( foldery_explorer_paper_rotation( $folder->getId() ) ),
             (int) $index,
-            esc_attr( number_format( $image[1] / max( 1, $image[2] ), 4, '.', '' ) )
+            esc_attr( number_format( $image[1] / max( 1, $image[2] ), 4, '.', '' ) ),
+            esc_attr( $orientation_class )
         );
     }
     $html .= '</div>';
@@ -513,7 +546,7 @@ function foldery_explorer_render_folder( $folder_id, $include_page_content = tru
     }
 
     if ( count( $children ) ) {
-        $html .= foldery_explorer_render_stack( $children );
+        $html .= foldery_explorer_render_stack( $children, 'category' );
     } elseif ( $folder->getCnt() ) {
         $html .= foldery_explorer_render_masonry( $folder->getId() );
     }
