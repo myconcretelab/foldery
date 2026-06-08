@@ -270,3 +270,174 @@
 	width: 100%;
 	margin: 0;
 }
+
+.foldery-atelier-decor-list {
+	display: grid;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+.foldery-atelier-decor-list.is-empty {
+	min-height: 38px;
+	background: #f6f7f7;
+	border: 1px dashed #c3c4c7;
+}
+
+.foldery-atelier-decor-item {
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 2px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.foldery-atelier-decor-item.ui-sortable-helper {
+	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+}
+
+.foldery-atelier-decor-summary {
+	display: grid;
+	grid-template-columns: 18px 42px minmax(0, 1fr) 14px;
+	gap: 8px;
+	align-items: center;
+	min-height: 56px;
+	padding: 6px 8px;
+	cursor: pointer;
+	list-style: none;
+}
+
+.foldery-atelier-decor-summary::-webkit-details-marker {
+	display: none;
+}
+
+.foldery-atelier-decor-summary:after {
+	content: "\f347";
+	color: #787c82;
+	font-family: dashicons;
+	font-size: 14px;
+	line-height: 1;
+}
+
+.foldery-atelier-decor-item[open] .foldery-atelier-decor-summary:after {
+	content: "\f343";
+}
+
+.foldery-atelier-decor-summary:hover {
+	background: #f6f7f7;
+}
+
+.foldery-atelier-decor-tools {
+	display: grid;
+	gap: 5px;
+	justify-items: center;
+	align-content: center;
+}
+
+.foldery-atelier-decor-handle {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	color: #a7aaad;
+	cursor: move;
+}
+
+.foldery-atelier-decor-handle .dashicons {
+	width: 14px;
+	height: 14px;
+	font-size: 14px;
+}
+
+.foldery-atelier-decor-handle:after {
+	content: "";
+	position: absolute;
+	width: 14px;
+	height: 1px;
+	margin-top: 23px;
+	background: #dcdcde;
+	pointer-events: none;
+}
+
+.foldery-atelier-decor-remove {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	padding: 0;
+	color: #e65054;
+	text-decoration: none !important;
+	box-shadow: none;
+}
+
+.foldery-atelier-decor-remove:hover,
+.foldery-atelier-decor-remove:focus {
+	color: #d63638;
+	box-shadow: none;
+	text-decoration: none !important;
+}
+
+.foldery-atelier-decor-remove .dashicons {
+	width: 14px;
+	height: 14px;
+	font-size: 14px;
+}
+
+.foldery-atelier-decor-thumb {
+	width: 42px;
+	aspect-ratio: 1;
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 2px;
+	overflow: hidden;
+}
+
+.foldery-atelier-decor-thumb img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.foldery-atelier-decor-main {
+	min-width: 0;
+	padding: 10px 12px 12px 66px;
+	border-top: 1px solid #f0f0f1;
+}
+
+.foldery-atelier-decor-title {
+	min-width: 0;
+	overflow: hidden;
+	color: #1d2327;
+	font-weight: 600;
+	line-height: 1.2;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.foldery-atelier-decor-range {
+	display: grid;
+	grid-template-columns: 82px minmax(0, 1fr);
+	gap: 8px;
+	align-items: center;
+	margin: 5px 0;
+	color: #50575e;
+	font-size: 12px;
+}
+
+.foldery-atelier-decor-range span {
+	display: flex;
+	justify-content: space-between;
+	gap: 4px;
+}
+
+.foldery-atelier-decor-range output {
+	color: #1d2327;
+	font-variant-numeric: tabular-nums;
+}
+
+.foldery-atelier-decor-range input[type="range"] {
+	width: 100%;
+	margin: 0;
+}

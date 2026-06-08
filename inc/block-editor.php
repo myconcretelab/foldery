@@ -50,6 +50,7 @@ function foldery_register_blocks_editor_assets() {
                 'overlayColor'   => defined( 'FOLDERY_ATELIER_OVERLAY_COLOR_META' ) ? FOLDERY_ATELIER_OVERLAY_COLOR_META : '_foldery_atelier_overlay_color',
                 'overlayOpacity' => defined( 'FOLDERY_ATELIER_OVERLAY_OPACITY_META' ) ? FOLDERY_ATELIER_OVERLAY_OPACITY_META : '_foldery_atelier_overlay_opacity',
                 'vignette'       => defined( 'FOLDERY_ATELIER_VIGNETTE_META' ) ? FOLDERY_ATELIER_VIGNETTE_META : '_foldery_atelier_vignette',
+                'contentImages'  => defined( 'FOLDERY_ATELIER_CONTENT_IMAGES_META' ) ? FOLDERY_ATELIER_CONTENT_IMAGES_META : '_foldery_atelier_content_images',
             ),
             'fallbackHeroImageUrl' => get_template_directory_uri() . '/assets/images/bureau-bg.jpg',
             'siteHeader'           => array(

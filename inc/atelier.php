@@ -31,6 +31,10 @@ if ( ! defined( 'FOLDERY_ATELIER_VIGNETTE_META' ) ) {
     define( 'FOLDERY_ATELIER_VIGNETTE_META', '_foldery_atelier_vignette' );
 }
 
+if ( ! defined( 'FOLDERY_ATELIER_CONTENT_IMAGES_META' ) ) {
+    define( 'FOLDERY_ATELIER_CONTENT_IMAGES_META', '_foldery_atelier_content_images' );
+}
+
 function foldery_atelier_meta_keys() {
     return array(
         FOLDERY_ATELIER_HERO_IMAGE_META,
@@ -40,6 +44,7 @@ function foldery_atelier_meta_keys() {
         FOLDERY_ATELIER_OVERLAY_COLOR_META,
         FOLDERY_ATELIER_OVERLAY_OPACITY_META,
         FOLDERY_ATELIER_VIGNETTE_META,
+        FOLDERY_ATELIER_CONTENT_IMAGES_META,
     );
 }
 
@@ -62,6 +67,10 @@ function foldery_atelier_parse_ids( $ids ) {
 
 function foldery_atelier_clamp_int( $value, $min, $max ) {
     return min( $max, max( $min, absint( $value ) ) );
+}
+
+function foldery_atelier_clamp_signed_int( $value, $min, $max ) {
+    return min( $max, max( $min, (int) $value ) );
 }
 
 function foldery_atelier_default_overlay_settings() {
@@ -137,6 +146,70 @@ function foldery_atelier_parse_artworks( $value ) {
     return $artworks;
 }
 
+function foldery_atelier_default_content_image( $attachment_id, $index = 0 ) {
+    return array(
+        'id'    => absint( $attachment_id ),
+        'x'     => 22 + ( ( absint( $index ) * 23 ) % 56 ),
+        'y'     => 100 + ( absint( $index ) * 180 ),
+        'width' => 280,
+        'scale' => 100,
+        'rotate' => 0,
+        'alpha' => 100,
+    );
+}
+
+function foldery_atelier_normalize_content_image( $image, $index = 0 ) {
+    if ( is_numeric( $image ) ) {
+        return foldery_atelier_default_content_image( $image, $index );
+    }
+
+    if ( ! is_array( $image ) ) {
+        return null;
+    }
+
+    $attachment_id = isset( $image['id'] ) ? absint( $image['id'] ) : 0;
+    if ( ! $attachment_id ) {
+        return null;
+    }
+
+    $defaults = foldery_atelier_default_content_image( $attachment_id, $index );
+
+    return array(
+        'id'    => $attachment_id,
+        'x'     => isset( $image['x'] ) ? foldery_atelier_clamp_int( $image['x'], 0, 100 ) : $defaults['x'],
+        'y'     => isset( $image['y'] ) ? foldery_atelier_clamp_int( $image['y'], 0, 4000 ) : $defaults['y'],
+        'width' => isset( $image['width'] ) ? foldery_atelier_clamp_int( $image['width'], 60, 900 ) : $defaults['width'],
+        'scale' => isset( $image['scale'] ) ? foldery_atelier_clamp_int( $image['scale'], 20, 300 ) : $defaults['scale'],
+        'rotate' => isset( $image['rotate'] ) ? foldery_atelier_clamp_signed_int( $image['rotate'], -45, 45 ) : $defaults['rotate'],
+        'alpha' => isset( $image['alpha'] ) ? foldery_atelier_clamp_int( $image['alpha'], 0, 100 ) : $defaults['alpha'],
+    );
+}
+
+function foldery_atelier_parse_content_images( $value ) {
+    if ( is_array( $value ) ) {
+        $raw = $value;
+    } else {
+        $value   = trim( (string) $value );
+        $decoded = '[' === substr( $value, 0, 1 ) ? json_decode( $value, true ) : null;
+        $raw     = is_array( $decoded ) ? $decoded : foldery_atelier_parse_ids( $value );
+    }
+
+    $images = array();
+    $seen   = array();
+
+    foreach ( $raw as $index => $item ) {
+        $image = foldery_atelier_normalize_content_image( $item, $index );
+        if ( ! $image || isset( $seen[ $image['id'] ] ) ) {
+            continue;
+        }
+
+        $seen[ $image['id'] ] = true;
+        $images[]             = $image;
+    }
+
+    return $images;
+}
+
 function foldery_atelier_current_page_id() {
     if ( is_singular( 'page' ) ) {
         return get_queried_object_id();
@@ -156,6 +229,8 @@ function foldery_atelier_register_meta() {
             $sanitize_callback = 'foldery_atelier_sanitize_ids_meta';
         } elseif ( FOLDERY_ATELIER_ARTWORKS_META === $key ) {
             $sanitize_callback = 'foldery_atelier_sanitize_artworks_meta';
+        } elseif ( FOLDERY_ATELIER_CONTENT_IMAGES_META === $key ) {
+            $sanitize_callback = 'foldery_atelier_sanitize_content_images_meta';
         } elseif ( FOLDERY_ATELIER_OVERLAY_COLOR_META === $key ) {
             $sanitize_callback = 'foldery_atelier_sanitize_overlay_color';
         } elseif ( in_array( $key, array( FOLDERY_ATELIER_OVERLAY_OPACITY_META, FOLDERY_ATELIER_VIGNETTE_META ), true ) ) {
@@ -187,6 +262,12 @@ function foldery_atelier_sanitize_artworks_meta( $value ) {
     $artworks = foldery_atelier_parse_artworks( $value );
 
     return $artworks ? wp_json_encode( $artworks ) : '';
+}
+
+function foldery_atelier_sanitize_content_images_meta( $value ) {
+    $images = foldery_atelier_parse_content_images( $value );
+
+    return $images ? wp_json_encode( $images ) : '';
 }
 
 function foldery_atelier_hex_to_rgb( $color ) {
@@ -375,6 +456,89 @@ function foldery_render_atelier_hero_block() {
     return ob_get_clean();
 }
 
+function foldery_atelier_content_image_style( $image ) {
+    $scale = foldery_atelier_clamp_int( $image['scale'], 20, 300 ) / 100;
+    $alpha = foldery_atelier_clamp_int( $image['alpha'], 0, 100 ) / 100;
+
+    return sprintf(
+        '--atelier-content-image-x:%1$d%%; --atelier-content-image-y:%2$dpx; --atelier-content-image-width:%3$dpx; --atelier-content-image-scale:%4$s; --atelier-content-image-rotate:%5$ddeg; --atelier-content-image-alpha:%6$s;',
+        foldery_atelier_clamp_int( $image['x'], 0, 100 ),
+        foldery_atelier_clamp_int( $image['y'], 0, 4000 ),
+        foldery_atelier_clamp_int( $image['width'], 60, 900 ),
+        number_format( $scale, 2, '.', '' ),
+        foldery_atelier_clamp_signed_int( $image['rotate'], -45, 45 ),
+        number_format( $alpha, 2, '.', '' )
+    );
+}
+
+function foldery_atelier_render_content_images( $post_id ) {
+    $images = foldery_atelier_parse_content_images( foldery_atelier_get_meta( $post_id, FOLDERY_ATELIER_CONTENT_IMAGES_META ) );
+    if ( empty( $images ) ) {
+        return '';
+    }
+
+    ob_start();
+    ?>
+    <div class="atelier-content-images" aria-hidden="true">
+        <?php foreach ( $images as $index => $image ) : ?>
+            <?php
+            $attachment_id = absint( $image['id'] );
+            $markup        = wp_get_attachment_image(
+                $attachment_id,
+                'large',
+                false,
+                array(
+                    'class'   => 'atelier-content-image__asset',
+                    'loading' => $index < 2 ? 'eager' : 'lazy',
+                    'alt'     => '',
+                )
+            );
+
+            if ( '' === $markup ) {
+                continue;
+            }
+            ?>
+            <figure class="atelier-content-image atelier-content-image--<?php echo esc_attr( $index + 1 ); ?>" style="<?php echo esc_attr( foldery_atelier_content_image_style( $image ) ); ?>">
+                <?php echo $markup; ?>
+            </figure>
+        <?php endforeach; ?>
+    </div>
+    <?php
+
+    return ob_get_clean();
+}
+
+function foldery_atelier_inject_content_images( $block_content, $block ) {
+    if ( is_admin() || ! function_exists( 'foldery_is_atelier_template' ) || ! foldery_is_atelier_template() ) {
+        return $block_content;
+    }
+
+    $class_name = isset( $block['attrs']['className'] ) ? (string) $block['attrs']['className'] : '';
+    if ( false === strpos( ' ' . $class_name . ' ', ' atelier-board ' ) ) {
+        return $block_content;
+    }
+
+    $post_id = foldery_atelier_current_page_id();
+    if ( ! $post_id ) {
+        return $block_content;
+    }
+
+    $images = foldery_atelier_render_content_images( $post_id );
+    if ( '' === $images ) {
+        return $block_content;
+    }
+
+    return preg_replace_callback(
+        '/(<main\b[^>]*\batelier-board\b[^>]*>)/',
+        function( $matches ) use ( $images ) {
+            return $matches[1] . $images;
+        },
+        $block_content,
+        1
+    );
+}
+add_filter( 'render_block', 'foldery_atelier_inject_content_images', 20, 2 );
+
 function foldery_register_atelier_hero_block() {
     register_block_type(
         'foldery/atelier-hero',
@@ -393,6 +557,15 @@ function foldery_atelier_add_meta_box() {
         'foldery_atelier_hero',
         __( 'Heros atelier', 'foldery' ),
         'foldery_atelier_render_meta_box',
+        'page',
+        'side',
+        'default'
+    );
+
+    add_meta_box(
+        'foldery_atelier_content_images',
+        __( 'Matieres atelier', 'foldery' ),
+        'foldery_atelier_render_content_images_meta_box',
         'page',
         'side',
         'default'
@@ -444,6 +617,65 @@ function foldery_atelier_render_artwork_control( $artwork ) {
             <label class="foldery-atelier-artwork-range">
                 <span><?php esc_html_e( 'Scotch', 'foldery' ); ?> <output><?php echo esc_html( $artwork['tapes'] ); ?></output></span>
                 <input type="range" class="foldery-atelier-artwork-tapes" min="0" max="5" step="1" value="<?php echo esc_attr( $artwork['tapes'] ); ?>">
+            </label>
+        </div>
+    </details>
+    <?php
+
+    return ob_get_clean();
+}
+
+function foldery_atelier_render_content_image_control( $image, $index = 0 ) {
+    $image = foldery_atelier_normalize_content_image( $image, $index );
+    if ( ! $image ) {
+        return '';
+    }
+
+    $attachment_id = absint( $image['id'] );
+    $title         = get_the_title( $attachment_id );
+    $title         = $title ? $title : sprintf( __( 'Image #%d', 'foldery' ), $attachment_id );
+
+    ob_start();
+    ?>
+    <details class="foldery-atelier-decor-item" data-decor-id="<?php echo esc_attr( $attachment_id ); ?>" data-decor-preview="<?php echo esc_url( wp_get_attachment_image_url( $attachment_id, 'large' ) ); ?>">
+        <summary class="foldery-atelier-decor-summary">
+            <span class="foldery-atelier-decor-tools">
+                <span class="foldery-atelier-decor-handle" aria-label="<?php esc_attr_e( 'Reordonner', 'foldery' ); ?>">
+                    <span class="dashicons dashicons-menu" aria-hidden="true"></span>
+                </span>
+                <button type="button" class="button-link foldery-atelier-decor-remove" aria-label="<?php esc_attr_e( 'Retirer cette image', 'foldery' ); ?>">
+                    <span class="dashicons dashicons-trash" aria-hidden="true"></span>
+                </button>
+            </span>
+            <span class="foldery-atelier-decor-thumb">
+                <?php echo foldery_atelier_media_preview( $attachment_id ); ?>
+            </span>
+            <span class="foldery-atelier-decor-title"><?php echo esc_html( $title ); ?></span>
+        </summary>
+        <div class="foldery-atelier-decor-main">
+            <label class="foldery-atelier-decor-range">
+                <span><?php esc_html_e( 'X', 'foldery' ); ?> <output><?php echo esc_html( $image['x'] ); ?>%</output></span>
+                <input type="range" class="foldery-atelier-decor-x" min="0" max="100" step="1" value="<?php echo esc_attr( $image['x'] ); ?>">
+            </label>
+            <label class="foldery-atelier-decor-range">
+                <span><?php esc_html_e( 'Y', 'foldery' ); ?> <output><?php echo esc_html( $image['y'] ); ?>px</output></span>
+                <input type="range" class="foldery-atelier-decor-y" min="0" max="4000" step="10" value="<?php echo esc_attr( $image['y'] ); ?>">
+            </label>
+            <label class="foldery-atelier-decor-range">
+                <span><?php esc_html_e( 'Largeur', 'foldery' ); ?> <output><?php echo esc_html( $image['width'] ); ?>px</output></span>
+                <input type="range" class="foldery-atelier-decor-width" min="60" max="900" step="10" value="<?php echo esc_attr( $image['width'] ); ?>">
+            </label>
+            <label class="foldery-atelier-decor-range">
+                <span><?php esc_html_e( 'Echelle', 'foldery' ); ?> <output><?php echo esc_html( $image['scale'] ); ?>%</output></span>
+                <input type="range" class="foldery-atelier-decor-scale" min="20" max="300" step="5" value="<?php echo esc_attr( $image['scale'] ); ?>">
+            </label>
+            <label class="foldery-atelier-decor-range">
+                <span><?php esc_html_e( 'Rotation', 'foldery' ); ?> <output><?php echo esc_html( $image['rotate'] ); ?>deg</output></span>
+                <input type="range" class="foldery-atelier-decor-rotate" min="-45" max="45" step="1" value="<?php echo esc_attr( $image['rotate'] ); ?>">
+            </label>
+            <label class="foldery-atelier-decor-range">
+                <span><?php esc_html_e( 'Alpha', 'foldery' ); ?> <output><?php echo esc_html( $image['alpha'] ); ?>%</output></span>
+                <input type="range" class="foldery-atelier-decor-alpha" min="0" max="100" step="1" value="<?php echo esc_attr( $image['alpha'] ); ?>">
             </label>
         </div>
     </details>
@@ -517,8 +749,35 @@ function foldery_atelier_render_meta_box( $post ) {
     <?php
 }
 
+function foldery_atelier_render_content_images_meta_box( $post ) {
+    $images = foldery_atelier_parse_content_images( foldery_atelier_get_meta( $post->ID, FOLDERY_ATELIER_CONTENT_IMAGES_META ) );
+
+    wp_nonce_field( 'foldery_atelier_save_content_images_meta', 'foldery_atelier_content_images_nonce' );
+    ?>
+    <div class="foldery-atelier-fields">
+        <div class="foldery-atelier-media-field" data-foldery-media-field="decor">
+            <strong><?php esc_html_e( 'Images dans le contenu', 'foldery' ); ?></strong>
+            <input type="hidden" name="foldery_atelier_content_images" value="<?php echo esc_attr( foldery_atelier_sanitize_content_images_meta( $images ) ); ?>">
+            <div class="foldery-atelier-decor-list" data-foldery-atelier-decor>
+                <?php foreach ( $images as $index => $image ) : ?>
+                    <?php echo foldery_atelier_render_content_image_control( $image, $index ); ?>
+                <?php endforeach; ?>
+            </div>
+            <p class="foldery-atelier-media-actions">
+                <button type="button" class="button foldery-atelier-choose-media" data-title="<?php esc_attr_e( 'Choisir les matieres', 'foldery' ); ?>" data-button="<?php esc_attr_e( 'Utiliser ces images', 'foldery' ); ?>"><?php esc_html_e( 'Choisir les images', 'foldery' ); ?></button>
+                <button type="button" class="button-link-delete foldery-atelier-clear-media"><?php esc_html_e( 'Retirer', 'foldery' ); ?></button>
+            </p>
+            <p class="description"><?php esc_html_e( 'X = largeur du contenu, Y = distance depuis le haut du papier.', 'foldery' ); ?></p>
+        </div>
+    </div>
+    <?php
+}
+
 function foldery_atelier_save_meta( $post_id ) {
-    if ( ! isset( $_POST['foldery_atelier_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['foldery_atelier_nonce'] ) ), 'foldery_atelier_save_meta' ) ) {
+    $has_hero_nonce = isset( $_POST['foldery_atelier_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['foldery_atelier_nonce'] ) ), 'foldery_atelier_save_meta' );
+    $has_decor_nonce = isset( $_POST['foldery_atelier_content_images_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['foldery_atelier_content_images_nonce'] ) ), 'foldery_atelier_save_content_images_meta' );
+
+    if ( ! $has_hero_nonce && ! $has_decor_nonce ) {
         return;
     }
 
@@ -530,28 +789,35 @@ function foldery_atelier_save_meta( $post_id ) {
         return;
     }
 
-    $title = isset( $_POST['foldery_atelier_title'] ) ? sanitize_text_field( wp_unslash( $_POST['foldery_atelier_title'] ) ) : '';
-    update_post_meta( $post_id, FOLDERY_ATELIER_TITLE_META, $title );
+    if ( $has_hero_nonce ) {
+        $title = isset( $_POST['foldery_atelier_title'] ) ? sanitize_text_field( wp_unslash( $_POST['foldery_atelier_title'] ) ) : '';
+        update_post_meta( $post_id, FOLDERY_ATELIER_TITLE_META, $title );
 
-    $subtitle = isset( $_POST['foldery_atelier_subtitle'] ) ? sanitize_textarea_field( wp_unslash( $_POST['foldery_atelier_subtitle'] ) ) : '';
-    update_post_meta( $post_id, FOLDERY_ATELIER_SUBTITLE_META, $subtitle );
+        $subtitle = isset( $_POST['foldery_atelier_subtitle'] ) ? sanitize_textarea_field( wp_unslash( $_POST['foldery_atelier_subtitle'] ) ) : '';
+        update_post_meta( $post_id, FOLDERY_ATELIER_SUBTITLE_META, $subtitle );
 
-    $overlay_defaults = foldery_atelier_default_overlay_settings();
+        $overlay_defaults = foldery_atelier_default_overlay_settings();
 
-    $overlay_color = isset( $_POST['foldery_atelier_overlay_color'] ) ? foldery_atelier_sanitize_overlay_color( wp_unslash( $_POST['foldery_atelier_overlay_color'] ) ) : $overlay_defaults['color'];
-    update_post_meta( $post_id, FOLDERY_ATELIER_OVERLAY_COLOR_META, $overlay_color );
+        $overlay_color = isset( $_POST['foldery_atelier_overlay_color'] ) ? foldery_atelier_sanitize_overlay_color( wp_unslash( $_POST['foldery_atelier_overlay_color'] ) ) : $overlay_defaults['color'];
+        update_post_meta( $post_id, FOLDERY_ATELIER_OVERLAY_COLOR_META, $overlay_color );
 
-    $overlay_opacity = isset( $_POST['foldery_atelier_overlay_opacity'] ) ? foldery_atelier_sanitize_percent_meta( wp_unslash( $_POST['foldery_atelier_overlay_opacity'] ) ) : (string) $overlay_defaults['opacity'];
-    update_post_meta( $post_id, FOLDERY_ATELIER_OVERLAY_OPACITY_META, $overlay_opacity );
+        $overlay_opacity = isset( $_POST['foldery_atelier_overlay_opacity'] ) ? foldery_atelier_sanitize_percent_meta( wp_unslash( $_POST['foldery_atelier_overlay_opacity'] ) ) : (string) $overlay_defaults['opacity'];
+        update_post_meta( $post_id, FOLDERY_ATELIER_OVERLAY_OPACITY_META, $overlay_opacity );
 
-    $vignette = isset( $_POST['foldery_atelier_vignette'] ) ? foldery_atelier_sanitize_percent_meta( wp_unslash( $_POST['foldery_atelier_vignette'] ) ) : (string) $overlay_defaults['vignette'];
-    update_post_meta( $post_id, FOLDERY_ATELIER_VIGNETTE_META, $vignette );
+        $vignette = isset( $_POST['foldery_atelier_vignette'] ) ? foldery_atelier_sanitize_percent_meta( wp_unslash( $_POST['foldery_atelier_vignette'] ) ) : (string) $overlay_defaults['vignette'];
+        update_post_meta( $post_id, FOLDERY_ATELIER_VIGNETTE_META, $vignette );
 
-    $hero_image_id = isset( $_POST['foldery_atelier_hero_image_id'] ) ? absint( $_POST['foldery_atelier_hero_image_id'] ) : 0;
-    update_post_meta( $post_id, FOLDERY_ATELIER_HERO_IMAGE_META, $hero_image_id ? (string) $hero_image_id : '' );
+        $hero_image_id = isset( $_POST['foldery_atelier_hero_image_id'] ) ? absint( $_POST['foldery_atelier_hero_image_id'] ) : 0;
+        update_post_meta( $post_id, FOLDERY_ATELIER_HERO_IMAGE_META, $hero_image_id ? (string) $hero_image_id : '' );
 
-    $artworks = isset( $_POST['foldery_atelier_artwork_ids'] ) ? foldery_atelier_sanitize_artworks_meta( wp_unslash( $_POST['foldery_atelier_artwork_ids'] ) ) : '';
-    update_post_meta( $post_id, FOLDERY_ATELIER_ARTWORKS_META, $artworks );
+        $artworks = isset( $_POST['foldery_atelier_artwork_ids'] ) ? foldery_atelier_sanitize_artworks_meta( wp_unslash( $_POST['foldery_atelier_artwork_ids'] ) ) : '';
+        update_post_meta( $post_id, FOLDERY_ATELIER_ARTWORKS_META, $artworks );
+    }
+
+    if ( $has_decor_nonce ) {
+        $images = isset( $_POST['foldery_atelier_content_images'] ) ? foldery_atelier_sanitize_content_images_meta( wp_unslash( $_POST['foldery_atelier_content_images'] ) ) : '';
+        update_post_meta( $post_id, FOLDERY_ATELIER_CONTENT_IMAGES_META, $images );
+    }
 }
 add_action( 'save_post_page', 'foldery_atelier_save_meta' );
 
@@ -579,6 +845,7 @@ function foldery_atelier_admin_assets( $hook ) {
                 'foldery_atelier_overlay_color' => FOLDERY_ATELIER_OVERLAY_COLOR_META,
                 'foldery_atelier_overlay_opacity' => FOLDERY_ATELIER_OVERLAY_OPACITY_META,
                 'foldery_atelier_vignette'      => FOLDERY_ATELIER_VIGNETTE_META,
+                'foldery_atelier_content_images' => FOLDERY_ATELIER_CONTENT_IMAGES_META,
             ),
         )
     );
