@@ -161,8 +161,16 @@ function foldery_lightbox_enqueue_assets() {
 
     $options = foldery_lightbox_options();
 
+    foreach ( array( 'enabled', 'groupLinks', 'groupByPost', 'groupGallery', 'loop', 'autofit', 'animate', 'titleDefault', 'slideshowAutostart' ) as $key ) {
+        $options[ $key ] = ! empty( $options[ $key ] );
+    }
+
     wp_enqueue_style( 'foldery-lightbox', get_template_directory_uri() . '/assets/css/foldery-lightbox.css', array(), '1.0.0' );
     wp_enqueue_script( 'foldery-lightbox', get_template_directory_uri() . '/assets/js/foldery-lightbox.js', array(), '1.0.0', true );
-    wp_localize_script( 'foldery-lightbox', 'FolderyLightboxOptions', $options );
+    wp_add_inline_script(
+        'foldery-lightbox',
+        'window.FolderyLightboxOptions = ' . wp_json_encode( $options ) . ';',
+        'before'
+    );
 }
 add_action( 'wp_enqueue_scripts', 'foldery_lightbox_enqueue_assets', 20 );
