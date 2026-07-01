@@ -27,9 +27,19 @@ function foldery_header_social_links( $raw = null ) {
     return $links;
 }
 
+function foldery_site_logo_id() {
+    $site_logo_id = get_option( 'site_logo', false );
+
+    if ( false !== $site_logo_id ) {
+        return absint( $site_logo_id );
+    }
+
+    return absint( get_theme_mod( 'custom_logo' ) );
+}
+
 function foldery_header_logo_html() {
-    $custom_logo_id = absint( get_theme_mod( 'custom_logo' ) );
-    $image          = $custom_logo_id ? wp_get_attachment_image( $custom_logo_id, 'medium', false, array( 'class' => 'foldery-paper-header__logo-image' ) ) : '';
+    $logo_id = foldery_site_logo_id();
+    $image   = $logo_id ? wp_get_attachment_image( $logo_id, 'medium', false, array( 'class' => 'foldery-paper-header__logo-image' ) ) : '';
 
     if ( '' === $image ) {
         $fallback = get_template_directory_uri() . '/assets/images/logo.png';

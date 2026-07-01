@@ -250,6 +250,34 @@
     return media && media.source_url ? media.source_url : '';
   }
 
+  function useSiteLogo() {
+    var logo = useSelect(function(select) {
+      var core = select('core');
+      var site = core.getEditedEntityRecord('root', 'site');
+      var logoId = site && Object.prototype.hasOwnProperty.call(site, 'site_logo')
+        ? parseInt(site.site_logo, 10) || 0
+        : parseInt(siteHeaderData.logoId, 10) || 0;
+      var media = logoId
+        ? core.getEntityRecord('postType', 'attachment', logoId, { context: 'view' })
+        : null;
+
+      return {
+        id: logoId,
+        url: mediaImageUrl(media, 'medium') || siteHeaderData.logoUrl || '',
+        canEdit: core.canUser('update', { kind: 'root', name: 'site' })
+      };
+    }, []);
+    var coreDispatch = useDispatch('core');
+
+    logo.setId = function(id) {
+      coreDispatch.editEntityRecord('root', 'site', undefined, {
+        site_logo: id ? parseInt(id, 10) : null
+      });
+    };
+
+    return logo;
+  }
+
   function syncLegacyMetaInput(key, value) {
     var inputName = atelierMetaInputs[key];
     var input = inputName ? document.querySelector('[name="' + inputName + '"]') : null;
@@ -379,8 +407,8 @@
             'aria-label': siteHeaderData.siteName || '',
             onClick: preventDefault
           },
-          siteHeaderData.logoUrl
-            ? el('img', { className: 'foldery-paper-header__logo-image', src: siteHeaderData.logoUrl, alt: siteHeaderData.siteName || '' })
+          props.logoUrl
+            ? el('img', { className: 'foldery-paper-header__logo-image', src: props.logoUrl, alt: siteHeaderData.siteName || '' })
             : null
         ),
         el(
@@ -677,6 +705,7 @@
     },
     edit: function(props) {
       var blockProps = useBlockProps({ className: 'foldery-site-header-editor' });
+      var siteLogo = useSiteLogo();
 
       return el(
         Fragment,
@@ -687,6 +716,49 @@
           el(
             PanelBody,
             { title: __('Contenu du header', 'foldery'), initialOpen: true },
+            el(
+              'div',
+              { className: 'foldery-site-header-logo-control' },
+              el('strong', null, __('Logo du site', 'foldery')),
+              siteLogo.url
+                ? el('img', {
+                    src: siteLogo.url,
+                    alt: '',
+                    style: { display: 'block', maxHeight: '90px', maxWidth: '100%', margin: '12px 0' }
+                  })
+                : null,
+              siteLogo.canEdit !== false
+                ? el(
+                    MediaUploadCheck,
+                    null,
+                    el(MediaUpload, {
+                      allowedTypes: ['image'],
+                      multiple: false,
+                      value: siteLogo.id || 0,
+                      onSelect: function(media) {
+                        if (media && media.id) {
+                          siteLogo.setId(media.id);
+                        }
+                      },
+                      render: function(renderProps) {
+                        return el(Button, {
+                          variant: 'secondary',
+                          onClick: renderProps.open
+                        }, siteLogo.id ? __('Remplacer le logo', 'foldery') : __('Choisir le logo', 'foldery'));
+                      }
+                    })
+                  )
+                : null,
+              siteLogo.id
+                ? el(Button, {
+                    variant: 'tertiary',
+                    isDestructive: true,
+                    onClick: function() {
+                      siteLogo.setId(null);
+                    }
+                  }, __('Retirer le logo', 'foldery'))
+                : null
+            ),
             el(TextControl, {
               label: __('Nom de l artiste', 'foldery'),
               value: siteHeaderValue(props.attributes, 'artistName', 'artist_name'),
@@ -780,7 +852,8 @@
           'div',
           blockProps,
           el(SiteHeaderPreview, {
-            attributes: props.attributes
+            attributes: props.attributes,
+            logoUrl: siteLogo.url
           })
         )
       );
