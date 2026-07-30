@@ -279,33 +279,92 @@
 @media screen and (max-width: 480px) {
   .foldery-lightbox__layout {
     inset: 0;
-    max-height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: none;
+    padding:
+      max(10px, env(safe-area-inset-top))
+      10px
+      max(10px, env(safe-area-inset-bottom));
+    overflow: auto;
   }
 
   .foldery-lightbox__container {
-    min-width: 320px;
-    width: 100%;
-    min-height: 100vh;
+    display: block;
+    min-width: 0;
+    width: fit-content;
+    min-height: 0;
     max-width: 100%;
-    margin: 0;
-    padding: 5px;
-    border-radius: 0;
-    box-shadow: none;
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+    margin: auto;
+    padding: 8px;
+    border-radius: 4px;
+    box-shadow: 0 18px 52px rgba(0, 0, 0, 0.46);
   }
 
   .foldery-lightbox__controls {
-    top: 3px;
-    right: 3px;
+    top: 10px;
+    right: 10px;
+    width: auto;
+  }
+
+  .foldery-lightbox__slideshow {
+    display: none;
+  }
+
+  .foldery-lightbox__close {
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.96) !important;
+    border: 2px solid #211b17;
+    border-radius: 50%;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.42) !important;
+    opacity: 1;
+  }
+
+  .foldery-lightbox__close:hover,
+  .foldery-lightbox__close:focus,
+  .foldery-lightbox__close:active {
+    background: #fff !important;
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.5) !important;
+    outline: 3px solid rgba(255, 255, 255, 0.72);
+    outline-offset: 2px;
+    opacity: 1;
+  }
+
+  .foldery-lightbox__close::before,
+  .foldery-lightbox__close::after {
+    top: 19px;
+    right: 8px;
+    width: 24px;
+    height: 3px;
+    background: #211b17;
+    border-radius: 3px;
   }
 
   .foldery-lightbox__image,
   .foldery-lightbox--autofit .foldery-lightbox__image {
-    max-width: calc(100vw - 10px);
-    max-height: calc(100vh - 90px);
+    max-width: calc(100vw - 36px);
+    max-height: calc(100vh - 122px);
+    max-height: calc(100dvh - 122px);
   }
 
   .foldery-lightbox__nav {
     top: 17%;
     height: 79%;
+  }
+
+  .foldery-lightbox__details {
+    padding: 9px 3px 2px;
+  }
+
+  .foldery-lightbox__title,
+  .foldery-lightbox__status {
+    font-size: 14px;
   }
 }
