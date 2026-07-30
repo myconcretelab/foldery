@@ -4,7 +4,7 @@
  */
 
 if ( ! defined( 'FOLDERY_VERSION' ) ) {
-    define( 'FOLDERY_VERSION', '3.0.73' );
+    define( 'FOLDERY_VERSION', '3.0.74' );
 }
 
 if ( ! isset( $content_width ) ) {

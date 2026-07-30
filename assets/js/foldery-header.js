@@ -26,7 +26,6 @@
 
   function createMobileDrawer(header, menu, index) {
     var drawer = document.createElement('aside');
-    var title = document.createElement('p');
     var mobileMenu = menu.cloneNode(true);
     var headerColumns = header.querySelectorAll(
       '.foldery-paper-header__column--artist, .foldery-paper-header__column--contact'
@@ -38,12 +37,8 @@
     drawer.setAttribute('aria-label', 'Navigation');
     drawer.setAttribute('inert', '');
 
-    title.className = 'foldery-mobile-drawer__title';
-    title.textContent = 'Navigation';
-
     mobileMenu.classList.add('foldery-paper-header__menu--mobile');
     mobileMenu.removeAttribute('id');
-    drawer.appendChild(title);
     drawer.appendChild(mobileMenu);
 
     if (headerColumns.length) {

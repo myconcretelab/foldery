@@ -510,9 +510,10 @@ body.admin-bar .foldery-paper-header {
     bottom: 0;
     z-index: 85;
     box-sizing: border-box;
-    display: block;
+    display: flex;
+    flex-direction: column;
     width: var(--foldery-mobile-drawer-width);
-    padding: calc(78px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom));
+    padding: calc(34px + env(safe-area-inset-top)) 22px calc(28px + env(safe-area-inset-bottom));
     overflow-x: hidden;
     overflow-y: auto;
     color: #211b17;
@@ -531,7 +532,7 @@ body.admin-bar .foldery-paper-header {
 
   body.admin-bar .foldery-mobile-drawer {
     top: 46px;
-    padding-top: 54px;
+    padding-top: 34px;
   }
 
   .foldery-mobile-drawer.is-open {
@@ -540,17 +541,9 @@ body.admin-bar .foldery-paper-header {
     transform: translate3d(0, 0, 0);
   }
 
-  .foldery-mobile-drawer__title {
-    margin: 0 0 28px;
-    color: rgba(255, 250, 240, 0.78);
-    font-family: "proxima_nova_ltsemibold", Arial, sans-serif;
-    font-size: 12px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-  }
-
   .foldery-mobile-drawer .foldery-paper-header__menu {
     display: block;
+    flex: 0 0 auto;
     width: 100%;
     margin: 0;
   }
@@ -619,8 +612,10 @@ body.admin-bar .foldery-paper-header {
 
   .foldery-mobile-drawer__info {
     display: grid;
+    flex: 0 0 auto;
     gap: 16px;
-    margin-top: 42px;
+    margin-top: auto;
+    padding-top: 42px;
   }
 
   .foldery-mobile-drawer__info-card {
