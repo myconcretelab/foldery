@@ -1702,8 +1702,8 @@ body.admin-bar .atelier-global-header {
 
   .atelier-page .foldery-explorer-stack--home {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 34px 22px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 42px;
     min-height: 0;
     padding-top: 6px;
   }
@@ -1714,31 +1714,31 @@ body.admin-bar .atelier-global-header {
     left: auto !important;
     right: auto !important;
     top: auto !important;
-    grid-column: span 3;
-    width: auto;
+    grid-column: 1 / -1;
+    width: 100%;
     transform: none;
     margin-top: 0;
   }
 
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 {
-    grid-column: span 6;
+    grid-column: 1 / -1;
   }
 
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2,
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 {
-    margin-top: 18px;
+    margin-top: 0;
   }
 
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 {
-    grid-column: 4 / span 3;
-    margin-top: -10px;
+    grid-column: 1 / -1;
+    margin-top: 0;
   }
 
   .atelier-page .foldery-explorer-stack--home .img-area,
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 .img-area,
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .img-area,
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 .img-area {
-    width: min(100%, 178px) !important;
+    width: min(100%, 330px) !important;
   }
 
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .img-area {
@@ -1747,22 +1747,18 @@ body.admin-bar .atelier-global-header {
 
   .atelier-page .foldery-explorer-flow {
     min-height: 0;
-    padding: 18px 30px 42px;
+    width: 100%;
+    max-width: 380px;
+    margin: 0 auto;
+    padding: 18px 24px 48px;
   }
 
   .atelier-page .foldery-explorer-flow-main.img-area,
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .foldery-explorer-flow-main.img-area,
-  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .foldery-explorer-flow-main.img-area {
-    width: min(100%, 280px) !important;
-  }
-
-  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--1 .foldery-explorer-flow-main.img-area {
-    width: min(100%, 330px) !important;
-  }
-
+  .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--3 .foldery-explorer-flow-main.img-area,
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--2 .foldery-explorer-flow-main.img-area,
   .atelier-page .foldery-explorer-stack--home .foldery-explorer-item--4 .foldery-explorer-flow-main.img-area {
-    width: min(100%, 250px) !important;
+    width: min(100%, 330px) !important;
   }
 
   .atelier-page .foldery-explorer-flow-thumb {
