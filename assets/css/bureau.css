@@ -2046,26 +2046,28 @@ body.admin-bar .atelier-global-header {
 
   .atelier-page .foldery-masonry {
     box-sizing: border-box;
+    width: 80vw !important;
     max-width: 100%;
     margin-right: auto;
     margin-left: auto;
   }
 
-  .atelier-page .foldery-masonry .grid-item.img-lg {
+  .atelier-page .foldery-masonry .grid-item {
     box-sizing: border-box;
+    width: 100% !important;
     max-width: 100%;
     margin-right: auto;
     margin-left: auto;
   }
 
-  .atelier-page .foldery-masonry .grid-item.img-lg a,
-  .atelier-page .foldery-masonry .grid-item.img-lg img {
+  .atelier-page .foldery-masonry .grid-item a,
+  .atelier-page .foldery-masonry .grid-item img {
     display: block;
     width: 100%;
     max-width: 100%;
   }
 
-  .atelier-page .foldery-masonry .grid-item.img-lg img {
+  .atelier-page .foldery-masonry .grid-item img {
     height: auto;
     object-fit: contain;
     object-position: center;
