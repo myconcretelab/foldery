@@ -2006,7 +2006,7 @@ body.admin-bar .atelier-global-header {
   }
 
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .foldery-explorer-item {
-    --foldery-category-image-width: 178px;
+    --foldery-category-image-width: min(88vw, 300px);
     grid-column: span 3;
     margin-top: 0;
     transform: none;
@@ -2015,17 +2015,17 @@ body.admin-bar .atelier-global-header {
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .foldery-explorer-item.is-landscape,
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .foldery-explorer-item.is-panorama {
     grid-column: span 6;
-    --foldery-category-image-width: 330px;
+    --foldery-category-image-width: min(94vw, 380px);
   }
 
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .is-landscape .img-area,
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .is-panorama .img-area {
-    width: min(100%, 330px) !important;
+    width: min(100%, 380px) !important;
   }
 
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .is-balanced .img-area,
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .is-portrait .img-area {
-    width: min(100%, 178px) !important;
+    width: min(100%, 300px) !important;
   }
 
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack--category[data-masonry] {
