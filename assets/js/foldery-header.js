@@ -26,6 +26,7 @@
 
   function createMobileDrawer(header, menu, index) {
     var drawer = document.createElement('aside');
+    var closeButton = document.createElement('button');
     var mobileMenu = menu.cloneNode(true);
     var headerColumns = header.querySelectorAll(
       '.foldery-paper-header__column--artist, .foldery-paper-header__column--contact'
@@ -37,8 +38,13 @@
     drawer.setAttribute('aria-label', 'Navigation');
     drawer.setAttribute('inert', '');
 
+    closeButton.className = 'foldery-mobile-drawer__close';
+    closeButton.type = 'button';
+    closeButton.setAttribute('aria-label', 'Fermer le menu');
+
     mobileMenu.classList.add('foldery-paper-header__menu--mobile');
     mobileMenu.removeAttribute('id');
+    drawer.appendChild(closeButton);
     drawer.appendChild(mobileMenu);
 
     if (headerColumns.length) {
@@ -68,6 +74,7 @@
     }
 
     var drawer = createMobileDrawer(header, menu, index);
+    var drawerClose = drawer.querySelector('.foldery-mobile-drawer__close');
     var label = toggle.querySelector('.screen-reader-text');
     var isOpen = false;
 
@@ -93,9 +100,8 @@
 
       if (open) {
         window.requestAnimationFrame(function () {
-          var firstLink = drawer.querySelector('a');
-          if (firstLink) {
-            firstLink.focus({ preventScroll: true });
+          if (drawerClose) {
+            drawerClose.focus({ preventScroll: true });
           }
         });
       } else if (returnFocus) {
@@ -109,6 +115,12 @@
       }
       setOpen(!isOpen, false);
     });
+
+    if (drawerClose) {
+      drawerClose.addEventListener('click', function () {
+        setOpen(false, true);
+      });
+    }
 
     drawer.addEventListener('click', function (event) {
       if (event.target.closest('a')) {
