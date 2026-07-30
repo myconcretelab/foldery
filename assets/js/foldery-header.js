@@ -28,6 +28,9 @@
     var drawer = document.createElement('aside');
     var title = document.createElement('p');
     var mobileMenu = menu.cloneNode(true);
+    var headerColumns = header.querySelectorAll(
+      '.foldery-paper-header__column--artist, .foldery-paper-header__column--contact'
+    );
 
     drawer.id = drawerId(index);
     drawer.className = 'foldery-mobile-drawer';
@@ -42,6 +45,20 @@
     mobileMenu.removeAttribute('id');
     drawer.appendChild(title);
     drawer.appendChild(mobileMenu);
+
+    if (headerColumns.length) {
+      var info = document.createElement('div');
+      info.className = 'foldery-mobile-drawer__info';
+
+      headerColumns.forEach(function (column) {
+        var card = column.cloneNode(true);
+        card.classList.add('foldery-mobile-drawer__info-card');
+        info.appendChild(card);
+      });
+
+      drawer.appendChild(info);
+    }
+
     document.body.appendChild(drawer);
 
     return drawer;

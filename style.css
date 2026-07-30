@@ -617,6 +617,38 @@ body.admin-bar .foldery-paper-header {
     transform: none;
   }
 
+  .foldery-mobile-drawer__info {
+    display: grid;
+    gap: 16px;
+    margin-top: 42px;
+  }
+
+  .foldery-mobile-drawer__info-card {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 18px 16px 16px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(59, 43, 29, 0.12);
+    box-shadow: 0 12px 22px rgba(24, 14, 8, 0.3);
+  }
+
+  .foldery-mobile-drawer__info-card h2 {
+    font-size: 17px;
+    line-height: 1.1;
+  }
+
+  .foldery-mobile-drawer__info-card p {
+    margin-top: 10px;
+  }
+
+  .foldery-mobile-drawer__info-card p,
+  .foldery-mobile-drawer__info-card a,
+  .foldery-mobile-drawer__info-card span {
+    font-size: 14px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
   .foldery-site-header {
     align-items: flex-start;
   }
