@@ -11,7 +11,6 @@
 
 - Respecter les modifications locales existantes et ne pas inclure de fichiers sans rapport avec la demande.
 - Apres une modification de CSS, JavaScript ou PHP chargee par WordPress, incrementer legerement `FOLDERY_VERSION` dans `functions.php` pour invalider le cache.
-- Pour les changements d'interface, verifier au minimum les largeurs 360 px, 390 px, 768 px et 1440 px lorsque l'environnement local est disponible.
 - Executer les controles pertinents avant livraison :
   - `php -l` sur les fichiers PHP modifies ;
   - `node --check` sur les fichiers JavaScript modifies ;
