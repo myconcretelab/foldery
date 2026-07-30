@@ -2012,6 +2012,12 @@ body.admin-bar .atelier-global-header {
     transform: none;
   }
 
+  .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .stack-link h5 {
+    padding: 9px 16px 8px;
+    font-size: clamp(15px, 4.2vw, 18px);
+    line-height: 1.15;
+  }
+
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .foldery-explorer-item.is-landscape,
   .atelier-page .foldery-explorer-folder .foldery-explorer-stack:not(.foldery-explorer-stack--home) .foldery-explorer-item.is-panorama {
     grid-column: span 6;
