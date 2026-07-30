@@ -2123,19 +2123,20 @@ body.admin-bar .atelier-global-header {
 
 @media (max-width: 600px) {
   .atelier-global-header {
-    position: relative;
-  }
-
-  body.admin-bar .atelier-global-header {
+    position: fixed;
     top: 0;
   }
 
+  body.admin-bar .atelier-global-header {
+    top: 46px;
+  }
+
   .atelier-hero {
-    --atelier-artwork-size: clamp(112px, min(36vw, 20svh), 168px);
-    --atelier-artwork-image-max: clamp(145px, min(44vw, 26svh), 218px);
-    --atelier-hero-inner-height: min(76svh, 560px);
-    height: calc(100svh + var(--atelier-hero-end-overlay));
-    min-height: 680px;
+    --atelier-artwork-size: clamp(116px, 37vw, 164px);
+    --atelier-artwork-image-max: clamp(150px, 48vw, 220px);
+    --atelier-hero-inner-height: calc(100% - var(--atelier-hero-end-overlay));
+    height: max(100svh, 760px);
+    min-height: 760px;
     margin-top: 0;
     background-position: center top;
   }
@@ -2145,17 +2146,69 @@ body.admin-bar .atelier-global-header {
     height: var(--atelier-hero-inner-height);
   }
 
+  .atelier-hero__copy {
+    left: 20px;
+    right: 20px;
+    top: 172px;
+    width: auto;
+    text-align: center;
+  }
+
   .atelier-hero__copy h1 {
-    font-size: clamp(27px, 9vw, 45px);
+    font-size: clamp(29px, 9vw, 42px);
+    line-height: 0.98;
   }
 
   .atelier-hero__copy p {
     max-width: min(330px, 100%);
+    margin-top: 12px;
     padding: 7px 12px 6px;
   }
 
   .atelier-hero__artworks {
-    top: 286px;
+    top: 0;
+  }
+
+  .atelier-hero-artwork {
+    padding: 7px;
+  }
+
+  .atelier-hero-artwork--1 {
+    left: -18px;
+    top: 305px;
+    z-index: 2;
+    --atelier-artwork-rotate: -5deg;
+  }
+
+  .atelier-hero-artwork--2 {
+    left: auto;
+    right: -16px;
+    top: 376px;
+    z-index: 3;
+    --atelier-artwork-rotate: 6deg;
+  }
+
+  .atelier-hero-artwork--3 {
+    left: 18px;
+    bottom: 34px;
+    z-index: 4;
+    --atelier-artwork-rotate: 3deg;
+  }
+
+  .atelier-hero-artwork--4 {
+    right: 8px;
+    left: auto;
+    top: auto;
+    bottom: 4px;
+    z-index: 5;
+    display: block;
+    --atelier-artwork-scale: 0.88;
+    --atelier-artwork-rotate: -5deg;
+  }
+
+  .atelier-hero-artwork--5,
+  .atelier-hero-artwork--6 {
+    display: none;
   }
 
   .atelier-paper-zone {

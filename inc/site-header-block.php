@@ -135,6 +135,16 @@ function foldery_render_site_header_block( $attributes ) {
     <header class="<?php echo esc_attr( $classes ); ?>" data-foldery-paper-header>
         <div class="foldery-paper-header__paper">
             <?php echo foldery_header_logo_html(); ?>
+            <?php if ( $menu ) : ?>
+                <button class="foldery-paper-header__toggle" type="button" aria-expanded="false">
+                    <span class="screen-reader-text"><?php esc_html_e( 'Ouvrir le menu', 'foldery' ); ?></span>
+                    <span class="foldery-paper-header__toggle-lines" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </span>
+                </button>
+            <?php endif; ?>
             <div class="foldery-paper-header__content">
                 <section class="foldery-paper-header__column foldery-paper-header__column--artist" aria-label="<?php esc_attr_e( 'Artiste', 'foldery' ); ?>">
                     <?php if ( $artist_name ) : ?>
