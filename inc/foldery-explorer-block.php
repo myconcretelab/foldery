@@ -241,6 +241,55 @@ function foldery_explorer_attachment_ids_from_folder( $folder ) {
     return $ids;
 }
 
+function foldery_explorer_home_image_ids( $folder, $limit = 4 ) {
+    $folder_ids = foldery_explorer_attachment_ids_from_folder( $folder );
+    $limit      = max( 1, (int) $limit );
+    if ( ! count( $folder_ids ) ) {
+        return array();
+    }
+
+    $selected_ids     = array( (int) $folder_ids[0] );
+    $has_child_images = false;
+
+    foreach ( $folder->getChildren() as $child ) {
+        if ( ! foldery_is_media_folder( $child ) ) {
+            continue;
+        }
+
+        $child_ids = $child->read();
+        if ( ! count( $child_ids ) ) {
+            continue;
+        }
+
+        $has_child_images = true;
+        $candidate_id     = (int) $child_ids[0];
+        if ( $candidate_id && ! in_array( $candidate_id, $selected_ids, true ) ) {
+            $selected_ids[] = $candidate_id;
+        }
+
+        if ( count( $selected_ids ) >= $limit ) {
+            break;
+        }
+    }
+
+    if ( $has_child_images ) {
+        return array_slice( $selected_ids, 0, $limit );
+    }
+
+    foreach ( array_slice( $folder_ids, 1 ) as $candidate_id ) {
+        $candidate_id = (int) $candidate_id;
+        if ( $candidate_id && ! in_array( $candidate_id, $selected_ids, true ) ) {
+            $selected_ids[] = $candidate_id;
+        }
+
+        if ( count( $selected_ids ) >= $limit ) {
+            break;
+        }
+    }
+
+    return $selected_ids;
+}
+
 function foldery_explorer_attachment_field( $key, $post_id = null, $format_value = true ) {
     if ( function_exists( 'get_field' ) ) {
         return get_field( $key, $post_id, $format_value );
@@ -402,7 +451,9 @@ function foldery_explorer_render_stack( $folders, $variant = '' ) {
 
     $index   = 0;
     foreach ( $folders as $folder ) {
-        $folder_ids = foldery_explorer_attachment_ids_from_folder( $folder );
+        $folder_ids = 'home' === $variant
+            ? foldery_explorer_home_image_ids( $folder )
+            : foldery_explorer_attachment_ids_from_folder( $folder );
         $image_id   = count( $folder_ids ) ? (int) $folder_ids[0] : 0;
         if ( ! $image_id ) {
             continue;
