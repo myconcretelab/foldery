@@ -233,8 +233,9 @@ function foldery_explorer_attachment_ids_from_folder( $folder ) {
     }
 
     foreach ( $folder->getChildren() as $child ) {
-        if ( $child->getCnt() ) {
-            $ids = array_merge( $ids, $child->read() );
+        $child_ids = foldery_explorer_attachment_ids_from_folder( $child );
+        if ( count( $child_ids ) ) {
+            $ids = array_merge( $ids, $child_ids );
         }
     }
 
@@ -256,7 +257,7 @@ function foldery_explorer_home_image_ids( $folder, $limit = 4 ) {
             continue;
         }
 
-        $child_ids = $child->read();
+        $child_ids = foldery_explorer_attachment_ids_from_folder( $child );
         if ( ! count( $child_ids ) ) {
             continue;
         }
