@@ -504,7 +504,6 @@
 				return;
 			}
 			$('.foldery-media-message').text(labels('orderSaved'));
-			refreshMedia();
 		});
 	}
 
