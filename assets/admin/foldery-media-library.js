@@ -3,7 +3,7 @@
 
 	var config = window.folderyMediaLibrary || {};
 	var selectedFolder = parseInt(config.tree && config.tree.selected, 10) || 0;
-	var draggedAttachmentId = null;
+	var draggedAttachmentIds = [];
 	var isSorting = false;
 	var isFolderSorting = false;
 	var pageChooserOpen = false;
@@ -328,22 +328,32 @@
 
 	function selectedAttachmentIds() {
 		var ids = [];
+		function addId(value) {
+			var id = parseInt(value, 10);
+			if (id && ids.indexOf(id) === -1) {
+				ids.push(id);
+			}
+		}
 		var browser = mediaBrowser();
 		if (browser && browser.controller && browser.controller.state) {
 			var selection = browser.controller.state().get('selection');
 			if (selection && selection.length) {
-				ids = selection.pluck('id');
+				selection.pluck('id').forEach(addId);
 			}
 		}
-		if (!ids.length) {
-			$('.attachments .attachment.selected, .attachments .attachment[aria-checked="true"]').each(function () {
-				var id = parseInt($(this).attr('data-id'), 10);
-				if (id) {
-					ids.push(id);
-				}
-			});
+		$('.attachments .attachment.selected, .attachments .attachment[aria-checked="true"]').each(function () {
+			addId($(this).attr('data-id'));
+		});
+		return ids;
+	}
+
+	function attachmentIdsForMove(attachmentId) {
+		var id = parseInt(attachmentId, 10);
+		var selectedIds = selectedAttachmentIds();
+		if (!id) {
+			return [];
 		}
-		return ids.filter(Boolean);
+		return selectedIds.indexOf(id) === -1 ? [id] : selectedIds;
 	}
 
 	function currentFolderName() {
@@ -603,14 +613,16 @@
 		}
 	}
 
-	function moveAttachmentToFolder(attachmentId, folderId) {
-		attachmentId = parseInt(attachmentId, 10);
+	function moveAttachmentsToFolder(attachmentIds, folderId) {
+		attachmentIds = (attachmentIds || []).map(function (attachmentId) {
+			return parseInt(attachmentId, 10);
+		}).filter(Boolean);
 		folderId = parseInt(folderId, 10);
-		if (!attachmentId || folderId === 0) {
+		if (!attachmentIds.length || folderId === 0) {
 			return;
 		}
 		setFolder(folderId, false);
-		request('move', { to: folderId, ids: [attachmentId] }).done(refreshMedia);
+		request('move', { to: folderId, ids: attachmentIds }).done(refreshMedia);
 	}
 
 	function destroyAttachmentMoving() {
@@ -648,7 +660,8 @@
 				tolerance: 'pointer',
 				drop: function (event, ui) {
 					event.preventDefault();
-					moveAttachmentToFolder(ui.draggable.attr('data-id'), folderId);
+					var ids = draggedAttachmentIds.length ? draggedAttachmentIds : attachmentIdsForMove(ui.draggable.attr('data-id'));
+					moveAttachmentsToFolder(ids, folderId);
 				}
 			});
 		});
@@ -683,11 +696,11 @@
 				revert: 'invalid',
 				zIndex: 100000,
 				start: function () {
-					draggedAttachmentId = parseInt($(this).attr('data-id'), 10) || null;
+					draggedAttachmentIds = attachmentIdsForMove($(this).attr('data-id'));
 					setAttachmentMovingActive(true);
 				},
 				stop: function () {
-					draggedAttachmentId = null;
+					draggedAttachmentIds = [];
 					setAttachmentMovingActive(false);
 				}
 			});
@@ -929,11 +942,15 @@
 				event.preventDefault();
 				return;
 			}
-			draggedAttachmentId = parseInt($(this).attr('data-id'), 10);
-			if (event.originalEvent && event.originalEvent.dataTransfer && draggedAttachmentId) {
-				event.originalEvent.dataTransfer.setData('text/plain', String(draggedAttachmentId));
+			draggedAttachmentIds = attachmentIdsForMove($(this).attr('data-id'));
+			if (event.originalEvent && event.originalEvent.dataTransfer && draggedAttachmentIds.length) {
+				event.originalEvent.dataTransfer.setData('text/plain', String(draggedAttachmentIds[0]));
 				event.originalEvent.dataTransfer.effectAllowed = 'move';
 			}
+		});
+
+		$(document).on('dragend', '.attachments .attachment', function () {
+			draggedAttachmentIds = [];
 		});
 
 		$(document).on('dragover', '.foldery-media-folder', function (event) {
@@ -950,12 +967,11 @@
 		$(document).on('drop', '.foldery-media-folder', function (event) {
 			event.preventDefault();
 			var to = parseInt($(this).attr('data-folder-id'), 10);
-			var id = draggedAttachmentId;
-			if (to === 0 || !id) {
+			if (to === 0 || !draggedAttachmentIds.length) {
 				return;
 			}
-			setFolder(to, false);
-			request('move', { to: to, ids: [id] }).done(refreshMedia);
+			moveAttachmentsToFolder(draggedAttachmentIds, to);
+			draggedAttachmentIds = [];
 		});
 
 		if (wp && wp.media && wp.media.frame) {
