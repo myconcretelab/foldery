@@ -746,13 +746,18 @@
 		}
 
 		$attachments.sortable({
+			forceHelperSize: true,
+			forcePlaceholderSize: true,
+			helper: 'clone',
 			items: '.attachment',
 			placeholder: 'foldery-media-sort-placeholder',
 			tolerance: 'pointer',
 			start: function (event, ui) {
 				setSortingActive(true);
-				ui.placeholder.width(ui.item.outerWidth());
-				ui.placeholder.height(ui.item.outerHeight());
+				var itemWidth = ui.helper.outerWidth();
+				var itemHeight = ui.helper.outerHeight();
+				ui.helper.css({ height: itemHeight, width: itemWidth });
+				ui.placeholder.css({ height: itemHeight, width: itemWidth });
 			},
 			stop: function () {
 				window.setTimeout(function () {

@@ -353,7 +353,10 @@ body.foldery-media-is-moving .uploader-window {
 	background: #f0f6fc;
 	border: 2px dashed #2271b1;
 	box-sizing: border-box;
-	margin: 8px;
+	float: left;
+	list-style: none;
+	margin: 0;
+	position: relative;
 }
 
 .foldery-media-folder-list {
