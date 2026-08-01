@@ -613,6 +613,23 @@
 		}
 	}
 
+	function exitBulkSelectionMode() {
+		var frame = wp && wp.media ? wp.media.frame : null;
+		if (!frame || typeof frame.isModeActive !== 'function' || !frame.isModeActive('select')) {
+			return;
+		}
+		frame.deactivateMode('select').activateMode('edit');
+	}
+
+	function completeAttachmentMove(response) {
+		if (!response || !response.success) {
+			return;
+		}
+		exitBulkSelectionMode();
+		$('.foldery-media-message').text(labels('moved'));
+		refreshMedia();
+	}
+
 	function moveAttachmentsToFolder(attachmentIds, folderId) {
 		attachmentIds = (attachmentIds || []).map(function (attachmentId) {
 			return parseInt(attachmentId, 10);
@@ -621,8 +638,7 @@
 		if (!attachmentIds.length || folderId === 0) {
 			return;
 		}
-		setFolder(folderId, false);
-		request('move', { to: folderId, ids: attachmentIds }).done(refreshMedia);
+		request('move', { to: folderId, ids: attachmentIds }).done(completeAttachmentMove);
 	}
 
 	function destroyAttachmentMoving() {
@@ -871,10 +887,7 @@
 				window.alert(labels('selectFiles'));
 				return;
 			}
-			request('move', { to: selectedFolder, ids: ids }).done(function () {
-				$('.foldery-media-message').text(labels('moved'));
-				refreshMedia();
-			});
+			request('move', { to: selectedFolder, ids: ids }).done(completeAttachmentMove);
 		});
 
 		$(document).on('click', '.foldery-media-save-page-link', function () {
