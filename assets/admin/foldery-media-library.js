@@ -289,8 +289,16 @@
 	function refreshMedia() {
 		var browser = mediaBrowser();
 		if (browser && browser.collection && browser.collection.props) {
-			browser.collection.props.set({ foldery_media_folder: selectedFolder });
+			browser.collection.props.set({
+				foldery_media_folder: selectedFolder,
+				order: canReorder() ? 'ASC' : 'DESC',
+				orderby: canReorder() ? 'post__in' : 'date'
+			});
 			browser.collection.props.unset('paged');
+			if (browser.collection.mirroring) {
+				browser.collection.mirroring.reset();
+				browser.collection.mirroring._hasMore = true;
+			}
 			browser.collection.reset();
 			browser.collection.more();
 			syncUploader();
@@ -475,24 +483,28 @@
 		return selectedFolder > 0 && selectedFolder !== parseInt(config.rootId, 10);
 	}
 
-	function visibleAttachmentIds() {
+	function visibleAttachmentIds($attachments) {
 		var ids = [];
-		$('.attachments .attachment').each(function () {
+		$attachments.children('.attachment').each(function () {
 			var id = parseInt($(this).attr('data-id'), 10);
-			if (id) {
+			if (id && ids.indexOf(id) === -1) {
 				ids.push(id);
 			}
 		});
 		return ids;
 	}
 
-	function saveAttachmentOrder() {
-		var ids = visibleAttachmentIds();
+	function saveAttachmentOrder(event) {
+		var ids = visibleAttachmentIds($(event.currentTarget));
 		if (!canReorder() || ids.length < 2) {
 			return;
 		}
-		request('reorder', { id: selectedFolder, ids: ids }).done(function () {
+		request('reorder', { id: selectedFolder, ids: ids }).done(function (response) {
+			if (!response || !response.success) {
+				return;
+			}
 			$('.foldery-media-message').text(labels('orderSaved'));
+			refreshMedia();
 		});
 	}
 

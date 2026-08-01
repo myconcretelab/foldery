@@ -405,8 +405,9 @@ function foldery_media_reorder_attachments( $fid, $ids ) {
 	$ordered = array_merge( $ordered, array_values( array_diff( $current, $ordered ) ) );
 
 	$table_posts = foldery_media_table_name( 'posts' );
+	$wpdb->query( 'START TRANSACTION' );
 	foreach ( $ordered as $index => $attachment_id ) {
-		$wpdb->update(
+		$updated = $wpdb->update(
 			$table_posts,
 			array( 'nr' => $index + 1 ),
 			array(
@@ -417,7 +418,18 @@ function foldery_media_reorder_attachments( $fid, $ids ) {
 			array( '%d' ),
 			array( '%d', '%d', '%d' )
 		);
+		if ( false === $updated ) {
+			$wpdb->query( 'ROLLBACK' );
+			return array( __( 'Media order could not be saved.', 'foldery' ) );
+		}
 	}
+
+	$persisted = array_values( array_map( 'intval', foldery_media_get_attachments( $fid, 'ASC', 'folder_order' ) ) );
+	if ( $ordered !== $persisted ) {
+		$wpdb->query( 'ROLLBACK' );
+		return array( __( 'Media order could not be verified.', 'foldery' ) );
+	}
+	$wpdb->query( 'COMMIT' );
 
 	return true;
 }
