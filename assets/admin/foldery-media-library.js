@@ -494,8 +494,8 @@
 		return ids;
 	}
 
-	function saveAttachmentOrder(event) {
-		var ids = visibleAttachmentIds($(event.currentTarget));
+	function saveAttachmentOrder($attachments) {
+		var ids = visibleAttachmentIds($attachments);
 		if (!canReorder() || ids.length < 2) {
 			return;
 		}
@@ -772,11 +772,12 @@
 				ui.placeholder.css({ height: itemHeight, width: itemWidth });
 			},
 			stop: function () {
+				var $list = $(this);
 				window.setTimeout(function () {
 					setSortingActive(false);
+					saveAttachmentOrder($list);
 				}, 0);
-			},
-			update: saveAttachmentOrder
+			}
 		});
 	}
 
